@@ -155,7 +155,8 @@ const Explore = ({ initialTab }: { initialTab?: ExploreTab }) => {
   return (
     <Trace page={InterfacePageName.EXPLORE_PAGE} properties={{ chainName: chain }} shouldLogImpression>
       <ExploreContainer>
-        <ExploreChartsSection />
+        {/* FIXME: 修改chart 模块 */}
+        {/* <ExploreChartsSection /> */}
         <NavWrapper ref={tabNavRef}>
           <TabBar data-testid="explore-navbar">
             {Pages.map(({ title, loggingElementName, key }, index) => {
