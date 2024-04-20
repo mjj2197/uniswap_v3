@@ -68,11 +68,8 @@ export function getDeprecatedInjection(isDarkMode?: boolean): ProviderInfo | und
  */
 export const getIsMetaMaskWallet = () => getDeprecatedInjection()?.name === 'MetaMask'
 
-export const getIsOKXWallet = () => {
-  // Prompt MetaMask install when no window.ethereum or eip6963 injection is present, or the only injection detected is coinbase (CB has separate entry point in UI)
-  // if (typeof window.okxwallet !== 'undefined') 
-  return { name: 'OKX Wallet', icon: OKXWALLET_ICON }
-}
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+export const getIsOKXWallet = () => (window as any).okxwallet?.isOKExWallet
 
 export const getIsCoinbaseWallet = () => Boolean(window.ethereum?.isCoinbaseWallet)
 
