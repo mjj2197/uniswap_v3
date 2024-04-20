@@ -18,6 +18,7 @@ import { isMobile, isTouchable, isWebAndroid, isWebIOS } from 'uniswap/src/utils
 
 import { APP_RPC_URLS } from '../constants/networks'
 import { DEPRECATED_RPC_PROVIDERS, RPC_PROVIDERS } from '../constants/providers'
+import OKXConnector from './okxConnector'
 import { EIP6963 } from './eip6963'
 import { Connection, ConnectionType, ProviderInfo } from './types'
 import { getDeprecatedInjection, getIsCoinbaseWallet, getIsInjected, getIsMetaMaskWallet, getIsOKXWallet } from './utils'
@@ -90,7 +91,7 @@ const getIsMetaMaskBrowser = () => isMobile && getIsMetaMaskWallet()
 const getIsInjectedMobileBrowser = () => getIsCoinbaseWalletBrowser() || getIsMetaMaskBrowser()
 
 const getShouldAdvertiseMetaMask = () => !getIsMetaMaskWallet() && !isMobile && (!getIsInjected() || getIsCoinbaseWallet())
-const getShouldAdvertiseOKXWallet = () => !getIsOKXWallet() && !isMobile && (!getIsInjected() || getIsCoinbaseWallet())
+const getShouldAdvertiseOKXWallet = () => !getIsOKXWallet() && !isMobile
 
 const getIsGenericInjector = () => getIsInjected() && !getIsMetaMaskWallet() && !getIsCoinbaseWallet()
 
@@ -111,16 +112,17 @@ export const deprecatedInjectedConnection: Connection = {
     return false
   },
 }
-const [web3Injected2, web3InjectedHooks2] = initializeConnector<EIP1193>((actions) => new EIP1193({ actions, provider: (window as any).okxwallet as Provider, onError }))
+const [web3Injected2, web3InjectedHooks2] = initializeConnector<OKXConnector>((actions) => new OKXConnector({ actions, onError }))
 
 export const OKXConnection: Connection = {
   getProviderInfo: () => ({ name: 'OKX Wallet', icon: OKXWALLET_ICON }),
   connector: web3Injected2,
   hooks: web3InjectedHooks2,
   type: ConnectionType.OKX_WALLET,
-  shouldDisplay: () => getIsOKXWallet(),
+  shouldDisplay: () => true,
   // If on non-injected, non-mobile browser, prompt user to install OKX Wallet
   overrideActivate: () => {
+    console.log('🚀 ~ getShouldAdvertiseOKXWallet:', getShouldAdvertiseOKXWallet())
     if (getShouldAdvertiseOKXWallet()) {
       window.open('https://okx.com/', 'inst_okxwallet')
       return true
@@ -199,9 +201,7 @@ export const walletConnectV2Connection: Connection = new (class implements Conne
   }
 })()
 
-const [web3WCV2UniwalletConnect, web3WCV2UniwalletConnectHooks] = initializeConnector<UniwalletWCV2Connect>(
-  (actions) => new UniwalletWCV2Connect({ actions, onError })
-)
+const [web3WCV2UniwalletConnect, web3WCV2UniwalletConnectHooks] = initializeConnector<UniwalletWCV2Connect>((actions) => new UniwalletWCV2Connect({ actions, onError }))
 
 const isNonSupportedDevice = !isWebIOS && !isWebAndroid && isTouchable
 
@@ -232,8 +232,7 @@ const coinbaseWalletConnection: Connection = {
   connector: web3CoinbaseWallet,
   hooks: web3CoinbaseWalletHooks,
   type: ConnectionType.COINBASE_WALLET,
-  shouldDisplay: () =>
-    Boolean((isMobile && !getIsInjectedMobileBrowser()) || !isMobile || getIsCoinbaseWalletBrowser()),
+  shouldDisplay: () => Boolean((isMobile && !getIsInjectedMobileBrowser()) || !isMobile || getIsCoinbaseWalletBrowser()),
   // If on a mobile browser that isn't the coinbase wallet browser, deeplink to the coinbase wallet app
   overrideActivate: () => {
     if (isMobile && !getIsInjectedMobileBrowser()) {
