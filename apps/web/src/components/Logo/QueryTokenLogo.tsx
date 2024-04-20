@@ -10,7 +10,6 @@ import { AppState } from 'state/reducer'
 import { getInitialUrl } from 'hooks/useAssetLogoSource'
 
 import { AssetLogoBaseProps } from './AssetLogo'
-import store from '../../state'
 
 export default function QueryTokenLogo(
   props: AssetLogoBaseProps & {

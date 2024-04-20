@@ -83,17 +83,17 @@ export function useV3Pools(sortState: PoolTableSortState): {
   const { data: data48, loading: loading48, error: error48 } = usePoolsBulkQuery({ variables: { ids: pools, block: { number: block48 } } })
   const { data: dataWeek, loading: loadingWeek, error: errorWeek } = usePoolsBulkQuery({ variables: { ids: pools, block: { number: blockWeek } } })
 
-  const anyError = Boolean(error)
+  const anyError = Boolean(error || error0)
   const anyLoading = Boolean(loading)
 
   // return early if not all data yet
-  // if (anyError || anyLoading) {
-  //   return {
-  //     loading: anyLoading,
-  //     error: anyError,
-  //     data: [],
-  //   }
-  // }
+  if (anyError || anyLoading || !data0?.pools) {
+    return {
+      loading: anyLoading,
+      error: anyError,
+      data: [],
+    }
+  }
 
   const parsed = data0?.pools
     ? data0.pools.reduce((accum: { [id: string]: PoolFields }, poolData) => {
@@ -122,7 +122,7 @@ export function useV3Pools(sortState: PoolTableSortState): {
 
   const unsortedPools =
     pools?.map((address) => {
-      const current: PoolFields | undefined = parsed[address]
+      const current: PoolFields = parsed[address]
       const oneDay: PoolFields | undefined = parsed24[address]
       const twoDay: PoolFields | undefined = parsed48[address]
       const week: PoolFields | undefined = parsedWeek[address]
@@ -140,17 +140,17 @@ export function useV3Pools(sortState: PoolTableSortState): {
           : 0
 
       return {
-        hash: current.id,
-        token0: current.token0,
-        token1: current.token1,
-        txCount: Number.parseInt(current.txCount),
-        tvl: Number.parseInt(current.totalValueLockedUSD),
+        hash: current?.id,
+        token0: current?.token0,
+        token1: current?.token1,
+        txCount: Number.parseInt(current?.txCount),
+        tvl: Number.parseInt(current?.totalValueLockedUSD),
         tvlUSD: tvlUSD,
         tvlUSDChange: tvlUSDChange,
         volume24h: volumeUSD,
         volumeChange: volumeUSDChange,
         volumeWeek: volumeUSDWeek,
-        feeTier: current.feeTier,
+        feeTier: current?.feeTier,
       } as TablePool
     }) ?? []
 

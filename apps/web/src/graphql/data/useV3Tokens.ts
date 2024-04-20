@@ -132,13 +132,13 @@ export function useV3Tokens(sortState: TokenSortState): {
   // }
 
   // // return early if not all data yet
-  // if (anyError || anyLoading) {
-  //   return {
-  //     loading: anyLoading,
-  //     error: anyError,
-  //     data: [],
-  //   }
-  // }
+  if (anyError || anyLoading) {
+    return {
+      loading: anyLoading,
+      error: anyError,
+      data: [],
+    }
+  }
   const start = performance.now()
   const parsed = data?.tokens
     ? data.tokens.reduce((accum: { [address: string]: TokenFields }, tokendata) => {

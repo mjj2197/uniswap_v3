@@ -107,3 +107,110 @@ query PoolsBulk($ids: [ID!], $block: Block_height) {
     totalValueLockedUSD
   }
 }
+# token detail page
+query TokensById($id: ID!) {
+  token(id: $id) {
+    id
+    symbol
+    name
+    derivedETH
+    volumeUSD
+    volume
+    txCount
+    totalValueLocked
+    totalValueLockedUSD
+    feesUSD
+  }
+}
+query TokenDayDatas($startTime: Int!, $skip: Int!, $address: String!) {
+  tokenDayDatas(first: 1000, skip: $skip, where: { token: $address, date_gt: $startTime }, orderBy: date, orderDirection: asc) {
+    date
+    volumeUSD
+    totalValueLockedUSD
+  }
+}
+query UniswapDayDatas($startTime: Int!, $skip: Int!) {
+  uniswapDayDatas(
+    first: 1000
+    skip: $skip
+    subgraphError: allow
+    where: {date_gt: $startTime}
+    orderBy: date
+    orderDirection: asc
+  ) {
+    id
+    date
+    volumeUSD
+    tvlUSD
+  }
+}
+
+# Transactions tab
+query Transactions {
+  transactions(
+    first: 500
+    orderBy: timestamp
+    orderDirection: desc
+    subgraphError: allow
+  ) {
+    id
+    timestamp
+    mints {
+      pool {
+        token0 {
+          id
+          symbol
+          name
+        }
+        token1 {
+          id
+          symbol
+          name
+        }
+      }
+      owner
+      sender
+      origin
+      amount0
+      amount1
+      amountUSD
+    }
+    swaps {
+      pool {
+        token0 {
+          id
+          symbol
+          name
+        }
+        token1 {
+          id
+          symbol
+          name
+        }
+      }
+      origin
+      amount0
+      amount1
+      amountUSD
+    }
+    burns {
+      pool {
+        token0 {
+          id
+          symbol
+          name
+        }
+        token1 {
+          id
+          symbol
+          name
+        }
+      }
+      owner
+      origin
+      amount0
+      amount1
+      amountUSD
+    }
+  }
+}

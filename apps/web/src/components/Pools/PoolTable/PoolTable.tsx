@@ -87,7 +87,6 @@ function PoolDescription({
       <NameText>
         {token0.symbol}/{token1.symbol}
       </NameText>
-      {protocolVersion === ProtocolVersion.V2 && <Badge>{protocolVersion.toLowerCase()}</Badge>}
       <Badge>{feeTier / BIPS_BASE}%</Badge>
     </Row>
   )

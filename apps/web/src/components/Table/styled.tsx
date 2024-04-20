@@ -2,13 +2,14 @@ import { Trans } from '@lingui/macro'
 import { ChainId } from '@jaguarswap/sdk-core'
 import { PortfolioLogo } from 'components/AccountDrawer/MiniPortfolio/PortfolioLogo'
 import { ButtonLight } from 'components/Button'
+import { getInitialUrl } from 'hooks/useAssetLogoSource'
 import Column from 'components/Column'
 import { HideScrollBarStyles } from 'components/Common'
 import Row from 'components/Row'
 import { getAbbreviatedTimeString } from 'components/Table/utils'
 import { MouseoverTooltip, TooltipSize } from 'components/Tooltip'
 import { NATIVE_CHAIN_ID, nativeOnChain } from 'constants/tokens'
-import { OrderDirection, getTokenDetailsURL, supportedChainIdFromGQLChain, unwrapToken } from 'graphql/data/util'
+import { OrderDirection, getTokenDetailsURL, chainIdToBackendName, unwrapToken } from 'graphql/data/util'
 import { OrderDirection as TheGraphOrderDirection } from 'graphql/thegraph/__generated__/types-and-hooks'
 import { useActiveLocale } from 'hooks/useActiveLocale'
 import { ArrowDown, CornerLeftUp, ExternalLink as ExternalLinkIcon } from 'react-feather'
@@ -17,6 +18,9 @@ import styled, { css } from 'styled-components'
 import { ClickableStyle, EllipsisStyle, ExternalLink, ThemedText } from 'theme/components'
 import { Z_INDEX } from 'theme/zIndex'
 import { Token } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
+import { useAppSelector } from 'state/hooks'
+import { AppState } from 'state/reducer'
+import { CHAIN_ID_TO_BACKEND_NAME } from '../../graphql/data/util'
 
 export const SHOW_RETURN_TO_TOP_OFFSET = 500
 export const LOAD_MORE_BOTTOM_OFFSET = 50
@@ -237,24 +241,21 @@ const TokenSymbolText = styled(ThemedText.BodyPrimary)`
  * @returns JSX.Element showing the Token's Logo, Chain logo if non-mainnet, and Token Symbol
  */
 export const TokenLinkCell = ({ token }: { token: Token }) => {
-  const chainId = supportedChainIdFromGQLChain(token.chain) ?? ChainId.X1
+  const chainId = useAppSelector((state: AppState) => state.application.chainId) ?? ChainId.X1
+
   const unwrappedToken = unwrapToken(chainId, token)
   const isNative = unwrappedToken.address === NATIVE_CHAIN_ID
   const nativeCurrency = nativeOnChain(chainId)
+  const logo = getInitialUrl(token.address, chainId)
   return (
     <StyledInternalLink
       to={getTokenDetailsURL({
         address: unwrappedToken.address,
-        chain: token.chain,
+        chain: chainIdToBackendName(chainId),
       })}
     >
       <Row gap="4px" maxWidth="68px">
-        <PortfolioLogo
-          chainId={chainId}
-          size="16px"
-          images={isNative ? undefined : [token.project?.logo?.url]}
-          currencies={isNative ? [nativeCurrency] : undefined}
-        />
+        <PortfolioLogo chainId={chainId} size="16px" images={[logo]} currencies={isNative ? [nativeCurrency] : undefined} />
         <TokenSymbolText>{unwrappedToken?.symbol ?? <Trans>UNKNOWN</Trans>}</TokenSymbolText>
       </Row>
     </StyledInternalLink>

@@ -5,83 +5,43 @@ import Row from 'components/Row'
 import { Table } from 'components/Table'
 import { Cell } from 'components/Table/Cell'
 import { Filter } from 'components/Table/Filter'
-import {
-  FilterHeaderRow,
-  HeaderArrow,
-  HeaderSortText,
-  StyledExternalLink,
-  TimestampCell,
-  TokenLinkCell,
-} from 'components/Table/styled'
-import { useUpdateManualOutage } from 'featureFlags/flags/outageBanner'
-import { BETypeToTransactionType, TransactionType, useAllTransactions } from 'graphql/data/useAllTransactions'
+import { FilterHeaderRow, StyledExternalLink, TimestampCell, TokenLinkCell } from 'components/Table/styled'
 import { supportedChainIdFromGQLChain, validateUrlChainParam } from 'graphql/data/util'
-import { OrderDirection, Transaction_OrderBy } from 'graphql/thegraph/__generated__/types-and-hooks'
 import { useActiveLocalCurrency } from 'hooks/useActiveLocalCurrency'
 import { useMemo, useReducer, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { ThemedText } from 'theme/components'
-import {
-  PoolTransaction,
-  PoolTransactionType,
-} from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 import { shortenAddress } from 'utilities/src/addresses'
 import { useFormatter } from 'utils/formatNumbers'
 import { ExplorerDataType, getExplorerLink } from 'utils/getExplorerLink'
-
-type ExploreTxTableSortState = {
-  sortBy: Transaction_OrderBy
-  sortDirection: OrderDirection
-}
+import { useV3Transactions, TransactionType, TableTransaction } from '../../../graphql/data/useV3Transactions'
 
 export default function RecentTransactions() {
   const activeLocalCurrency = useActiveLocalCurrency()
   const { formatNumber, formatFiatPrice } = useFormatter()
   const [filterModalIsOpen, toggleFilterModal] = useReducer((s) => !s, false)
-  const [filter, setFilters] = useState<TransactionType[]>([
-    TransactionType.SWAP,
-    TransactionType.BURN,
-    TransactionType.MINT,
-  ])
+  const [filter, setFilters] = useState<TransactionType[]>([TransactionType.SWAP, TransactionType.BURN, TransactionType.MINT])
   const chainName = validateUrlChainParam(useParams<{ chainName?: string }>().chainName)
   const chainId = supportedChainIdFromGQLChain(chainName)
 
-  const [sortState] = useState<ExploreTxTableSortState>({
-    sortBy: Transaction_OrderBy.Timestamp,
-    sortDirection: OrderDirection.Desc,
-  })
-  const { transactions, loading, loadMore, errorV2, errorV3 } = useAllTransactions(chainName, filter)
-  const combinedError =
-    errorV2 && errorV3
-      ? new ApolloError({ errorMessage: `Could not retrieve V2 and V3 Transactions for chain: ${chainId}` })
-      : undefined
-  const allDataStillLoading = loading && !transactions.length
-  const showLoadingSkeleton = allDataStillLoading || !!combinedError
-  useUpdateManualOutage({ chainId, errorV3, errorV2 })
-  // TODO(WEB-3236): once GQL BE Transaction query is supported add usd, token0 amount, and token1 amount sort support
+  const { data: transactions, loading, error } = useV3Transactions(filter)
+
+  const showLoadingSkeleton = loading || !!error
   const columns = useMemo(() => {
-    const columnHelper = createColumnHelper<PoolTransaction>()
+    const columnHelper = createColumnHelper<TableTransaction>()
     return [
       columnHelper.accessor((transaction) => transaction, {
         id: 'timestamp',
         header: () => (
           <Cell minWidth={120} justifyContent="flex-start" grow>
             <Row gap="4px">
-              {sortState.sortBy === Transaction_OrderBy.Timestamp && (
-                <HeaderArrow direction={sortState.sortDirection} />
-              )}
-              <HeaderSortText $active={sortState.sortBy === Transaction_OrderBy.Timestamp}>
-                <Trans>Time</Trans>
-              </HeaderSortText>
+              <Trans>Time</Trans>
             </Row>
           </Cell>
         ),
         cell: (transaction) => (
           <Cell loading={showLoadingSkeleton} minWidth={120} justifyContent="flex-start" grow>
-            <TimestampCell
-              timestamp={Number(transaction.getValue?.().timestamp)}
-              link={getExplorerLink(chainId, transaction.getValue?.().hash, ExplorerDataType.TRANSACTION)}
-            />
+            <TimestampCell timestamp={Number(transaction.getValue?.().timestamp)} link={getExplorerLink(chainId, transaction.getValue?.().hash, ExplorerDataType.TRANSACTION)} />
           </Cell>
         ),
       }),
@@ -90,14 +50,7 @@ export default function RecentTransactions() {
         header: () => (
           <Cell minWidth={276} justifyContent="flex-start" grow>
             <FilterHeaderRow modalOpen={filterModalIsOpen} onClick={() => toggleFilterModal()}>
-              <Filter
-                allFilters={Object.values(TransactionType)}
-                activeFilter={filter}
-                setFilters={setFilters}
-                isOpen={filterModalIsOpen}
-                toggleFilterModal={toggleFilterModal}
-                isSticky={true}
-              />
+              <Filter allFilters={Object.values(TransactionType)} activeFilter={filter} setFilters={setFilters} isOpen={filterModalIsOpen} toggleFilterModal={toggleFilterModal} isSticky={true} />
               <ThemedText.BodySecondary>
                 <Trans>Type</Trans>
               </ThemedText.BodySecondary>
@@ -108,18 +61,16 @@ export default function RecentTransactions() {
           <Cell loading={showLoadingSkeleton} minWidth={276} justifyContent="flex-start" grow>
             <Row gap="8px">
               <ThemedText.BodySecondary>
-                <Trans>{BETypeToTransactionType[transaction.getValue?.().type]}</Trans>
+                <Trans>{transaction.getValue?.().type}</Trans>
               </ThemedText.BodySecondary>
               <TokenLinkCell token={transaction.getValue?.().token0} />
-              <ThemedText.BodySecondary>
-                {transaction.getValue?.().type === PoolTransactionType.Swap ? <Trans>for</Trans> : <Trans>and</Trans>}
-              </ThemedText.BodySecondary>
+              <ThemedText.BodySecondary>{transaction.getValue?.().type === TransactionType.SWAP ? <Trans>for</Trans> : <Trans>and</Trans>}</ThemedText.BodySecondary>
               <TokenLinkCell token={transaction.getValue?.().token1} />
             </Row>
           </Cell>
         ),
       }),
-      columnHelper.accessor((transaction) => transaction.usdValue.value, {
+      columnHelper.accessor((transaction) => transaction.amountUSD, {
         id: 'fiat-value',
         header: () => (
           <Cell minWidth={125}>
@@ -146,7 +97,7 @@ export default function RecentTransactions() {
             <Row gap="8px" justify="flex-end">
               <ThemedText.BodyPrimary>
                 {formatNumber({
-                  input: Math.abs(parseFloat(transaction.getValue?.().token0Quantity)) || 0,
+                  input: Math.abs(transaction.getValue?.().token0.amount) || 0,
                 })}
               </ThemedText.BodyPrimary>
               <TokenLinkCell token={transaction.getValue?.().token0} />
@@ -168,7 +119,7 @@ export default function RecentTransactions() {
             <Row gap="8px" justify="flex-end">
               <ThemedText.BodyPrimary>
                 {formatNumber({
-                  input: Math.abs(parseFloat(transaction.getValue?.().token1Quantity)) || 0,
+                  input: Math.abs(transaction.getValue?.().token1.amount) || 0,
                 })}
               </ThemedText.BodyPrimary>
               <TokenLinkCell token={transaction.getValue?.().token1} />
@@ -176,7 +127,7 @@ export default function RecentTransactions() {
           </Cell>
         ),
       }),
-      columnHelper.accessor((transaction) => transaction.account, {
+      columnHelper.accessor((transaction) => transaction.sender, {
         id: 'maker-address',
         header: () => (
           <Cell minWidth={150}>
@@ -187,33 +138,12 @@ export default function RecentTransactions() {
         ),
         cell: (makerAddress) => (
           <Cell loading={showLoadingSkeleton} minWidth={150}>
-            <StyledExternalLink href={getExplorerLink(chainId, makerAddress.getValue?.(), ExplorerDataType.ADDRESS)}>
-              {shortenAddress(makerAddress.getValue?.())}
-            </StyledExternalLink>
+            <StyledExternalLink href={getExplorerLink(chainId, makerAddress.getValue?.(), ExplorerDataType.ADDRESS)}>{shortenAddress(makerAddress.getValue?.())}</StyledExternalLink>
           </Cell>
         ),
       }),
     ]
-  }, [
-    activeLocalCurrency,
-    chainId,
-    filter,
-    filterModalIsOpen,
-    formatFiatPrice,
-    formatNumber,
-    showLoadingSkeleton,
-    sortState.sortBy,
-    sortState.sortDirection,
-  ])
+  }, [activeLocalCurrency, chainId, filter, filterModalIsOpen, formatFiatPrice, formatNumber, showLoadingSkeleton])
 
-  return (
-    <Table
-      columns={columns}
-      data={transactions}
-      loading={allDataStillLoading}
-      error={combinedError}
-      loadMore={loadMore}
-      maxWidth={1200}
-    />
-  )
+  return <Table columns={columns} data={transactions} loading={loading} error={error} loadMore={loading} maxWidth={1200} />
 }
