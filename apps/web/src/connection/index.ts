@@ -4,8 +4,9 @@ import { CoinbaseWallet } from '@web3-react/coinbase-wallet'
 import { initializeConnector } from '@web3-react/core'
 import { GnosisSafe } from '@web3-react/gnosis-safe'
 import { MetaMask } from '@web3-react/metamask'
+import { EIP1193 } from '@web3-react/eip1193'
 import { Network } from '@web3-react/network'
-import { Actions, Connector } from '@web3-react/types'
+import { Actions, Connector, Provider } from '@web3-react/types'
 import GNOSIS_ICON from 'assets/images/gnosis.png'
 import UNISWAP_LOGO from 'assets/svg/logo.svg'
 import COINBASE_ICON from 'assets/wallets/coinbase-icon.svg'
@@ -59,9 +60,7 @@ export const eip6963Connection: InjectedConnection = {
   },
 }
 
-const [web3Network, web3NetworkHooks] = initializeConnector<Network>(
-  (actions) => new Network({ actions, urlMap: RPC_PROVIDERS, defaultChainId: 1 })
-)
+const [web3Network, web3NetworkHooks] = initializeConnector<Network>((actions) => new Network({ actions, urlMap: RPC_PROVIDERS, defaultChainId: 1 }))
 export const networkConnection: Connection = {
   getProviderInfo: () => ({ name: 'Network' }),
   connector: web3Network,
@@ -90,8 +89,9 @@ const getIsCoinbaseWalletBrowser = () => isMobile && getIsCoinbaseWallet()
 const getIsMetaMaskBrowser = () => isMobile && getIsMetaMaskWallet()
 const getIsInjectedMobileBrowser = () => getIsCoinbaseWalletBrowser() || getIsMetaMaskBrowser()
 
-const getShouldAdvertiseMetaMask = () =>
-  !getIsMetaMaskWallet() && !isMobile && (!getIsInjected() || getIsCoinbaseWallet())
+const getShouldAdvertiseMetaMask = () => !getIsMetaMaskWallet() && !isMobile && (!getIsInjected() || getIsCoinbaseWallet())
+const getShouldAdvertiseOKXWallet = () => !getIsOKXWallet() && !isMobile && (!getIsInjected() || getIsCoinbaseWallet())
+
 const getIsGenericInjector = () => getIsInjected() && !getIsMetaMaskWallet() && !getIsCoinbaseWallet()
 
 const [web3Injected, web3InjectedHooks] = initializeConnector<MetaMask>((actions) => new MetaMask({ actions, onError }))
@@ -111,16 +111,17 @@ export const deprecatedInjectedConnection: Connection = {
     return false
   },
 }
+const [web3Injected2, web3InjectedHooks2] = initializeConnector<EIP1193>((actions) => new EIP1193({ actions, provider: (window as any).okxwallet as Provider, onError }))
 
 export const OKXConnection: Connection = {
   getProviderInfo: () => ({ name: 'OKX Wallet', icon: OKXWALLET_ICON }),
-  connector: web3Injected,
-  hooks: web3InjectedHooks,
+  connector: web3Injected2,
+  hooks: web3InjectedHooks2,
   type: ConnectionType.OKX_WALLET,
   shouldDisplay: () => getIsOKXWallet(),
   // If on non-injected, non-mobile browser, prompt user to install OKX Wallet
   overrideActivate: () => {
-    if (getShouldAdvertiseMetaMask()) {
+    if (getShouldAdvertiseOKXWallet()) {
       window.open('https://okx.com/', 'inst_okxwallet')
       return true
     }
@@ -137,8 +138,7 @@ export const gnosisSafeConnection: Connection = {
 }
 
 export const walletConnectV2Connection: Connection = new (class implements Connection {
-  private initializer = (actions: Actions, defaultChainId = ChainId.X1) =>
-    new WalletConnectV2({ actions, defaultChainId, onError })
+  private initializer = (actions: Actions, defaultChainId = ChainId.X1) => new WalletConnectV2({ actions, defaultChainId, onError })
 
   type = ConnectionType.WALLET_CONNECT_V2
   getName = () => 'WalletConnect'

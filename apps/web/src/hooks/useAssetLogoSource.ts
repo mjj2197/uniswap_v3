@@ -38,14 +38,12 @@ function prioritizeLogoSources(uris: string[]) {
 export function getInitialUrl(address?: string | null, chainId?: number | null, isNative?: boolean, backupImg?: string | null) {
   if (chainId && isNative) return getNativeLogoURI(chainId)
 
-  // FIXME: 暂时先用 ethereum 中的logo， 如果发现有些logo不在仓库中，可以fork uniswap/assets仓库
-  // const networkName = chainId ? chainIdToNetworkName(chainId) : 'ethereum'
-  const networkName = 'ethereum'
+  const networkName = chainId ? chainIdToNetworkName(chainId) : 'xlayer'
   const checksummedAddress = isAddress(address)
 
   if (checksummedAddress) {
     // FIXME： 替换成主网的logo
-    return `https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/${networkName}/assets/${checksummedAddress}/logo.png`
+    return `https://raw.githubusercontent.com/JaguarX-com/assets/master/blockchains/${networkName}/assets/${checksummedAddress}/logo.png`
   } else {
     return backupImg ?? undefined
   }
