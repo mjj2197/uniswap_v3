@@ -5,17 +5,18 @@ import { isAddress } from 'utilities/src/addresses'
 
 import EthereumLogo from '../../assets/images/ethereum-logo.png'
 import { NATIVE_CHAIN_ID } from '../../constants/tokens'
+import { NetworkStatus } from '@apollo/client'
 
-type Network = 'X Layer' | 'X Layer Testnet'
+type Network = 'xlayer' | 'xlayer-testnet'
 
 export function chainIdToNetworkName(networkId: ChainId): Network {
   switch (networkId) {
     case ChainId.X1:
-      return 'X Layer'
+      return 'xlayer'
     case ChainId.X1_TESTNET:
-      return 'X Layer Testnet'
+      return 'xlayer-testnet'
     default:
-      return 'X Layer'
+      return 'xlayer'
   }
 }
 
@@ -31,7 +32,7 @@ function getTokenLogoURI(address: string, chainId: ChainId = ChainId.X1): string
   const networksWithUrls = [ChainId.X1, ChainId.X1_TESTNET]
 
   if (networksWithUrls.includes(chainId)) {
-    return `https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/${networkName}/assets/${address}/logo.png`
+    return `https://raw.githubusercontent.com/JaguarX-com/assets/master/blockchains/${networkName}/assets/${address}/logo.png`
   }
 }
 
