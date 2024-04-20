@@ -8,7 +8,7 @@ import { ExploreTab } from 'pages/Explore'
 import { useEffect } from 'react'
 import { DefaultTheme } from 'styled-components'
 import { ThemeColors } from 'theme/colors'
-import { Chain, ContractInput, HistoryDuration, PriceSource, TokenStandard } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
+import { Chain as Chain0, ContractInput, HistoryDuration, PriceSource, TokenStandard } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 import { getNativeTokenDBAddress } from 'utils/nativeTokens'
 import dayjs from 'dayjs'
 
@@ -18,7 +18,10 @@ export enum PollingInterval {
   Fast = AVERAGE_L1_BLOCK_TIME,
   LightningMcQueen = ms(`3s`), // approx block interval for polygon
 }
-
+export enum Chain1 {
+  X1 = 'XLayer',
+  X1_TESTNET = 'XLayertestnet',
+}
 // Polls a query only when the current component is mounted, as useQuery's pollInterval prop will continue to poll after unmount
 export function usePollQueryWhileMounted<T, K extends OperationVariables>(queryResult: QueryResult<T, K>, interval: PollingInterval) {
   const { startPolling, stopPolling } = queryResult
@@ -60,18 +63,18 @@ export function isPricePoint(p: PricePoint | undefined): p is PricePoint {
   return p !== undefined
 }
 
-export const GQL_MAINNET_CHAINS_MUTABLE = [Chain.X1, Chain.X1_TESTNET]
+export const GQL_MAINNET_CHAINS_MUTABLE = [Chain1.X1, Chain1.X1_TESTNET]
 
-const GQL_MAINNET_CHAINS = [Chain.X1] as const
+const GQL_MAINNET_CHAINS = [Chain1.X1] as const
 
-const GQL_TESTNET_CHAINS = [Chain.X1_TESTNET] as const
+const GQL_TESTNET_CHAINS = [Chain1.X1_TESTNET] as const
 
 const UX_SUPPORTED_GQL_CHAINS = [...GQL_MAINNET_CHAINS, ...GQL_TESTNET_CHAINS] as const
 type InterfaceGqlChain = (typeof UX_SUPPORTED_GQL_CHAINS)[number]
 
 export const CHAIN_ID_TO_BACKEND_NAME: { [key: number]: InterfaceGqlChain } = {
-  [ChainId.X1]: Chain.X1,
-  [ChainId.X1_TESTNET]: Chain.X1_TESTNET,
+  [ChainId.X1]: Chain1.X1,
+  [ChainId.X1_TESTNET]: Chain1.X1_TESTNET,
 }
 
 export function chainIdToBackendName(chainId: number | undefined) {
@@ -100,8 +103,8 @@ export function gqlToCurrency(
 }
 
 const URL_CHAIN_PARAM_TO_BACKEND: { [key: string]: InterfaceGqlChain } = {
-  x1: Chain.Ethereum,
-  x1Testnet: Chain.Ethereum,
+  x1: Chain1.Ethereum,
+  x1Testnet: Chain1.Ethereum,
 }
 
 /**
@@ -124,17 +127,17 @@ export function getValidUrlChainId(chainName: string | undefined): ChainId | und
 
 /**
  * @param chainName parsed in chain name from url query parameter
- * @returns if chainName is a valid chain name supported by the backend, returns the backend chain name, otherwise returns Chain.Ethereum
+ * @returns if chainName is a valid chain name supported by the backend, returns the backend chain name, otherwise returns Chain1.Ethereum
  */
 export function validateUrlChainParam(chainName: string | undefined) {
   const isValidChainName = chainName && URL_CHAIN_PARAM_TO_BACKEND[chainName]
   const isValidBackEndChain = isValidChainName && (BACKEND_SUPPORTED_CHAINS as ReadonlyArray<Chain>).includes(isValidChainName)
-  return isValidBackEndChain ? URL_CHAIN_PARAM_TO_BACKEND[chainName] : Chain.Ethereum
+  return isValidBackEndChain ? URL_CHAIN_PARAM_TO_BACKEND[chainName] : Chain1.Ethereum
 }
 
 const CHAIN_NAME_TO_CHAIN_ID: { [key in InterfaceGqlChain]: ChainId } = {
-  [Chain.Ethereum]: ChainId.X1,
-  // [Chain.X1Testnet]: ChainId.X1_TESTNET,
+  [Chain1.Ethereum]: ChainId.X1,
+  // [Chain1.X1Testnet]: ChainId.X1_TESTNET,
 }
 
 export function isSupportedGQLChain(chain: Chain): chain is InterfaceGqlChain {
@@ -157,7 +160,7 @@ export function logSentryErrorForUnsupportedChain({ extras, errorMessage }: { ex
   })
 }
 
-export const BACKEND_SUPPORTED_CHAINS = [Chain.Ethereum] as const
+export const BACKEND_SUPPORTED_CHAINS = [Chain1.Ethereum] as const
 export const BACKEND_NOT_YET_SUPPORTED_CHAIN_IDS = [] as const
 
 export function isBackendSupportedChain(chain: Chain): chain is InterfaceGqlChain {
