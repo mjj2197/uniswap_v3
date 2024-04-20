@@ -139,7 +139,6 @@ export function useV3Tokens(sortState: TokenSortState): {
       data: [],
     }
   }
-  const start = performance.now()
   const parsed = data?.tokens
     ? data.tokens.reduce((accum: { [address: string]: TokenFields }, tokendata) => {
         accum[tokendata.id] = tokendata
@@ -215,8 +214,6 @@ export function useV3Tokens(sortState: TokenSortState): {
     }) ?? []
 
   const unfilteredTokens = sortTokens(unsortedTokens, sortState)
-  const end = performance.now()
-  console.log(end - start)
 
   // const filteredPools = useFilteredPools(unfilteredPools).slice(0, 100)
   return { data: unfilteredTokens, loading: anyLoading, error: anyError }
