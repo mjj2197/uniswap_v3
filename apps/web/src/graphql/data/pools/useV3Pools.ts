@@ -83,17 +83,17 @@ export function useV3Pools(sortState: PoolTableSortState): {
   const { data: data48, loading: loading48, error: error48 } = usePoolsBulkQuery({ variables: { ids: pools, block: { number: block48 } } })
   const { data: dataWeek, loading: loadingWeek, error: errorWeek } = usePoolsBulkQuery({ variables: { ids: pools, block: { number: blockWeek } } })
 
-  const anyError = Boolean(error || error0 || blockError24 || blockError48 || blockErrorWeek || error24 || error48 || errorWeek)
-  const anyLoading = Boolean(loading || loading0 || loading24 || loading48 || loadingWeek)
+  const anyError = Boolean(error)
+  const anyLoading = Boolean(loading)
 
   // return early if not all data yet
-  if (anyError || anyLoading) {
-    return {
-      loading: anyLoading,
-      error: anyError,
-      data: [],
-    }
-  }
+  // if (anyError || anyLoading) {
+  //   return {
+  //     loading: anyLoading,
+  //     error: anyError,
+  //     data: [],
+  //   }
+  // }
 
   const parsed = data0?.pools
     ? data0.pools.reduce((accum: { [id: string]: PoolFields }, poolData) => {
@@ -157,5 +157,5 @@ export function useV3Pools(sortState: PoolTableSortState): {
   const unfilteredPools = sortPools(unsortedPools, sortState)
 
   // const filteredPools = useFilteredPools(unfilteredPools).slice(0, 100)
-  return { data: unfilteredPools, loading, error: anyError }
+  return { data: unfilteredPools, loading: anyLoading, error: anyError }
 }

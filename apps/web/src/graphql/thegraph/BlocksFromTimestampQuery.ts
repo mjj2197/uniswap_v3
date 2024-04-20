@@ -6,7 +6,7 @@ import { apolloClientBlock } from './apollo'
 export default function useBlocksFromTimestamp(timestamp: number): {
   error?: ApolloError
   isLoading: boolean
-  data: BlocksFromTimestampQuery
+  data: number
 } {
   const {
     data,
@@ -24,7 +24,7 @@ export default function useBlocksFromTimestamp(timestamp: number): {
     () => ({
       error,
       isLoading,
-      data,
+      data: data?.blocks[0] ?? 0,
     }),
     [data, error, isLoading]
   )

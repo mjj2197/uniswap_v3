@@ -93,7 +93,7 @@ export function useV3Tokens(sortState: TokenSortState): {
   error: boolean
   data: TableToken[]
 } {
-  const { data: allTokens, error } = useAllTokensQuery()
+  const { data: allTokens, error: allTokensError } = useAllTokensQuery()
   const tokens = useMemo(() => allTokens?.tokens.map((d) => d.id) ?? [], [allTokens])
 
   // 获取三个时间间隔的 block number
@@ -105,7 +105,7 @@ export function useV3Tokens(sortState: TokenSortState): {
   const {
     data: ethPrices,
     error: ethError,
-    loading,
+    loading: ethLoading,
   } = useEthPriceUsdQuery({
     variables: {
       block24: block24,
@@ -114,31 +114,31 @@ export function useV3Tokens(sortState: TokenSortState): {
     },
   })
 
-  const { data } = useTokensBulkQuery({ variables: { ids: tokens } })
+  const { data, loading, error } = useTokensBulkQuery({ variables: { ids: tokens } })
   const { data: data24, loading: loading24, error: error24 } = useTokensBulkQuery({ variables: { ids: tokens, block: { number: block24 } } })
   const { data: data48, loading: loading48, error: error48 } = useTokensBulkQuery({ variables: { ids: tokens, block: { number: block48 } } })
   const { data: dataWeek, loading: loadingWeek, error: errorWeek } = useTokensBulkQuery({ variables: { ids: tokens, block: { number: blockWeek } } })
 
-  const anyError = Boolean(error || blockError24 || blockError48 || blockErrorWeek || ethError || error24 || error48 || errorWeek)
-  const anyLoading = Boolean(loading || loading24 || loading48 || loadingWeek)
+  const anyError = Boolean(allTokensError || error)
+  const anyLoading = Boolean(loading)
 
-  // 如果没有获取到 eth 价格，直接返回
-  if (!ethPrices) {
-    return {
-      loading: true,
-      error: false,
-      data: [],
-    }
-  }
+  // // 如果没有获取到 eth 价格，直接返回
+  // if (!ethPrices) {
+  //   return {
+  //     loading: true,
+  //     error: false,
+  //     data: [],
+  //   }
+  // }
 
-  // return early if not all data yet
-  if (anyError || anyLoading) {
-    return {
-      loading: anyLoading,
-      error: anyError,
-      data: [],
-    }
-  }
+  // // return early if not all data yet
+  // if (anyError || anyLoading) {
+  //   return {
+  //     loading: anyLoading,
+  //     error: anyError,
+  //     data: [],
+  //   }
+  // }
   const start = performance.now()
   const parsed = data?.tokens
     ? data.tokens.reduce((accum: { [address: string]: TokenFields }, tokendata) => {
@@ -186,9 +186,9 @@ export function useV3Tokens(sortState: TokenSortState): {
       const tvlUSD = current ? Number.parseFloat(current.totalValueLockedUSD) : 0
       const tvlUSDChange = getPercentChange(current?.totalValueLockedUSD, oneDay?.totalValueLockedUSD)
       const tvlToken = current ? Number.parseFloat(current.totalValueLocked) : 0
-      const priceUSD = current ? Number.parseFloat(current.derivedETH) * ethPrices.current[0].ethPriceUSD : 0
-      const priceUSDOneDay = oneDay ? Number.parseFloat(oneDay.derivedETH) * ethPrices.oneDay[0].ethPriceUSD : 0
-      const priceUSDWeek = week ? Number.parseFloat(week.derivedETH) * ethPrices.oneWeek[0].ethPriceUSD : 0
+      const priceUSD = current && ethPrices ? Number.parseFloat(current.derivedETH) * ethPrices.current[0].ethPriceUSD : 0
+      const priceUSDOneDay = oneDay && ethPrices ? Number.parseFloat(oneDay.derivedETH) * ethPrices.oneDay[0].ethPriceUSD : 0
+      const priceUSDWeek = week && ethPrices ? Number.parseFloat(week.derivedETH) * ethPrices.oneWeek[0].ethPriceUSD : 0
       const priceUSDChange = priceUSD && priceUSDOneDay ? getPercentChange(priceUSD.toString(), priceUSDOneDay.toString()) : 0
 
       const priceUSDChangeWeek = priceUSD && priceUSDWeek ? getPercentChange(priceUSD.toString(), priceUSDWeek.toString()) : 0
@@ -219,5 +219,5 @@ export function useV3Tokens(sortState: TokenSortState): {
   console.log(end - start)
 
   // const filteredPools = useFilteredPools(unfilteredPools).slice(0, 100)
-  return { data: unfilteredTokens, loading, error: anyError }
+  return { data: unfilteredTokens, loading: anyLoading, error: anyError }
 }
