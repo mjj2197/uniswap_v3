@@ -60,17 +60,18 @@ export function isPricePoint(p: PricePoint | undefined): p is PricePoint {
   return p !== undefined
 }
 
-export const GQL_MAINNET_CHAINS_MUTABLE = [Chain.X1, Chain.X1Testnet]
+export const GQL_MAINNET_CHAINS_MUTABLE = [Chain.X1, Chain.X1_TESTNET]
 
-const GQL_MAINNET_CHAINS = [Chain.Ethereum] as const
+const GQL_MAINNET_CHAINS = [Chain.X1] as const
 
-const GQL_TESTNET_CHAINS = [Chain.Ethereum] as const
+const GQL_TESTNET_CHAINS = [Chain.X1_TESTNET] as const
 
 const UX_SUPPORTED_GQL_CHAINS = [...GQL_MAINNET_CHAINS, ...GQL_TESTNET_CHAINS] as const
 type InterfaceGqlChain = (typeof UX_SUPPORTED_GQL_CHAINS)[number]
 
 export const CHAIN_ID_TO_BACKEND_NAME: { [key: number]: InterfaceGqlChain } = {
-  [ChainId.X1]: Chain.Ethereum,
+  [ChainId.X1]: Chain.X1,
+  [ChainId.X1_TESTNET]: Chain.X1_TESTNET,
 }
 
 export function chainIdToBackendName(chainId: number | undefined) {

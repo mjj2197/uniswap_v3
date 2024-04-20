@@ -24,7 +24,8 @@ export const title = style([
     display: 'block',
     color: 'neutral1',
     paddingLeft: '12',
-    fontSize: '16'
+    fontSize: '16',
+    cursor: 'auto'
   }),
 ])
 
