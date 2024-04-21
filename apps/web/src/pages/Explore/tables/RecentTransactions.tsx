@@ -1,4 +1,4 @@
-import { ApolloError } from '@apollo/client'
+import React from 'react'
 import { Trans } from '@lingui/macro'
 import { createColumnHelper } from '@tanstack/react-table'
 import Row from 'components/Row'

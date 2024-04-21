@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useTransactionsQuery } from '../thegraph/__generated__/types-and-hooks'
 import { ApolloError } from '@apollo/client'
+import { TokenTransactionType } from './useV3TokenTransactions'
 
 export enum TransSortMethod {
   PRICE = 'Price',
@@ -10,7 +11,7 @@ export enum TransSortMethod {
 }
 
 export type TableTransaction = {
-  type: TransactionType
+  type: TransactionType | TokenTransactionType
   hash: string
   timestamp: string
   sender: string

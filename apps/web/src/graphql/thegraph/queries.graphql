@@ -108,8 +108,8 @@ query PoolsBulk($ids: [ID!], $block: Block_height) {
   }
 }
 # token detail page
-query TokensById($id: ID!) {
-  token(id: $id) {
+query TokensById($address: ID!) {
+  token(id: $address) {
     id
     symbol
     name
@@ -122,6 +122,66 @@ query TokensById($id: ID!) {
     feesUSD
   }
 }
+
+query TokenPools($address: String!) {
+  asToken0: pools(first: 200, orderBy: totalValueLockedUSD, orderDirection: desc, where: { token0: $address }, subgraphError: allow) {
+    id
+    feeTier
+    liquidity
+    sqrtPrice
+    tick
+    token0 {
+      id
+      symbol
+      name
+      decimals
+      derivedETH
+    }
+    token1 {
+      id
+      symbol
+      name
+      decimals
+      derivedETH
+    }
+    token0Price
+    token1Price
+    volumeUSD
+    txCount
+    totalValueLockedToken0
+    totalValueLockedToken1
+    totalValueLockedUSD
+  }
+  asToken1: pools(first: 200, orderBy: totalValueLockedUSD, orderDirection: desc, where: { token1: $address }, subgraphError: allow) {
+    id
+    feeTier
+    liquidity
+    sqrtPrice
+    tick
+    token0 {
+      id
+      symbol
+      name
+      decimals
+      derivedETH
+    }
+    token1 {
+      id
+      symbol
+      name
+      decimals
+      derivedETH
+    }
+    token0Price
+    token1Price
+    volumeUSD
+    txCount
+    totalValueLockedToken0
+    totalValueLockedToken1
+    totalValueLockedUSD
+  }
+}
+
 query TokenDayDatas($startTime: Int!, $skip: Int!, $address: String!) {
   tokenDayDatas(first: 1000, skip: $skip, where: { token: $address, date_gt: $startTime }, orderBy: date, orderDirection: asc) {
     date
@@ -130,14 +190,7 @@ query TokenDayDatas($startTime: Int!, $skip: Int!, $address: String!) {
   }
 }
 query UniswapDayDatas($startTime: Int!, $skip: Int!) {
-  uniswapDayDatas(
-    first: 1000
-    skip: $skip
-    subgraphError: allow
-    where: {date_gt: $startTime}
-    orderBy: date
-    orderDirection: asc
-  ) {
+  uniswapDayDatas(first: 1000, skip: $skip, subgraphError: allow, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
     id
     date
     volumeUSD
@@ -145,14 +198,9 @@ query UniswapDayDatas($startTime: Int!, $skip: Int!) {
   }
 }
 
-# Transactions tab
+# Transactions
 query Transactions {
-  transactions(
-    first: 500
-    orderBy: timestamp
-    orderDirection: desc
-    subgraphError: allow
-  ) {
+  transactions(first: 500, orderBy: timestamp, orderDirection: desc, subgraphError: allow) {
     id
     timestamp
     mints {
@@ -212,5 +260,144 @@ query Transactions {
       amount1
       amountUSD
     }
+  }
+}
+
+query TokenTransactions($address: String!) {
+  mintsAs0: mints(first: 500, orderBy: timestamp, orderDirection: desc, where: { token0: $address }, subgraphError: allow) {
+    timestamp
+    transaction {
+      id
+    }
+    pool {
+      token0 {
+        id
+        symbol
+        name
+      }
+      token1 {
+        id
+        symbol
+        name
+      }
+    }
+    owner
+    sender
+    origin
+    amount0
+    amount1
+    amountUSD
+  }
+  mintsAs1: mints(first: 500, orderBy: timestamp, orderDirection: desc, where: { token0: $address }, subgraphError: allow) {
+    timestamp
+    transaction {
+      id
+    }
+    pool {
+      token0 {
+        id
+        symbol
+        name
+      }
+      token1 {
+        id
+        symbol
+        name
+      }
+    }
+    owner
+    sender
+    origin
+    amount0
+    amount1
+    amountUSD
+  }
+  swapsAs0: swaps(first: 500, orderBy: timestamp, orderDirection: desc, where: { token0: $address }, subgraphError: allow) {
+    timestamp
+    transaction {
+      id
+    }
+    pool {
+      token0 {
+        id
+        symbol
+        name
+      }
+      token1 {
+        id
+        symbol
+        name
+      }
+    }
+    origin
+    amount0
+    amount1
+    amountUSD
+  }
+  swapsAs1: swaps(first: 500, orderBy: timestamp, orderDirection: desc, where: { token1: $address }, subgraphError: allow) {
+    timestamp
+    transaction {
+      id
+    }
+    pool {
+      token0 {
+        id
+        symbol
+        name
+      }
+      token1 {
+        id
+        symbol
+        name
+      }
+    }
+    origin
+    amount0
+    amount1
+    amountUSD
+  }
+  burnsAs0: burns(first: 500, orderBy: timestamp, orderDirection: desc, where: { token0: $address }, subgraphError: allow) {
+    timestamp
+    transaction {
+      id
+    }
+    pool {
+      token0 {
+        id
+        symbol
+        name
+      }
+      token1 {
+        id
+        symbol
+        name
+      }
+    }
+    owner
+    amount0
+    amount1
+    amountUSD
+  }
+  burnsAs1: burns(first: 500, orderBy: timestamp, orderDirection: desc, where: { token1: $address }, subgraphError: allow) {
+    timestamp
+    transaction {
+      id
+    }
+    pool {
+      token0 {
+        id
+        symbol
+        name
+      }
+      token1 {
+        id
+        symbol
+        name
+      }
+    }
+    owner
+    amount0
+    amount1
+    amountUSD
   }
 }

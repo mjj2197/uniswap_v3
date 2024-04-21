@@ -28,7 +28,7 @@ interface PoolToken {
   name: string
 }
 
-interface PoolFields {
+export interface PoolFields {
   id: string
   token0: {
     id: string

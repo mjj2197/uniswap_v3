@@ -1,8 +1,6 @@
 import { ChainId } from '@jaguarswap/sdk-core'
 import { useWeb3React } from '@web3-react/core'
-import PrefetchBalancesWrapper, {
-  useCachedPortfolioBalancesQuery,
-} from 'components/PrefetchBalancesWrapper/PrefetchBalancesWrapper'
+import PrefetchBalancesWrapper, { useCachedPortfolioBalancesQuery } from 'components/PrefetchBalancesWrapper/PrefetchBalancesWrapper'
 import TokenDetails from 'components/Tokens/TokenDetails'
 import { useCreateTDPChartState } from 'components/Tokens/TokenDetails/ChartSection'
 import InvalidTokenDetails from 'components/Tokens/TokenDetails/InvalidTokenDetails'
@@ -22,6 +20,7 @@ import { isAddress } from 'utilities/src/addresses'
 import { getNativeTokenDBAddress } from 'utils/nativeTokens'
 import { LoadedTDPContext, MultiChainMap, PendingTDPContext, TDPProvider } from './TDPContext'
 import { getTokenPageTitle } from './utils'
+import { useTokensByIdQuery } from '../../graphql/thegraph/__generated__/types-and-hooks'
 
 const StyledPrefetchBalancesWrapper = styled(PrefetchBalancesWrapper)`
   display: contents;
@@ -38,12 +37,7 @@ function useOnChainToken(address: string | undefined, chainId: ChainId, skip: bo
 }
 
 /** Resolves a currency object from the following sources in order of preference: statically stored natives, query data, backup on-chain fetch data */
-function useTDPCurrency(
-  tokenQuery: ReturnType<typeof useTokenWebQuery>,
-  tokenAddress: string,
-  currencyChainId: ChainId,
-  isNative: boolean
-) {
+function useTDPCurrency(tokenQuery: ReturnType<typeof useTokenWebQuery>, tokenAddress: string, currencyChainId: ChainId, isNative: boolean) {
   const { chainId } = useWeb3React()
   const appChainId = chainId ?? ChainId.X1
 
@@ -94,9 +88,8 @@ function useCreateTDPContext(): PendingTDPContext | LoadedTDPContext {
 
   const tokenDBAddress = isNative ? getNativeTokenDBAddress(currencyChain) : tokenAddress
 
-  const tokenQuery = useTokenWebQuery({
-    variables: { address: tokenDBAddress, chain: currencyChain },
-    errorPolicy: 'all',
+  const tokenQuery = useTokensByIdQuery({
+    variables: { address: tokenDBAddress },
   })
   const chartState = useCreateTDPChartState(tokenDBAddress, currencyChain)
 
@@ -126,18 +119,7 @@ function useCreateTDPContext(): PendingTDPContext | LoadedTDPContext {
       multiChainMap,
       extractedAccent1,
     }
-  }, [
-    currency,
-    currencyChain,
-    currencyChainId,
-    currencyWasFetchedOnChain,
-    extractedAccent1,
-    multiChainMap,
-    warning,
-    tokenAddress,
-    tokenQuery,
-    chartState,
-  ])
+  }, [currency, currencyChain, currencyChainId, currencyWasFetchedOnChain, extractedAccent1, multiChainMap, warning, tokenAddress, tokenQuery, chartState])
 }
 
 export default function TokenDetailsPage() {
