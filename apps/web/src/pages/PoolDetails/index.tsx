@@ -2,14 +2,14 @@ import { Trans } from '@lingui/macro'
 import { InterfacePageName } from '@uniswap/analytics-events'
 import { Trace } from 'analytics'
 import Column from 'components/Column'
-import ChartSection from 'components/Pools/PoolDetails/ChartSection'
+// import ChartSection from 'components/Pools/PoolDetails/ChartSection'
 import { PoolDetailsBreadcrumb, PoolDetailsHeader } from 'components/Pools/PoolDetails/PoolDetailsHeader'
 import { PoolDetailsLink } from 'components/Pools/PoolDetails/PoolDetailsLink'
 import { PoolDetailsStats } from 'components/Pools/PoolDetails/PoolDetailsStats'
 import { PoolDetailsStatsButtons } from 'components/Pools/PoolDetails/PoolDetailsStatsButtons'
 import { PoolDetailsTableTab } from 'components/Pools/PoolDetails/PoolDetailsTable'
 import Row from 'components/Row'
-import { PoolData, usePoolData } from 'graphql/data/pools/usePoolData'
+import { PoolData, Token } from 'graphql/data/pools/usePoolData'
 import { getValidUrlChainName, gqlToCurrency, supportedChainIdFromGQLChain, unwrapToken } from 'graphql/data/util'
 import { useColor } from 'hooks/useColor'
 import NotFound from 'pages/NotFound'
@@ -21,6 +21,8 @@ import { Text } from 'rebass'
 import styled, { useTheme } from 'styled-components'
 import { BREAKPOINTS, ThemeProvider } from 'theme'
 import { isAddress } from 'utilities/src/addresses'
+import { useV3Pool } from 'graphql/data/pools/useV3Pool'
+import { ProtocolVersion } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 
 const PageWrapper = styled(Row)`
   padding: 0 16px 52px;
@@ -101,9 +103,7 @@ const LinksContainer = styled(Column)`
 `
 
 function getUnwrappedPoolToken(poolData?: PoolData, chainId?: number) {
-  return poolData?.token0 && poolData?.token1 && chainId
-    ? [unwrapToken(chainId, poolData?.token0), unwrapToken(chainId, poolData?.token1)]
-    : [undefined, undefined]
+  return poolData?.token0 && poolData?.token1 && chainId ? [unwrapToken(chainId, poolData?.token0), unwrapToken(chainId, poolData?.token1)] : [undefined, undefined]
 }
 
 export default function PoolDetailsPage() {
@@ -113,7 +113,8 @@ export default function PoolDetailsPage() {
   }>()
   const chain = getValidUrlChainName(chainName)
   const chainId = chain && supportedChainIdFromGQLChain(chain)
-  const { data: poolData, loading } = usePoolData(poolAddress?.toLowerCase() ?? '', chainId)
+
+  const { data: poolData, loading, error } = useV3Pool(poolAddress?.toLowerCase() ?? '')
   const [isReversed, toggleReversed] = useReducer((x) => !x, false)
   const unwrappedTokens = getUnwrappedPoolToken(poolData, chainId)
   const [token0, token1] = isReversed ? [unwrappedTokens?.[1], unwrappedTokens?.[0]] : unwrappedTokens
@@ -131,7 +132,7 @@ export default function PoolDetailsPage() {
   const isInvalidPool = !chainName || !poolAddress || !getValidUrlChainName(chainName) || !isAddress(poolAddress)
   const poolNotFound = (!loading && !poolData) || isInvalidPool
 
-  if (poolNotFound) return <NotFound />
+  // if (poolNotFound) return <NotFound />
   return (
     <ThemeProvider token0={color0 !== accent1 ? color0 : undefined} token1={color1 !== accent1 ? color1 : undefined}>
       <Helmet>
@@ -156,42 +157,25 @@ export default function PoolDetailsPage() {
           <LeftColumn>
             <Column gap="20px">
               <Column>
-                <PoolDetailsBreadcrumb
-                  chainId={chainId}
-                  poolAddress={poolAddress}
-                  token0={token0}
-                  token1={token1}
-                  loading={loading}
-                />
+                <PoolDetailsBreadcrumb chainId={chainId} poolAddress={poolAddress} token0={token0} token1={token1} loading={loading} />
                 <PoolDetailsHeader
                   chainId={chainId}
                   poolAddress={poolAddress}
                   token0={token0}
                   token1={token1}
                   feeTier={poolData?.feeTier}
-                  protocolVersion={poolData?.protocolVersion}
+                  protocolVersion={ProtocolVersion.V3}
                   toggleReversed={toggleReversed}
                   loading={loading}
                 />
               </Column>
-              <ChartSection poolData={poolData} loading={loading} isReversed={isReversed} chain={chain} />
+              {/* <ChartSection poolData={poolData} loading={loading} isReversed={isReversed} chain={chain} /> */}
             </Column>
             <HR />
-            <PoolDetailsTableTab
-              poolAddress={poolAddress}
-              token0={token0}
-              token1={token1}
-              protocolVersion={poolData?.protocolVersion}
-            />
+            <PoolDetailsTableTab poolAddress={poolAddress} token0={token0} token1={token1} protocolVersion={ProtocolVersion.V3} />
           </LeftColumn>
           <RightColumn>
-            <PoolDetailsStatsButtons
-              chainId={chainId}
-              token0={token0}
-              token1={token1}
-              feeTier={poolData?.feeTier}
-              loading={loading}
-            />
+            <PoolDetailsStatsButtons chainId={chainId} token0={token0} token1={token1} feeTier={poolData?.feeTier} loading={loading} />
             <PoolDetailsStats poolData={poolData} isReversed={isReversed} chainId={chainId} loading={loading} />
             <TokenDetailsWrapper>
               <TokenDetailsHeader>

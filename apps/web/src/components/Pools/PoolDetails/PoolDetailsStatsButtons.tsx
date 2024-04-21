@@ -278,14 +278,14 @@ export function PoolDetailsStatsButtons({ chainId, token0, token1, feeTier, load
           compact
           disableTokenInputs={chainId !== walletChainId}
         />
-        {Boolean(priorityWarning) && (
+        {/* {Boolean(priorityWarning) && (
           <TokenSafetyMessage
             tokenAddress={(priorityWarning === token0Warning ? token0?.address : token1?.address) ?? ''}
             warning={priorityWarning ?? NotFoundWarning}
             plural={Boolean(token0Warning && token1Warning)}
             tokenSymbol={priorityWarning === token0Warning ? token0?.symbol : token1?.symbol}
           />
-        )}
+        )} */}
       </SwapModalWrapper>
       <Scrim
         $open={swapModalOpen && !screenSizeLargerThanTablet}

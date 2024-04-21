@@ -198,6 +198,106 @@ query UniswapDayDatas($startTime: Int!, $skip: Int!) {
   }
 }
 
+query PoolById($address: ID!) {
+  pool(id: $address) {
+    id
+    feeTier
+    liquidity
+    sqrtPrice
+    tick
+    token0 {
+      id
+      symbol
+      name
+      decimals
+      derivedETH
+    }
+    token1 {
+      id
+      symbol
+      name
+      decimals
+      derivedETH
+    }
+    token0Price
+    token1Price
+    volumeUSD
+    txCount
+    totalValueLockedToken0
+    totalValueLockedToken1
+    totalValueLockedUSD
+  }
+}
+query PoolTransactions($address: String!) {
+  mints(first: 500, orderBy: timestamp, orderDirection: desc, where: { pool: $address }, subgraphError: allow) {
+    timestamp
+    transaction {
+      id
+    }
+    pool {
+      token0 {
+        id
+        symbol
+        name
+      }
+      token1 {
+        id
+        symbol
+        name
+      }
+    }
+    owner
+    sender
+    origin
+    amount0
+    amount1
+    amountUSD
+  }
+  swaps(first: 500, orderBy: timestamp, orderDirection: desc, where: { pool: $address }, subgraphError: allow) {
+    timestamp
+    transaction {
+      id
+    }
+    pool {
+      token0 {
+        id
+        symbol
+        name
+      }
+      token1 {
+        id
+        symbol
+        name
+      }
+    }
+    origin
+    amount0
+    amount1
+    amountUSD
+  }
+  burns(first: 500, orderBy: timestamp, orderDirection: desc, where: { pool: $address }, subgraphError: allow) {
+    timestamp
+    transaction {
+      id
+    }
+    pool {
+      token0 {
+        id
+        symbol
+        name
+      }
+      token1 {
+        id
+        symbol
+        name
+      }
+    }
+    owner
+    amount0
+    amount1
+    amountUSD
+  }
+}
 # Transactions
 query Transactions {
   transactions(first: 500, orderBy: timestamp, orderDirection: desc, subgraphError: allow) {

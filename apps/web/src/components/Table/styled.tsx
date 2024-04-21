@@ -245,7 +245,7 @@ export const TokenLinkCell = ({ token }: { token: Token }) => {
   const unwrappedToken = unwrapToken(chainId, token)
   const isNative = unwrappedToken.address === NATIVE_CHAIN_ID
   const nativeCurrency = nativeOnChain(chainId)
-  const logo = getInitialUrl(token.address, chainId)
+  const logo = getInitialUrl(token.address ?? token.id, chainId)
   return (
     <StyledInternalLink
       to={getTokenDetailsURL({

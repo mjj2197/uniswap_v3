@@ -11,25 +11,32 @@ export enum TransSortMethod {
 }
 
 export type TableTransaction = {
-  type: TransactionType | TokenTransactionType
+  type: TransactionType | TokenTransactionType | V3PoolTransactionType
   hash: string
   timestamp: string
-  sender: string
+  sender?: string
+  owner?: string
+  origin?: string
   token0: {
-    address: string
+    id: string
     name: string
     symbol: string
-    amount: number
+    amount: string
   }
   token1: {
-    address: string
+    id: string
     name: string
     symbol: string
-    amount: number
+    amount: string
   }
   amountUSD: number
 }
-
+export enum V3PoolTransactionType {
+  BUY = 'Buy',
+  SELL = 'Sell',
+  BURN = 'Burn',
+  MINT = 'Mint',
+}
 export enum TransactionType {
   SWAP = 'Swap',
   MINT = 'Add',
@@ -50,13 +57,13 @@ export function useV3Transactions(filter: TransactionType[] = [TransactionType.S
         timestamp: t.timestamp,
         sender: m.origin,
         token0: {
-          address: m.pool.token0.id,
+          id: m.pool.token0.id,
           name: m.pool.token0.name,
           symbol: m.pool.token0.symbol,
           amount: m.amount0,
         },
         token1: {
-          address: m.pool.token1.id,
+          id: m.pool.token1.id,
           name: m.pool.token1.name,
           symbol: m.pool.token1.symbol,
           amount: m.amount1,
@@ -71,13 +78,13 @@ export function useV3Transactions(filter: TransactionType[] = [TransactionType.S
         timestamp: t.timestamp,
         sender: m.origin,
         token0: {
-          address: m.pool.token0.id,
+          id: m.pool.token0.id,
           name: m.pool.token0.name,
           symbol: m.pool.token0.symbol,
           amount: m.amount0,
         },
         token1: {
-          address: m.pool.token1.id,
+          id: m.pool.token1.id,
           name: m.pool.token1.name,
           symbol: m.pool.token1.symbol,
           amount: m.amount1,
@@ -93,13 +100,13 @@ export function useV3Transactions(filter: TransactionType[] = [TransactionType.S
         timestamp: t.timestamp,
         sender: m.origin,
         token0: {
-          address: m.pool.token0.id,
+          id: m.pool.token0.id,
           name: m.pool.token0.name,
           symbol: m.pool.token0.symbol,
           amount: m.amount0,
         },
         token1: {
-          address: m.pool.token1.id,
+          id: m.pool.token1.id,
           name: m.pool.token1.name,
           symbol: m.pool.token1.symbol,
           amount: m.amount1,

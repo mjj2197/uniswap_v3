@@ -170,20 +170,20 @@ export function PoolDetailsStats({ poolData, isReversed, chainId, loading }: Poo
   const currency1 = useCurrency(poolData?.token1?.address, chainId)
 
   const [token0, token1] = useMemo(() => {
-    if (poolData && poolData.tvlToken0 && poolData.token0Price && poolData.tvlToken1 && poolData.token1Price) {
+    if (poolData && poolData.token0 && poolData.token0Price && poolData.token1 && poolData.token1Price) {
       const fullWidth = poolData?.tvlToken0 * poolData?.token0Price + poolData?.tvlToken1 * poolData?.token1Price
       const token0FullData: TokenFullData = {
         ...poolData?.token0,
         price: poolData?.token0Price,
-        tvl: poolData?.tvlToken0,
-        percent: (poolData?.tvlToken0 * poolData?.token0Price) / fullWidth,
+        tvl: poolData?.totalValueLockedToken0,
+        percent: (poolData?.totalValueLockedToken0 * poolData?.token0Price) / fullWidth,
         currency: currency0,
       }
       const token1FullData: TokenFullData = {
         ...poolData?.token1,
         price: poolData?.token1Price,
-        tvl: poolData?.tvlToken1,
-        percent: (poolData?.tvlToken1 * poolData?.token1Price) / fullWidth,
+        tvl: poolData?.totalValueLockedToken1,
+        percent: (poolData?.totalValueLockedToken1 * poolData?.token1Price) / fullWidth,
         currency: currency1,
       }
       return isReversed ? [token1FullData, token0FullData] : [token0FullData, token1FullData]
@@ -228,15 +228,15 @@ export function PoolDetailsStats({ poolData, isReversed, chainId, loading }: Poo
           </Row>
         )}
       </StatItemColumn>
-      {poolData?.tvlUSD && (
-        <StatItem title={<Trans>TVL</Trans>} value={poolData.tvlUSD} delta={poolData.tvlUSDChange} />
+      {poolData?.tvl && (
+        <StatItem title={<Trans>TVL</Trans>} value={poolData.tvl} delta={poolData.tvlUSDChange} />
       )}
-      {poolData?.volumeUSD24H !== undefined && (
+      {/* {poolData?.volumeUSD24H !== undefined && (
         <StatItem title={<Trans>24H volume</Trans>} value={poolData.volumeUSD24H} delta={poolData.volumeUSD24HChange} />
       )}
       {poolData?.volumeUSD24H !== undefined && poolData?.feeTier !== undefined && (
         <StatItem title={<Trans>24H fees</Trans>} value={poolData.volumeUSD24H * (poolData.feeTier / 1000000)} />
-      )}
+      )} */}
     </StatsWrapper>
   )
 }

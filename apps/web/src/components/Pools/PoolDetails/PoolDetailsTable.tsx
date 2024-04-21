@@ -25,58 +25,31 @@ const TableHeader = styled(ThemedText.HeadlineMedium)<{ active: boolean }>`
   user-select: none;
 `
 
-export function PoolDetailsTableTab({
-  poolAddress,
-  token0,
-  token1,
-  protocolVersion,
-}: {
-  poolAddress: string
-  token0?: Token
-  token1?: Token
-  protocolVersion?: ProtocolVersion
-}) {
+export function PoolDetailsTableTab({ poolAddress, token0, token1, protocolVersion }: { poolAddress: string; token0?: Token; token1?: Token; protocolVersion?: ProtocolVersion }) {
   const [activeTable, setActiveTable] = useState<PoolDetailsTableTabs>(PoolDetailsTableTabs.TRANSACTIONS)
   const chainName = validateUrlChainParam(useParams<{ chainName?: string }>().chainName)
   const chainId = supportedChainIdFromGQLChain(chainName)
   const { account } = useWeb3React()
   const { positions } = useMultiChainPositions(account ?? '', [chainId])
   const positionsInThisPool = useMemo(
-    () =>
-      positions?.filter(
-        (position) =>
-          Pool.getAddress(position.pool.token0, position.pool.token1, position.pool.fee).toLowerCase() ===
-          poolAddress.toLowerCase()
-      ) ?? [],
+    () => positions?.filter((position) => Pool.getAddress(position.pool.token0, position.pool.token1, position.pool.fee).toLowerCase() === poolAddress.toLowerCase()) ?? [],
     [poolAddress, positions]
   )
   return (
     <Column gap="lg">
       <Row gap="16px">
-        <TableHeader
-          active={activeTable === PoolDetailsTableTabs.TRANSACTIONS}
-          onClick={() => setActiveTable(PoolDetailsTableTabs.TRANSACTIONS)}
-          disabled={!positionsInThisPool.length}
-        >
+        <TableHeader active={activeTable === PoolDetailsTableTabs.TRANSACTIONS} onClick={() => setActiveTable(PoolDetailsTableTabs.TRANSACTIONS)} disabled={!positionsInThisPool.length}>
           <Trans>Transactions</Trans>
         </TableHeader>
         {Boolean(positionsInThisPool.length) && (
-          <TableHeader
-            active={activeTable === PoolDetailsTableTabs.POSITIONS}
-            onClick={() => setActiveTable(PoolDetailsTableTabs.POSITIONS)}
-          >
+          <TableHeader active={activeTable === PoolDetailsTableTabs.POSITIONS} onClick={() => setActiveTable(PoolDetailsTableTabs.POSITIONS)}>
             <Trans>Positions</Trans>
             {` (${positionsInThisPool?.length})`}
           </TableHeader>
         )}
       </Row>
       {activeTable === PoolDetailsTableTabs.TRANSACTIONS ? (
-        <PoolDetailsTransactionsTable
-          poolAddress={poolAddress}
-          token0={token0}
-          token1={token1}
-          protocolVersion={protocolVersion}
-        />
+        <PoolDetailsTransactionsTable poolAddress={poolAddress} token0={token0} token1={token1} />
       ) : (
         <PoolDetailsPositionsTable positions={positionsInThisPool} />
       )}

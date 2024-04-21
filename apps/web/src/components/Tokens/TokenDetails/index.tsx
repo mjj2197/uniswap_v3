@@ -145,7 +145,7 @@ function TDPSwapComponent() {
           compact
         />
       </div>
-      {warning && <TokenSafetyMessage tokenAddress={address} warning={warning} />}
+      {/* {warning && <TokenSafetyMessage tokenAddress={address} warning={warning} />}
       <TokenSafetyModal
         isOpen={openTokenSafetyModal || !!continueSwap}
         tokenAddress={address}
@@ -155,7 +155,7 @@ function TDPSwapComponent() {
         }}
         onCancel={() => onResolveSwap(false)}
         showCancel={true}
-      />
+      /> */}
     </>
   )
 }

@@ -103,8 +103,8 @@ export function gqlToCurrency(
 }
 
 const URL_CHAIN_PARAM_TO_BACKEND: { [key: string]: InterfaceGqlChain } = {
-  x1: Chain.X1,
-  x1Testnet: Chain.X1_TESTNET,
+  xlayer: Chain.X1,
+  'xlayer-testnet': Chain.X1_TESTNET,
 }
 
 /**

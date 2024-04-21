@@ -5,22 +5,20 @@ import { Table } from 'components/Table'
 import { Cell } from 'components/Table/Cell'
 import { Filter } from 'components/Table/Filter'
 import { FilterHeaderRow, HeaderArrow, HeaderSortText, TimestampCell } from 'components/Table/styled'
-import {
-  PoolTableTransaction,
-  PoolTableTransactionType,
-  usePoolTransactions,
-} from 'graphql/data/pools/usePoolTransactions'
+import { PoolTableTransaction, PoolTableTransactionType } from 'graphql/data/pools/usePoolTransactions'
 import { supportedChainIdFromGQLChain, validateUrlChainParam } from 'graphql/data/util'
-import { OrderDirection, Transaction_OrderBy } from 'graphql/thegraph/__generated__/types-and-hooks'
+import { OrderDirection, Transaction_OrderBy, Token } from 'graphql/thegraph/__generated__/types-and-hooks'
 import { useActiveLocalCurrency } from 'hooks/useActiveLocalCurrency'
 import { useMemo, useReducer, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { ExternalLink, ThemedText } from 'theme/components'
-import { ProtocolVersion, Token } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 import { shortenAddress } from 'utilities/src/addresses'
 import { NumberType, useFormatter } from 'utils/formatNumbers'
 import { ExplorerDataType, getExplorerLink } from 'utils/getExplorerLink'
+import { useV3PoolTransactions } from '../../../graphql/data/pools/useV3PoolTransactions'
+import { PoolTransactionType } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
+import { V3PoolTransactionType } from '../../../graphql/data/useV3Transactions'
 
 const StyledExternalLink = styled(ExternalLink)`
   color: ${({ theme }) => theme.neutral2};
@@ -54,40 +52,32 @@ const PoolTransactionColumnWidth: { [key in PoolTransactionColumn]: number } = {
   [PoolTransactionColumn.OutputAmount]: 125,
 }
 
-export function PoolDetailsTransactionsTable({
-  poolAddress,
-  token0,
-  token1,
-  protocolVersion,
-}: {
-  poolAddress: string
-  token0?: Token
-  token1?: Token
-  protocolVersion?: ProtocolVersion
-}) {
+function getTransactionMaker(type: V3PoolTransactionType, pool: PoolTableTransaction) {
+  switch (type) {
+    case V3PoolTransactionType.SELL:
+    case V3PoolTransactionType.BUY:
+      return pool.origin
+    case V3PoolTransactionType.MINT:
+    case V3PoolTransactionType.BURN:
+      return pool.owner
+    default:
+      break
+  }
+}
+
+export function PoolDetailsTransactionsTable({ poolAddress, token0, token1 }: { poolAddress: string; token0?: Token; token1?: Token }) {
   const chainName = validateUrlChainParam(useParams<{ chainName?: string }>().chainName)
   const chainId = supportedChainIdFromGQLChain(chainName)
   const activeLocalCurrency = useActiveLocalCurrency()
   const { formatNumber, formatFiatPrice } = useFormatter()
   const [filterModalIsOpen, toggleFilterModal] = useReducer((s) => !s, false)
-  const [filter, setFilters] = useState<PoolTableTransactionType[]>([
-    PoolTableTransactionType.BUY,
-    PoolTableTransactionType.SELL,
-    PoolTableTransactionType.BURN,
-    PoolTableTransactionType.MINT,
-  ])
+  const [filter, setFilters] = useState<PoolTableTransactionType[]>([PoolTableTransactionType.BUY, PoolTableTransactionType.SELL, PoolTableTransactionType.BURN, PoolTableTransactionType.MINT])
 
   const [sortState] = useState<PoolTxTableSortState>({
     sortBy: Transaction_OrderBy.Timestamp,
     sortDirection: OrderDirection.Desc,
   })
-  const { transactions, loading, loadMore, error } = usePoolTransactions(
-    poolAddress,
-    chainId,
-    filter,
-    token0,
-    protocolVersion
-  )
+  const { data: transactions, loading, error } = useV3PoolTransactions(poolAddress, filter, token0)
 
   const showLoadingSkeleton = loading || !!error
   const columns = useMemo(() => {
@@ -106,35 +96,30 @@ export function PoolDetailsTransactionsTable({
           </Cell>
         ),
         cell: (row) => (
-          <Cell
-            loading={showLoadingSkeleton}
-            minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.Timestamp]}
-            justifyContent="flex-start"
-          >
-            <TimestampCell
-              timestamp={Number(row.getValue?.().timestamp)}
-              link={getExplorerLink(chainId, row.getValue?.().transaction, ExplorerDataType.TRANSACTION)}
-            />
+          <Cell loading={showLoadingSkeleton} minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.Timestamp]} justifyContent="flex-start">
+            <TimestampCell timestamp={Number(row.getValue?.().timestamp)} link={getExplorerLink(chainId, row.getValue?.().hash, ExplorerDataType.TRANSACTION)} />
           </Cell>
         ),
       }),
       columnHelper.accessor(
         (row) => {
           let color, text
-          if (row.type === PoolTableTransactionType.BUY) {
-            color = 'success'
-            text = (
-              <span>
-                <Trans>Buy</Trans>&nbsp;{token0?.symbol}
-              </span>
-            )
-          } else if (row.type === PoolTableTransactionType.SELL) {
-            color = 'critical'
-            text = (
-              <span>
-                <Trans>Sell</Trans>&nbsp;{token0?.symbol}
-              </span>
-            )
+          if (row.type === PoolTableTransactionType.BUY || row.type === PoolTableTransactionType.SELL) {
+            if (row.token0.id.toLowerCase() === token0?.address?.toLowerCase()) {
+              color = 'success'
+              text = (
+                <span>
+                  <Trans>Buy</Trans>&nbsp;{token0?.symbol}
+                </span>
+              )
+            } else {
+              color = 'critical'
+              text = (
+                <span>
+                  <Trans>Sell</Trans>&nbsp;{token0?.symbol}
+                </span>
+              )
+            }
           } else {
             color = row.type === PoolTableTransactionType.MINT ? 'success' : 'critical'
             text = row.type === PoolTableTransactionType.MINT ? <Trans>Add</Trans> : <Trans>Remove</Trans>
@@ -146,13 +131,7 @@ export function PoolDetailsTransactionsTable({
           header: () => (
             <Cell minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.Type]} justifyContent="flex-start">
               <FilterHeaderRow modalOpen={filterModalIsOpen} onClick={() => toggleFilterModal()}>
-                <Filter
-                  allFilters={Object.values(PoolTableTransactionType)}
-                  activeFilter={filter}
-                  setFilters={setFilters}
-                  isOpen={filterModalIsOpen}
-                  toggleFilterModal={toggleFilterModal}
-                />
+                <Filter allFilters={Object.values(PoolTableTransactionType)} activeFilter={filter} setFilters={setFilters} isOpen={filterModalIsOpen} toggleFilterModal={toggleFilterModal} />
                 <ThemedText.BodySecondary>
                   <Trans>Type</Trans>
                 </ThemedText.BodySecondary>
@@ -160,11 +139,7 @@ export function PoolDetailsTransactionsTable({
             </Cell>
           ),
           cell: (PoolTransactionTableType) => (
-            <Cell
-              loading={showLoadingSkeleton}
-              minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.Type]}
-              justifyContent="flex-start"
-            >
+            <Cell loading={showLoadingSkeleton} minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.Type]} justifyContent="flex-start">
               {PoolTransactionTableType.getValue?.()}
             </Cell>
           ),
@@ -180,92 +155,60 @@ export function PoolDetailsTransactionsTable({
           </Cell>
         ),
         cell: (fiat) => (
-          <Cell
-            loading={showLoadingSkeleton}
-            minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.FiatValue]}
-            justifyContent="flex-end"
-            grow
-          >
+          <Cell loading={showLoadingSkeleton} minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.FiatValue]} justifyContent="flex-end" grow>
             <ThemedText.BodyPrimary>{formatFiatPrice({ price: fiat.getValue?.() })}</ThemedText.BodyPrimary>
           </Cell>
         ),
       }),
       columnHelper.accessor(
-        (row) => (row.pool.token0.id.toLowerCase() === token0?.address?.toLowerCase() ? row.amount0 : row.amount1),
+        (row) => {
+          console.log('%c⧭', 'color: #00b300', row.token0.id.toLowerCase() === token0?.address?.toLowerCase() ? row.token0.amount : row.token1.amount1)
+          return row.token0.id.toLowerCase() === token0?.address?.toLowerCase() ? row.token0.amount : row.token1.amount
+        },
         {
           id: 'input-amount',
           header: () => (
-            <Cell
-              loading={showLoadingSkeleton}
-              minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.InputAmount]}
-              justifyContent="flex-end"
-              grow
-            >
+            <Cell loading={showLoadingSkeleton} minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.InputAmount]} justifyContent="flex-end" grow>
               <ThemedText.BodySecondary>{token0?.symbol}</ThemedText.BodySecondary>
             </Cell>
           ),
           cell: (inputTokenAmount) => (
-            <Cell
-              loading={showLoadingSkeleton}
-              minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.InputAmount]}
-              justifyContent="flex-end"
-              grow
-            >
-              <ThemedText.BodyPrimary>
-                {formatNumber({ input: Math.abs(inputTokenAmount.getValue?.() ?? 0), type: NumberType.TokenTx })}
-              </ThemedText.BodyPrimary>
+            <Cell loading={showLoadingSkeleton} minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.InputAmount]} justifyContent="flex-end" grow>
+              <ThemedText.BodyPrimary>{formatNumber({ input: Math.abs(inputTokenAmount.getValue?.() ?? 0), type: NumberType.TokenTx })}</ThemedText.BodyPrimary>
             </Cell>
           ),
         }
       ),
       columnHelper.accessor(
-        (row) => (row.pool.token0.id.toLowerCase() === token0?.address?.toLowerCase() ? row.amount1 : row.amount0),
+        (row) => {
+          console.log('%c⧭', 'color: #1d5673', row.token0.id.toLowerCase() === token0?.address?.toLowerCase() ? row.token1.amount1 : row.token0.amount)
+          return row.token0.id.toLowerCase() === token0?.address?.toLowerCase() ? row.token1.amount : row.token0.amount
+        },
         {
           id: 'output-amount',
           header: () => (
-            <Cell
-              loading={showLoadingSkeleton}
-              minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.OutputAmount]}
-              justifyContent="flex-end"
-              grow
-            >
+            <Cell loading={showLoadingSkeleton} minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.OutputAmount]} justifyContent="flex-end" grow>
               <ThemedText.BodySecondary>{token1?.symbol}</ThemedText.BodySecondary>
             </Cell>
           ),
           cell: (outputTokenAmount) => (
-            <Cell
-              loading={showLoadingSkeleton}
-              minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.OutputAmount]}
-              justifyContent="flex-end"
-              grow
-            >
-              <ThemedText.BodyPrimary>
-                {formatNumber({ input: Math.abs(outputTokenAmount.getValue?.() ?? 0), type: NumberType.TokenTx })}
-              </ThemedText.BodyPrimary>
+            <Cell loading={showLoadingSkeleton} minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.OutputAmount]} justifyContent="flex-end" grow>
+              <ThemedText.BodyPrimary>{formatNumber({ input: Math.abs(outputTokenAmount.getValue?.() ?? 0), type: NumberType.TokenTx })}</ThemedText.BodyPrimary>
             </Cell>
           ),
         }
       ),
-      columnHelper.accessor((row) => row.maker, {
+      columnHelper.accessor((row) => getTransactionMaker(row.type, row), {
         id: 'maker-address',
         header: () => (
-          <Cell
-            minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.MakerAddress]}
-            justifyContent="flex-end"
-            grow
-          >
+          <Cell minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.MakerAddress]} justifyContent="flex-end" grow>
             <ThemedText.BodySecondary>
               <Trans>Wallet</Trans>
             </ThemedText.BodySecondary>
           </Cell>
         ),
         cell: (makerAddress) => (
-          <Cell
-            loading={showLoadingSkeleton}
-            minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.MakerAddress]}
-            justifyContent="flex-end"
-            grow
-          >
+          <Cell loading={showLoadingSkeleton} minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.MakerAddress]} justifyContent="flex-end" grow>
             <StyledExternalLink href={getExplorerLink(chainId, makerAddress.getValue?.(), ExplorerDataType.ADDRESS)}>
               <ThemedText.BodyPrimary>{shortenAddress(makerAddress.getValue?.(), 0)}</ThemedText.BodyPrimary>
             </StyledExternalLink>
@@ -273,30 +216,11 @@ export function PoolDetailsTransactionsTable({
         ),
       }),
     ]
-  }, [
-    activeLocalCurrency,
-    chainId,
-    filter,
-    filterModalIsOpen,
-    formatFiatPrice,
-    formatNumber,
-    showLoadingSkeleton,
-    sortState.sortBy,
-    token0?.address,
-    token0?.symbol,
-    token1?.symbol,
-  ])
+  }, [activeLocalCurrency, chainId, filter, filterModalIsOpen, formatFiatPrice, formatNumber, showLoadingSkeleton, sortState.sortBy, token0?.address, token0?.symbol, token1?.symbol])
 
   return (
     <TableWrapper data-testid="pool-details-transactions-table">
-      <Table
-        columns={columns}
-        data={transactions}
-        loading={loading}
-        error={error}
-        loadMore={loadMore}
-        maxHeight={600}
-      />
+      <Table columns={columns} data={transactions} loading={loading} error={error} maxHeight={600} />
     </TableWrapper>
   )
 }

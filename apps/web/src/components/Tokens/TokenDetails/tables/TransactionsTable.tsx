@@ -91,7 +91,7 @@ export function TransactionsTable({ chainId, referenceToken }: { chainId: ChainI
       columnHelper.accessor((transaction) => transaction, {
         id: 'type',
         header: () => (
-          <Cell minWidth={276} justifyContent="flex-start" grow>
+          <Cell justifyContent="flex-start" grow>
             <FilterHeaderRow modalOpen={filterModalIsOpen} onClick={() => toggleFilterModal()}>
               <Filter allFilters={Object.values(TokenTransactionType)} activeFilter={filter} setFilters={setFilters} isOpen={filterModalIsOpen} toggleFilterModal={toggleFilterModal} isSticky={true} />
               <ThemedText.BodySecondary>
@@ -108,19 +108,6 @@ export function TransactionsTable({ chainId, referenceToken }: { chainId: ChainI
             </Cell>
           )
         },
-      }),
-      columnHelper.accessor((transaction) => transaction.amountUSD, {
-        id: 'fiat-value',
-        header: () => (
-          <Cell minWidth={125}>
-            <ThemedText.BodySecondary>{activeLocalCurrency}</ThemedText.BodySecondary>
-          </Cell>
-        ),
-        cell: (fiat) => (
-          <Cell loading={showLoadingSkeleton} minWidth={125}>
-            <ThemedText.BodyPrimary>{formatFiatPrice({ price: fiat.getValue?.() })}</ThemedText.BodyPrimary>
-          </Cell>
-        ),
       }),
       columnHelper.accessor((transaction) => transaction, {
         id: 'token-amount-0',

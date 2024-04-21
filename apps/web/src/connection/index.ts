@@ -122,7 +122,6 @@ export const OKXConnection: Connection = {
   shouldDisplay: () => true,
   // If on non-injected, non-mobile browser, prompt user to install OKX Wallet
   overrideActivate: () => {
-    console.log('🚀 ~ getShouldAdvertiseOKXWallet:', getShouldAdvertiseOKXWallet())
     if (getShouldAdvertiseOKXWallet()) {
       window.open('https://okx.com/', 'inst_okxwallet')
       return true
