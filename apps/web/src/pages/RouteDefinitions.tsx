@@ -94,7 +94,7 @@ const SwapTitle = t`Buy, sell & trade Ethereum and other top tokens on Uniswap`
 export const routes: RouteDefinition[] = [
   createRouteDefinition({
     path: '/',
-    getTitle: () => t`Uniswap | Trade crypto & NFTs safely on the top DeFi exchange`,
+    getTitle: () => t`Jaguarswap | Trade crypto safely on the top DeFi exchange`,
     getElement: (args) => {
       return args.browserRouterEnabled && args.hash ? <Navigate to={args.hash.replace('#', '')} replace /> : <Landing />
     },
