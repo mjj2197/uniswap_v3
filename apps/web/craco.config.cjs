@@ -92,9 +92,9 @@ module.exports = {
       }),
     ],
     configure: (webpackConfig) => {
-      // if (!isProduction) {
+      if (!isProduction) {
         webpackConfig.devtool = false
-      // }
+      }
       // NOTE: 用于调试本地依赖库的代码
       // webpackConfig.cache = !isProduction
       // Configure webpack plugins:
