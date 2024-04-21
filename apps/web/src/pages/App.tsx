@@ -307,4 +307,5 @@ const ImageWrapper = styled.div`
   position: fixed;
   right: 0;
   bottom: 0;
+  pointer-events: none;
 `

@@ -430,14 +430,14 @@ export function SwapForm({ disableTokenInputs = false, onCurrencyChange }: SwapF
   return (
     <>
       <SwapWrapperContainer>
-        <TokenSafetyModal
+        {/* <TokenSafetyModal
           isOpen={urlTokensNotInDefault.length > 0 && !dismissTokenWarning}
           tokenAddress={urlTokensNotInDefault[0]?.address}
           secondTokenAddress={urlTokensNotInDefault[1]?.address}
           onContinue={handleConfirmTokenWarning}
           onCancel={handleDismissTokenWarning}
           showCancel={true}
-        />
+        /> */}
         {trade && showConfirm && (
           <ConfirmSwapModal
             trade={trade}
