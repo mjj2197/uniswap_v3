@@ -80,7 +80,7 @@ export interface RouteDefinition {
 function createRouteDefinition(route: Partial<RouteDefinition>): RouteDefinition {
   return {
     getElement: () => null,
-    getTitle: () => 'Uniswap Interface',
+    getTitle: () => 'Jaguar Interface',
     enabled: () => true,
     path: '/',
     nestedPaths: [],
@@ -89,7 +89,7 @@ function createRouteDefinition(route: Partial<RouteDefinition>): RouteDefinition
   }
 }
 
-const SwapTitle = t`Buy, sell & trade Ethereum and other top tokens on Uniswap`
+const SwapTitle = t`Buy, sell & trade Ethereum and other top tokens on Jaguarswap`
 
 export const routes: RouteDefinition[] = [
   createRouteDefinition({
@@ -107,7 +107,7 @@ export const routes: RouteDefinition[] = [
   }),
   createRouteDefinition({
     path: '/explore/tokens/:chainName/:tokenAddress',
-    getTitle: () => t`Buy & sell on Uniswap`,
+    getTitle: () => t`Buy & sell on Jaguarswap`,
     getElement: () => <TokenDetails />,
   }),
   createRouteDefinition({
@@ -127,7 +127,7 @@ export const routes: RouteDefinition[] = [
   }),
   createRouteDefinition({
     path: '/explore/pools/:chainName/:poolAddress',
-    getTitle: () => t`Explore pools on Uniswap`,
+    getTitle: () => t`Explore pools on Jaguarswap`,
     getElement: () => (
       <Suspense fallback={null}>
         <PoolDetails />
@@ -137,7 +137,7 @@ export const routes: RouteDefinition[] = [
   createRouteDefinition({
     path: '/send',
     getElement: () => <Swap />,
-    getTitle: () => t`Send tokens on Uniswap`,
+    getTitle: () => t`Send tokens on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/limits',
@@ -156,48 +156,48 @@ export const routes: RouteDefinition[] = [
   createRouteDefinition({
     path: '/pool/v2/find',
     getElement: () => <PoolFinder />,
-    getTitle: () => t`Explore top liquidity pools (v2) on Uniswap`,
+    getTitle: () => t`Explore top liquidity pools on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/pool/v2',
     getElement: () => <PoolV2 />,
-    getTitle: () => t`Provide liquidity to pools (v2) on Uniswap`,
+    getTitle: () => t`Provide liquidity to pools on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/pool',
     getElement: () => <Pool />,
-    getTitle: () => t`Manage & provide pool liquidity on Uniswap`,
+    getTitle: () => t`Manage & provide pool liquidity on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/pool/:tokenId',
     getElement: () => <PositionPage />,
-    getTitle: () => t`Manage pool liquidity on Uniswap`,
+    getTitle: () => t`Manage pool liquidity on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/pools/v2/find',
     getElement: () => <PoolFinder />,
-    getTitle: () => t`Explore top liquidity pools (v2) on Uniswap`,
+    getTitle: () => t`Explore top liquidity pools (v2) on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/pools/v2',
     getElement: () => <PoolV2 />,
-    getTitle: () => t`Manage & provide v2 pool liquidity on Uniswap`,
+    getTitle: () => t`Manage & provide v2 pool liquidity on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/pools',
     getElement: () => <Pool />,
-    getTitle: () => t`Manage & provide pool liquidity on Uniswap`,
+    getTitle: () => t`Manage & provide pool liquidity on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/pools/:tokenId',
     getElement: () => <PositionPage />,
-    getTitle: () => t`Manage pool liquidity on Uniswap`,
+    getTitle: () => t`Manage pool liquidity on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/add/v2',
     nestedPaths: [':currencyIdA', ':currencyIdA/:currencyIdB'],
     getElement: () => <AddLiquidityV2WithTokenRedirects />,
-    getTitle: () => t`Provide liquidity to pools (v2) on Uniswap`,
+    getTitle: () => t`Provide liquidity to pools (v2) on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/add',
@@ -208,27 +208,27 @@ export const routes: RouteDefinition[] = [
       ':currencyIdA/:currencyIdB/:feeAmount/:tokenId',
     ],
     getElement: () => <AddLiquidityWithTokenRedirects />,
-    getTitle: () => t`Provide liquidity to pools on Uniswap`,
+    getTitle: () => t`Provide liquidity to pools on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/remove/v2/:currencyIdA/:currencyIdB',
     getElement: () => <RemoveLiquidity />,
-    getTitle: () => t`Manage v2 pool liquidity on Uniswap`,
+    getTitle: () => t`Manage v2 pool liquidity on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/remove/:tokenId',
     getElement: () => <RemoveLiquidityV3 />,
-    getTitle: () => t`Manage pool liquidity on Uniswap`,
+    getTitle: () => t`Manage pool liquidity on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/migrate/v2',
     getElement: () => <MigrateV2 />,
-    getTitle: () => t`Migrate v2 pool liquidity to Uniswap v3`,
+    getTitle: () => t`Migrate v2 pool liquidity to Jaguarswap v3`,
   }),
   createRouteDefinition({
     path: '/migrate/v2/:address',
     getElement: () => <MigrateV2Pair />,
-    getTitle: () => t`Migrate v2 pool liquidity to Uniswap v3`,
+    getTitle: () => t`Migrate v2 pool liquidity to Jaguarswap v3`,
   }),
   createRouteDefinition({
     path: '/nfts',
@@ -238,7 +238,7 @@ export const routes: RouteDefinition[] = [
       </Suspense>
     ),
     enabled: (args) => !args.shouldDisableNFTRoutes,
-    getTitle: () => t`Trade NFTs across OpenSea & other top marketplaces on Uniswap`,
+    getTitle: () => t`Trade NFTs across OpenSea & other top marketplaces on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/nfts/asset/:contractAddress/:tokenId',
@@ -248,7 +248,7 @@ export const routes: RouteDefinition[] = [
       </Suspense>
     ),
     enabled: (args) => !args.shouldDisableNFTRoutes,
-    getTitle: () => t`Explore NFTs on Uniswap`,
+    getTitle: () => t`Explore NFTs on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/nfts/profile',
@@ -258,7 +258,7 @@ export const routes: RouteDefinition[] = [
       </Suspense>
     ),
     enabled: (args) => !args.shouldDisableNFTRoutes,
-    getTitle: () => t`Explore NFTs on Uniswap`,
+    getTitle: () => t`Explore NFTs on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/nfts/collection/:contractAddress',
@@ -268,7 +268,7 @@ export const routes: RouteDefinition[] = [
       </Suspense>
     ),
     enabled: (args) => !args.shouldDisableNFTRoutes,
-    getTitle: () => t`Explore NFTs on Uniswap`,
+    getTitle: () => t`Explore NFTs on Jaguarswap`,
   }),
   createRouteDefinition({
     path: '/nfts/collection/:contractAddress/activity',
@@ -278,7 +278,7 @@ export const routes: RouteDefinition[] = [
       </Suspense>
     ),
     enabled: (args) => !args.shouldDisableNFTRoutes,
-    getTitle: () => t`Explore NFTs on Uniswap`,
+    getTitle: () => t`Explore NFTs on Jaguarswap`,
   }),
   createRouteDefinition({ path: '*', getElement: () => <Navigate to="/not-found" replace /> }),
   createRouteDefinition({ path: '/not-found', getElement: () => <NotFound /> }),
