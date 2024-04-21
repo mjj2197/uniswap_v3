@@ -20,7 +20,6 @@ import { Z_INDEX } from 'theme/zIndex'
 import { Token } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 import { useAppSelector } from 'state/hooks'
 import { AppState } from 'state/reducer'
-import { CHAIN_ID_TO_BACKEND_NAME } from '../../graphql/data/util'
 
 export const SHOW_RETURN_TO_TOP_OFFSET = 500
 export const LOAD_MORE_BOTTOM_OFFSET = 50

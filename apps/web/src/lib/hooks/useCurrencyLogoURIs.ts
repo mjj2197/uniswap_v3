@@ -3,9 +3,8 @@ import useHttpLocations from 'hooks/useHttpLocations'
 import { useMemo } from 'react'
 import { isAddress } from 'utilities/src/addresses'
 
-import EthereumLogo from '../../assets/images/ethereum-logo.png'
+import OKKBLOGO from '../../assets/svg/okb.svg'
 import { NATIVE_CHAIN_ID } from '../../constants/tokens'
-import { NetworkStatus } from '@apollo/client'
 
 type Network = 'xlayer' | 'xlayer-testnet'
 
@@ -23,7 +22,7 @@ export function chainIdToNetworkName(networkId: ChainId): Network {
 export function getNativeLogoURI(chainId: ChainId = ChainId.X1): string {
   switch (chainId) {
     default:
-      return EthereumLogo
+      return OKKBLOGO
   }
 }
 

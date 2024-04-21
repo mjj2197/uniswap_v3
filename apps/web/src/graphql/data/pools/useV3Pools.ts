@@ -23,15 +23,23 @@ export interface TablePool {
 }
 
 interface PoolToken {
-  id: string
+  address: string
   symbol: string
   name: string
 }
 
 interface PoolFields {
   id: string
-  token0: PoolToken
-  token1: PoolToken
+  token0: {
+    id: string
+    symbol: string
+    name: string
+  }
+  token1: {
+    id: string
+    symbol: string
+    name: string
+  }
   txCount: string
   volumeUSD: string
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
@@ -141,8 +149,16 @@ export function useV3Pools(sortState: PoolTableSortState): {
 
       return {
         hash: current?.id,
-        token0: current?.token0,
-        token1: current?.token1,
+        token0: {
+          address: current?.token0.id,
+          name: current?.token0.name,
+          symbol: current?.token0.symbol,
+        },
+        token1: {
+          address: current?.token1.id,
+          name: current?.token1.name,
+          symbol: current?.token1.symbol,
+        },
         txCount: Number.parseInt(current?.txCount),
         tvl: Number.parseInt(current?.totalValueLockedUSD),
         tvlUSD: tvlUSD,

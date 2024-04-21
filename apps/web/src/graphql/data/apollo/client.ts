@@ -12,7 +12,6 @@ const CHAIN_SUBGRAPH_URL_BLOCK: Record<number, string> = {
   [ChainId.X1_TESTNET]: 'https://subgraph.jaguarex.com/subgraphs/name/jaguarswap/x1layer-blocks',
 }
 
-
 const httpLink = new HttpLink({ uri: CHAIN_SUBGRAPH_URL[ChainId.X1] })
 
 export const apolloClient = new ApolloClient({
@@ -28,7 +27,15 @@ export const apolloClient = new ApolloClient({
         // Tokens are cached by their chain/address (see Query.fields.token, above).
         // In any query for `token` or `tokens`, you *must* include `chain` and `address` fields in order
         // to properly normalize the result in the cache.
-        keyFields: false,
+        keyFields: ['id'],
+        fields: {
+          id: {
+            // Always cache lowercased for consistency (backend sometimes returns checksummed).
+            read(id: string | null): string | null {
+              return id?.toLowerCase() ?? null
+            },
+          },
+        },
       },
     },
   }),
@@ -40,5 +47,5 @@ export const apolloClient = new ApolloClient({
 })
 
 // This is done after creating the client so that client may be passed to `createSubscriptionLink`.
-const subscriptionLink = createSubscriptionLink({ uri: CHAIN_SUBGRAPH_URL[ChainId.X1], token: "" }, apolloClient)
+const subscriptionLink = createSubscriptionLink({ uri: CHAIN_SUBGRAPH_URL[ChainId.X1], token: '' }, apolloClient)
 apolloClient.setLink(splitSubscription(subscriptionLink, httpLink))

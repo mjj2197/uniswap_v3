@@ -36,7 +36,13 @@ export const apolloClient = new ApolloClient({
 })
 
 export const apolloClientBlock = new ApolloClient({
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Blocks: {
+        keyFields: ['number'],
+      },
+    },
+  }),
   link: concat(authMiddleware(CHAIN_SUBGRAPH_URL_BLOCK), httpLinkBlock),
 })
 

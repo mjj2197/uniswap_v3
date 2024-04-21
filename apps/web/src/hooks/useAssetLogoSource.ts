@@ -4,6 +4,9 @@ import { chainIdToNetworkName, getNativeLogoURI } from 'lib/hooks/useCurrencyLog
 import uriToHttp from 'lib/utils/uriToHttp'
 import { useCallback, useMemo, useReducer } from 'react'
 import { isAddress } from 'utilities/src/addresses'
+import { useAppSelector } from 'state/hooks'
+import { AppState } from 'state/reducer'
+import { ChainId } from '@jaguarswap/sdk-core'
 
 const BAD_SRCS: { [tokenAddress: string]: true } = {}
 
@@ -60,7 +63,10 @@ export default function useAssetLogoSource({
   isNative?: boolean
   primaryImg?: string | null
 }): [string | undefined, () => void] {
-  const hideLogo = Boolean(address && checkWarning(address, chainId)?.level === WARNING_LEVEL.BLOCKED)
+  const chainIdState = useAppSelector((state: AppState) => state.application.chainId) ?? ChainId.X1
+
+  const chainIdN = chainId ?? chainIdState
+  const hideLogo = Boolean(address && checkWarning(address, chainIdN)?.level === WARNING_LEVEL.BLOCKED)
   const [srcIndex, incrementSrcIndex] = useReducer((n: number) => n + 1, 0)
 
   const current = useMemo(() => {
@@ -68,14 +74,14 @@ export default function useAssetLogoSource({
 
     if (primaryImg && !BAD_SRCS[primaryImg] && !isNative) return primaryImg
 
-    const initialUrl = getInitialUrl(address, chainId, isNative)
+    const initialUrl = getInitialUrl(address, chainIdN, isNative)
     if (initialUrl && !BAD_SRCS[initialUrl]) return initialUrl
 
-    const uris = tokenLogoLookup.getIcons(address, chainId) ?? []
+    const uris = tokenLogoLookup.getIcons(address, chainIdN) ?? []
     const fallbackSrcs = prioritizeLogoSources(parseLogoSources(uris))
     return fallbackSrcs.find((src) => !BAD_SRCS[src])
     // eslint-disable-next-line react-hooks/exhaustive-deps -- rerun when src index changes, denoting a bad src was marked
-  }, [address, chainId, hideLogo, isNative, primaryImg, srcIndex])
+  }, [address, chainIdN, hideLogo, isNative, primaryImg, srcIndex])
 
   const nextSrc = useCallback(() => {
     if (current) BAD_SRCS[current] = true
