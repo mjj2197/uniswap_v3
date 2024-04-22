@@ -5,8 +5,11 @@ import { useWeb3React } from '@web3-react/core'
 import { sendAnalyticsEvent, TraceEvent } from 'analytics'
 import { ButtonEmphasis, ButtonSize, ThemeButton } from 'components/Button'
 import Column from 'components/Column'
+import { ChainLogo, getDefaultBorderRadius } from 'components/Logo/ChainLogo'
 import { CreditCardIcon } from 'components/Icons/CreditCard'
+import CurrencyLogo from 'components/Logo/CurrencyLogo'
 import { ImagesIcon } from 'components/Icons/Images'
+import { nativeOnChain } from 'constants/tokens'
 import { Power } from 'components/Icons/Power'
 import { Settings } from 'components/Icons/Settings'
 import Row, { AutoRow } from 'components/Row'
@@ -36,6 +39,8 @@ import MiniPortfolio from './MiniPortfolio'
 import { useToggleAccountDrawer } from './MiniPortfolio/hooks'
 import { portfolioFadeInAnimation } from './MiniPortfolio/PortfolioRow'
 import { Status } from './Status'
+
+import { useWalletBalance } from 'nft/hooks/useWalletBalance'
 
 const AuthenticatedHeaderWrapper = styled.div`
   padding: 20px 16px;
@@ -95,7 +100,8 @@ const PortfolioDrawerContainer = styled(Column)`
 `
 
 export default function AuthenticatedHeader({ account, openSettings }: { account: string; openSettings: () => void }) {
-  const { connector } = useWeb3React()
+  const { connector, chainId } = useWeb3React()
+  const { balance: OKBBalance } = useWalletBalance()
   const { ENSName } = useENSName(account)
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
@@ -103,16 +109,18 @@ export default function AuthenticatedHeader({ account, openSettings }: { account
   const setSellPageState = useProfilePageState((state) => state.setProfilePageState)
   const resetSellAssets = useSellAsset((state) => state.reset)
   const clearCollectionFilters = useWalletCollections((state) => state.clearCollectionFilters)
-  const shouldShowBuyFiatButton = !isPathBlocked('/buy')
+
+  const nativeToken = nativeOnChain(chainId)
+  // const shouldShowBuyFiatButton = !isPathBlocked('/buy')
   const { formatNumber, formatDelta } = useFormatter()
 
-  const shouldDisableNFTRoutes = useDisableNFTRoutes()
+  // const shouldDisableNFTRoutes = useDisableNFTRoutes()
 
   // const unclaimedAmount: CurrencyAmount<Token> | undefined = useUserUnclaimedAmount(account)
 
   // const isUnclaimed = useUserHasAvailableClaim(account)
   const connection = getConnection(connector)
-  const openClaimModal = useToggleModal(ApplicationModal.ADDRESS_CLAIM)
+  // const openClaimModal = useToggleModal(ApplicationModal.ADDRESS_CLAIM)
   const disconnect = useCallback(() => {
     connector.deactivate?.()
     connector.resetState()
@@ -153,36 +161,18 @@ export default function AuthenticatedHeader({ account, openSettings }: { account
       <HeaderWrapper>
         <Status account={account} ensUsername={ENSName} uniswapUsername={unitag?.username} connection={connection} />
         <IconContainer>
-          <IconButton
-            hideHorizontal={showDisconnectConfirm}
-            data-testid="wallet-settings"
-            onClick={openSettings}
-            Icon={Settings}
-          />
-          <TraceEvent
-            events={[BrowserEvent.onClick]}
-            name={SharedEventName.ELEMENT_CLICKED}
-            element={InterfaceElementName.DISCONNECT_WALLET_BUTTON}
-          >
-            <IconWithConfirmTextButton
-              data-testid="wallet-disconnect"
-              onConfirm={disconnect}
-              onShowConfirm={setShowDisconnectConfirm}
-              Icon={Power}
-              text="Disconnect"
-              dismissOnHoverOut
-            />
+          <IconButton hideHorizontal={showDisconnectConfirm} data-testid="wallet-settings" onClick={openSettings} Icon={Settings} />
+          <TraceEvent events={[BrowserEvent.onClick]} name={SharedEventName.ELEMENT_CLICKED} element={InterfaceElementName.DISCONNECT_WALLET_BUTTON}>
+            <IconWithConfirmTextButton data-testid="wallet-disconnect" onConfirm={disconnect} onShowConfirm={setShowDisconnectConfirm} Icon={Power} text="Disconnect" dismissOnHoverOut />
           </TraceEvent>
         </IconContainer>
       </HeaderWrapper>
       <PortfolioDrawerContainer>
-        {totalBalance !== undefined ? (
+        {/* {OKBBalance !== undefined ? (
           <FadeInColumn gap="xs">
             <ThemedText.HeadlineLarge fontWeight={535} data-testid="portfolio-total-balance">
-              {formatNumber({
-                input: totalBalance,
-                type: NumberType.PortfolioBalance,
-              })}
+              <CurrencyLogo currency={nativeToken} style={{ marginRight: 8 }} size="50px" />
+              {OKBBalance}
             </ThemedText.HeadlineLarge>
             <AutoRow marginBottom="20px">
               {absoluteChange !== 0 && percentChange && (
@@ -203,7 +193,7 @@ export default function AuthenticatedHeader({ account, openSettings }: { account
             <LoadingBubble height="44px" width="170px" />
             <LoadingBubble height="16px" width="100px" margin="4px 0 20px 0" />
           </Column>
-        )}
+        )} */}
         <MiniPortfolio account={account} />
         {/* {isUnclaimed && (
           <UNIButton onClick={openClaimModal} size={ButtonSize.medium} emphasis={ButtonEmphasis.medium}>
