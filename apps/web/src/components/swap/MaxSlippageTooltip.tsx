@@ -44,9 +44,9 @@ export function MaxSlippageTooltip({ trade, allowedSlippage }: { trade: Interfac
       <Separator />
       <div>
         {isExactIn ? <ExactInMessage amount={displayAmount} /> : <ExactOutMessage amount={displayAmount} />}{' '}
-        {/* <ExternalLink href="https://support.uniswap.org/hc/en-us/articles/8643879653261-What-is-Price-Slippage-">
+        <ExternalLink href="https://jaguar-swap.gitbook.io/jaguar-swap-docs/jaguar-swap/user-guides/2.-swapping/how-to-change-slippage-on-the-jaguar-swap">
           Learn more
-        </ExternalLink> */}
+        </ExternalLink>
       </div>
     </Column>
   )

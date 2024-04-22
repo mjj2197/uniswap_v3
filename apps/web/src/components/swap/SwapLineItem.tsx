@@ -83,9 +83,9 @@ function SwapFeeTooltipContent({ hasFee }: { hasFee: boolean }) {
   return (
     <>
       {message}{' '}
-      {/* <ExternalLink href="https://support.uniswap.org/hc/en-us/articles/20131678274957">
+      <ExternalLink href="https://jaguar-swap.gitbook.io/jaguar-swap-docs/jaguar-swap/user-guides/2.-swapping/what-is-a-token-fee">
         <Trans>Learn more</Trans>
-      </ExternalLink> */}
+      </ExternalLink>
     </>
   )
 }
