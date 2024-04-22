@@ -77,6 +77,7 @@ export const routingApi = createApi({
                 const quoteResult = await getClientSideQuote(args, router, CLIENT_PARAMS)
                 if (quoteResult.state === QuoteState.SUCCESS) {
                   const trade = await transformQuoteToTrade(args, quoteResult.data, QuoteMethod.CLIENT_SIDE_FALLBACK)
+                  console.log("🚀 trade data", trade)
                   return {
                     data: { ...trade, latencyMs: trace.now() },
                   }

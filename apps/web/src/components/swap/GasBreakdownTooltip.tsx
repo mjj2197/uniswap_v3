@@ -71,7 +71,6 @@ export function GasBreakdownTooltip({ trade }: GasBreakdownTooltipProps) {
 
 function NetworkCostDescription({ native }: { native: Currency }) {
   const chainName = chainIdToBackendName(native.chainId)
-  console.log(native.chainId, chainName)
 
   return (
     <ThemedText.LabelMicro>
