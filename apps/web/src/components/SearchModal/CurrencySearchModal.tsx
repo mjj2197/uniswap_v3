@@ -50,12 +50,12 @@ export default memo(function CurrencySearchModal({
 
   const handleCurrencySelect = useCallback(
     (currency: Currency, hasWarning?: boolean) => {
-      if (hasWarning && currency.isToken && !userAddedTokens.find((token) => token.equals(currency))) {
-        showTokenSafetySpeedbump(currency)
-      } else {
-        onCurrencySelect(currency)
-        onDismiss()
-      }
+      // if (hasWarning && currency.isToken && !userAddedTokens.find((token) => token.equals(currency))) {
+      //   // showTokenSafetySpeedbump(currency)
+      // } else {
+      // }
+      onCurrencySelect(currency)
+      onDismiss()
     },
     [onDismiss, onCurrencySelect, userAddedTokens]
   )
