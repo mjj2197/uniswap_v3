@@ -5274,8 +5274,8 @@ __metadata:
   linkType: hard
 
 "@jaguarswap/sdk-core@npm:^4.4.0":
-  version: 4.4.1
-  resolution: "@jaguarswap/sdk-core@npm:4.4.1"
+  version: 4.4.2
+  resolution: "@jaguarswap/sdk-core@npm:4.4.2"
   dependencies:
     "@ethersproject/address": ^5.0.2
     big.js: ^5.2.2
@@ -5283,7 +5283,7 @@ __metadata:
     jsbi: ^3.1.4
     tiny-invariant: ^1.1.0
     toformat: ^2.0.0
-  checksum: c589a53879afd9298682f970c99c5fe56daed8f63383622429879b4a4e92433b2c0f7327720be3be1c81a6c4b6ebd53879ff2bdb1991b856ed7ebe5ab7e52d50
+  checksum: 2bc2c4a884ee2329ff99e8e2365f8b614f277fc129cebf4bb9194eccd2e4b67d07a3cc3ded48f156f94e9c78e745f7494fc3c41d01172bdbfba4c99e43b96d2f
   languageName: node
   linkType: hard
 
@@ -44935,7 +44935,7 @@ __metadata:
     "@ethersproject/constants": 5.7.0
     "@ethersproject/contracts": 5.7.0
     "@ethersproject/providers": 5.7.2
-    "@jaguarswap/sdk-core": 4.1.2
+    "@jaguarswap/sdk-core": 4.4.2
     "@react-navigation/core": 6.2.2
     "@sentry/react": 7.80.0
     "@sentry/react-native": 5.5.0
@@ -45428,7 +45428,7 @@ __metadata:
     "@graphql-tools/load": 8.0.1
     "@graphql-tools/merge": 9.0.1
     "@graphql-tools/mock": 9.0.0
-    "@jaguarswap/sdk-core": 4.1.2
+    "@jaguarswap/sdk-core": 4.4.2
     "@jaguarswap/v3-sdk": 3.11.0
     "@react-native-community/netinfo": 9.3.0
     "@react-native-firebase/app-check": 18.4.0
