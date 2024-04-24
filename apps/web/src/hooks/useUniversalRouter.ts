@@ -77,6 +77,7 @@ export function useUniversalRouterSwapCallback(
           const deadline = await getDeadline()
 
           trace.setData('slippageTolerance', options.slippageTolerance.toFixed(2))
+         // @ts-ignore
           const { calldata: data, value } = SwapRouter.swapERC20CallParameters(trade, {
             slippageTolerance: options.slippageTolerance,
             deadlineOrPreviousBlockhash: deadline?.toString(),
@@ -141,6 +142,7 @@ export function useUniversalRouterSwapCallback(
             ...analyticsContext,
             // TODO (WEB-2993): remove these after debugging missing user properties.
             [CustomUserProperties.WALLET_ADDRESS]: account,
+            // @ts-ignore
             [CustomUserProperties.WALLET_TYPE]: getConnection(connector).getProviderInfo().name,
             [CustomUserProperties.PEER_WALLET_AGENT]: provider ? getWalletMeta(provider)?.agent : undefined,
           })

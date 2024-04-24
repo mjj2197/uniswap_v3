@@ -4,6 +4,7 @@ import { chainIdToBackendName, unwrapToken } from './util'
 
 export default function useTrendingTokens(chainId?: number) {
   const chain = chainIdToBackendName(chainId)
+  // @ts-ignore
   const { data, loading } = useTrendingTokensQuery({ variables: { chain } })
 
   return useMemo(

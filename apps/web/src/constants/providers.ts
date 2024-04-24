@@ -13,6 +13,7 @@ function getAppProvider(chainId: SupportedInterfaceChain) {
 
 /** These are the only JsonRpcProviders used directly by the interface. */
 export const RPC_PROVIDERS = {
+  [ChainId.X1]: getAppProvider(ChainId.X1),
   [ChainId.X1_TESTNET]: getAppProvider(ChainId.X1_TESTNET),
 } satisfies Record<SupportedInterfaceChain, AppJsonRpcProvider>
 

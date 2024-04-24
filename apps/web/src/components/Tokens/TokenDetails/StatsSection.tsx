@@ -56,17 +56,7 @@ export const StatsWrapper = styled.div`
 
 type NumericStat = number | undefined | null
 
-function Stat({
-  dataCy,
-  value,
-  title,
-  description,
-}: {
-  dataCy: string
-  value: NumericStat
-  title: ReactNode
-  description?: ReactNode
-}) {
+function Stat({ dataCy, value, title, description }: { dataCy: string; value: NumericStat; title: ReactNode; description?: ReactNode }) {
   const { formatNumber } = useFormatter()
 
   return (
@@ -114,20 +104,13 @@ export default function StatsSection(props: StatsSectionProps) {
             <Stat
               dataCy="tvl"
               value={TVL}
-              description={
-                <Trans>
-                  Total value locked (TVL) is the aggregate amount of the asset available across all Uniswap v3
-                  liquidity pools.
-                </Trans>
-              }
+              description={<Trans>Total value locked (TVL) is the aggregate amount of the asset available across all Uniswap v3 liquidity pools.</Trans>}
               title={<Trans>TVL</Trans>}
             />
             <Stat
               dataCy="market-cap"
               value={marketCap}
-              description={
-                <Trans>Market capitalization is the total market value of an asset&apos;s circulating supply.</Trans>
-              }
+              description={<Trans>Market capitalization is the total market value of an asset&apos;s circulating supply.</Trans>}
               title={<Trans>Market cap</Trans>}
             />
           </StatPair>
@@ -135,17 +118,14 @@ export default function StatsSection(props: StatsSectionProps) {
             <Stat
               dataCy="fdv"
               value={FDV}
+              // @ts-ignore
               description={HEADER_DESCRIPTIONS[TokenSortMethod.FULLY_DILUTED_VALUATION]}
               title={<Trans>FDV</Trans>}
             />
             <Stat
               dataCy="volume-24h"
               value={volume24H}
-              description={
-                <Trans>
-                  1 day volume is the amount of the asset that has been traded on Uniswap v3 during the past 24 hours.
-                </Trans>
-              }
+              description={<Trans>1 day volume is the amount of the asset that has been traded on Uniswap v3 during the past 24 hours.</Trans>}
               title={<Trans>1 day volume</Trans>}
             />
           </StatPair>
@@ -153,6 +133,7 @@ export default function StatsSection(props: StatsSectionProps) {
       </StatsWrapper>
     )
   } else {
+    // @ts-ignore
     return UNSUPPORTED_METADATA_CHAINS.includes(chainId) ? (
       <>
         <Header>

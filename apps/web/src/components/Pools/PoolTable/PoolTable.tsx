@@ -14,7 +14,7 @@ import { exploreSearchStringAtom } from 'components/Tokens/state'
 import { MouseoverTooltip } from 'components/Tooltip'
 import { BIPS_BASE } from 'constants/misc'
 import { useUpdateManualOutage } from 'featureFlags/flags/outageBanner'
-import { PoolSortFields, TablePool, useV3Pools } from 'graphql/data/pools/useV3Pools'
+import { PoolSortFields, PoolToken, TablePool, useV3Pools } from 'graphql/data/pools/useV3Pools'
 import { OrderDirection, chainIdToBackendName, supportedChainIdFromGQLChain, unwrapToken, validateUrlChainParam } from 'graphql/data/util'
 import { useAtom } from 'jotai'
 import { atomWithReset, useAtomValue, useResetAtom, useUpdateAtom } from 'jotai/utils'
@@ -24,14 +24,12 @@ import styled from 'styled-components'
 import { ThemedText } from 'theme/components'
 import { ProtocolVersion, Token } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 import { NumberType, useFormatter } from 'utils/formatNumbers'
-import React from 'react'
 
 const HEADER_DESCRIPTIONS: Record<PoolSortFields, ReactNode | undefined> = {
   [PoolSortFields.TVL]: undefined,
   [PoolSortFields.Volume24h]: undefined,
   [PoolSortFields.VolumeWeek]: undefined,
   [PoolSortFields.TxCount]: undefined,
-  [PoolSortFields.Turnover]: <Trans>Turnover refers to the amount of trading volume relative to total value locked (TVL) within a pool. Turnover = 24H Fees / TVL</Trans>,
 }
 
 const TableWrapper = styled.div`
@@ -67,20 +65,8 @@ export enum PoolTableColumns {
   VolumeWeek,
 }
 
-function PoolDescription({
-  token0,
-  token1,
-  feeTier,
-  chainId,
-  protocolVersion = ProtocolVersion.V3,
-}: {
-  token0: Token
-  token1: Token
-  feeTier: number
-  chainId: ChainId
-  protocolVersion: ProtocolVersion
-}) {
-  const tokens = [token0, token1]
+function PoolDescription({ token0, token1, feeTier, chainId }: { token0: PoolToken; token1: PoolToken; feeTier: number; chainId: ChainId }) {
+  const tokens = [token0.address, token1.address]
   return (
     <Row gap="sm">
       <DoubleTokenAndChainLogo chainId={chainId} tokens={tokens} size={28} />
@@ -143,10 +129,10 @@ export function TopPoolTable() {
     resetSortAscending()
   }, [resetSortAscending, resetSortMethod])
 
-  const { data: topPools, loading, error } = useV3Pools({ sortBy: sortMethod, sortDirection: sortAscending ? OrderDirection.Asc : OrderDirection.Desc }, chainId)
+  const { data: topPools, loading, error } = useV3Pools({ sortBy: sortMethod, sortDirection: sortAscending ? OrderDirection.Asc : OrderDirection.Desc })
   const combinedError = error ? new ApolloError({ errorMessage: `Could not V3 Top Pools on chain: ${chainId}` }) : undefined
   const allDataStillLoading = loading && !topPools?.length
-  useUpdateManualOutage({ chainId, error })
+  // useUpdateManualOutage({ chainId, error })
 
   return (
     <TableWrapper data-testid="top-pools-explore-table">
@@ -187,9 +173,7 @@ export function PoolsTable({
 
         return {
           index: poolSortRank,
-          poolDescription: (
-            <PoolDescription token0={unwrapToken(chainId, pool.token0)} token1={unwrapToken(chainId, pool.token1)} feeTier={pool.feeTier} chainId={chainId} protocolVersion={pool.protocolVersion} />
-          ),
+          poolDescription: <PoolDescription token0={unwrapToken(chainId, pool.token0)} token1={unwrapToken(chainId, pool.token1)} feeTier={pool.feeTier} chainId={chainId} />,
           txCount: pool.txCount,
           tvl: pool.tvl,
           volume24h: pool.volume24h,
@@ -303,7 +287,7 @@ export function PoolsTable({
             id: 'volumeChange',
             header: () => (
               <Cell minWidth={120} grow>
-                <PoolTableHeader category={PoolSortFields.VolumeChange} isCurrentSortMethod={sortMethod === PoolSortFields.VolumeChange} direction={orderDirection} />
+                <PoolTableHeader category={PoolSortFields.VolumeWeek} isCurrentSortMethod={sortMethod === PoolSortFields.VolumeWeek} direction={orderDirection} />
               </Cell>
             ),
             cell: (volumeChange) => (

@@ -29,7 +29,7 @@ export interface TablePool {
   totalValueLockedUSD?: number
 }
 
-interface PoolToken {
+export interface PoolToken {
   address: string
   symbol: string
   name: string

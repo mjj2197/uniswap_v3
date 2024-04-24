@@ -1,4 +1,3 @@
-import React from 'react'
 import { Trans } from '@lingui/macro'
 import { createColumnHelper } from '@tanstack/react-table'
 import Row from 'components/Row'
@@ -97,7 +96,7 @@ export default function RecentTransactions() {
             <Row gap="8px" justify="flex-end">
               <ThemedText.BodyPrimary>
                 {formatNumber({
-                  input: Math.abs(transaction.getValue?.().token0.amount) || 0,
+                  input: Math.abs(Number.parseFloat(transaction.getValue?.().token0.amount)) || 0,
                 })}
               </ThemedText.BodyPrimary>
               <TokenLinkCell token={transaction.getValue?.().token0} />
@@ -119,7 +118,7 @@ export default function RecentTransactions() {
             <Row gap="8px" justify="flex-end">
               <ThemedText.BodyPrimary>
                 {formatNumber({
-                  input: Math.abs(transaction.getValue?.().token1.amount) || 0,
+                  input: Math.abs(Number.parseFloat(transaction.getValue?.().token1.amount)) || 0,
                 })}
               </ThemedText.BodyPrimary>
               <TokenLinkCell token={transaction.getValue?.().token1} />
@@ -138,12 +137,12 @@ export default function RecentTransactions() {
         ),
         cell: (makerAddress) => (
           <Cell loading={showLoadingSkeleton} minWidth={150}>
-            <StyledExternalLink href={getExplorerLink(chainId, makerAddress.getValue?.(), ExplorerDataType.ADDRESS)}>{shortenAddress(makerAddress.getValue?.())}</StyledExternalLink>
+            <StyledExternalLink href={getExplorerLink(chainId, makerAddress.getValue?.() ?? '', ExplorerDataType.ADDRESS)}>{shortenAddress(makerAddress.getValue?.())}</StyledExternalLink>
           </Cell>
         ),
       }),
     ]
   }, [activeLocalCurrency, chainId, filter, filterModalIsOpen, formatFiatPrice, formatNumber, showLoadingSkeleton])
 
-  return <Table columns={columns} data={transactions} loading={loading} error={error} loadMore={loading} maxWidth={1200} />
+  return <Table columns={columns} data={transactions} loading={loading} error={error} maxWidth={1200} />
 }

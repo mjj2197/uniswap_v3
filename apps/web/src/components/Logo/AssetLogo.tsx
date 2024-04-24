@@ -1,6 +1,6 @@
-import { ChainId, Currency } from '@jaguarswap/sdk-core'
+import type React from 'react'
+import { ChainId, type Currency } from '@jaguarswap/sdk-core'
 import { PortfolioLogo } from 'components/AccountDrawer/MiniPortfolio/PortfolioLogo'
-import React from 'react'
 import styled from 'styled-components'
 
 export const MissingImageLogo = styled.div<{ size?: string }>`
@@ -21,7 +21,7 @@ export const MissingImageLogo = styled.div<{ size?: string }>`
 
 export type AssetLogoBaseProps = {
   symbol?: string | null
-  primaryImg?: string | null
+  primaryImg?: string | undefined
   size?: string
   style?: React.CSSProperties
   currency?: Currency | null

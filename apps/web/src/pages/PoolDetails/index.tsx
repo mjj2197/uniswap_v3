@@ -9,7 +9,7 @@ import { PoolDetailsStats } from 'components/Pools/PoolDetails/PoolDetailsStats'
 import { PoolDetailsStatsButtons } from 'components/Pools/PoolDetails/PoolDetailsStatsButtons'
 import { PoolDetailsTableTab } from 'components/Pools/PoolDetails/PoolDetailsTable'
 import Row from 'components/Row'
-import { PoolData, Token } from 'graphql/data/pools/usePoolData'
+import { TablePool, PoolToken } from 'graphql/data/pools/useV3Pools'
 import { getValidUrlChainName, gqlToCurrency, supportedChainIdFromGQLChain, unwrapToken } from 'graphql/data/util'
 import { useColor } from 'hooks/useColor'
 import NotFound from 'pages/NotFound'
@@ -102,7 +102,7 @@ const LinksContainer = styled(Column)`
   width: 100%;
 `
 
-function getUnwrappedPoolToken(poolData?: PoolData, chainId?: number) {
+function getUnwrappedPoolToken(poolData?: TablePool, chainId?: number) {
   return poolData?.token0 && poolData?.token1 && chainId ? [unwrapToken(chainId, poolData?.token0), unwrapToken(chainId, poolData?.token1)] : [undefined, undefined]
 }
 
@@ -132,7 +132,7 @@ export default function PoolDetailsPage() {
   const isInvalidPool = !chainName || !poolAddress || !getValidUrlChainName(chainName) || !isAddress(poolAddress)
   const poolNotFound = (!loading && !poolData) || isInvalidPool
 
-  // if (poolNotFound) return <NotFound />
+  if (poolNotFound) return <NotFound />
   return (
     <ThemeProvider token0={color0 !== accent1 ? color0 : undefined} token1={color1 !== accent1 ? color1 : undefined}>
       <Helmet>
@@ -172,7 +172,7 @@ export default function PoolDetailsPage() {
               {/* <ChartSection poolData={poolData} loading={loading} isReversed={isReversed} chain={chain} /> */}
             </Column>
             <HR />
-            <PoolDetailsTableTab poolAddress={poolAddress} token0={token0} token1={token1} protocolVersion={ProtocolVersion.V3} />
+            <PoolDetailsTableTab poolAddress={poolAddress} token0={token0} token1={token1} />
           </LeftColumn>
           <RightColumn>
             <PoolDetailsStatsButtons chainId={chainId} token0={token0} token1={token1} feeTier={poolData?.feeTier} loading={loading} />

@@ -26,15 +26,7 @@ interface ErrorModalContentProps {
   onRetry: () => void
 }
 
-function getErrorContent({
-  errorType,
-  trade,
-  swapResult,
-}: {
-  errorType: PendingModalError
-  swapResult?: SwapResult
-  trade?: InterfaceTrade
-}): {
+function getErrorContent({ errorType, trade, swapResult }: { errorType: PendingModalError; swapResult?: SwapResult; trade?: InterfaceTrade }): {
   title: JSX.Element
   message?: JSX.Element
   supportArticleURL?: SupportArticleURL
@@ -43,11 +35,7 @@ function getErrorContent({
     case PendingModalError.TOKEN_APPROVAL_ERROR:
       return {
         title: <Trans>Token approval failed</Trans>,
-        message: (
-          <Trans>
-            This provides the Uniswap protocol access to your token for trading. For security, it expires after 30 days.
-          </Trans>
-        ),
+        message: <Trans>This provides the Uniswap protocol access to your token for trading. For security, it expires after 30 days.</Trans>,
         supportArticleURL: SupportArticleURL.APPROVALS_EXPLAINER,
       }
     case PendingModalError.PERMIT_ERROR:
@@ -65,33 +53,24 @@ function getErrorContent({
       } else {
         return {
           title: <Trans>Swap failed</Trans>,
-          message: (
-            <Trans>Try using higher than normal slippage and gas to ensure your transaction is completed.</Trans>
-          ),
-          supportArticleURL:
-            swapResult?.type === TradeFillType.UniswapX
-              ? SupportArticleURL.UNISWAP_X_FAILURE
-              : SupportArticleURL.TRANSACTION_FAILURE,
+          message: <Trans>Try using higher than normal slippage and gas to ensure your transaction is completed.</Trans>,
+          supportArticleURL: SupportArticleURL.TRANSACTION_FAILURE,
+          // supportArticleURL:
+          //   swapResult?.type === TradeFillType.UniswapX
+          //     ? SupportArticleURL.UNISWAP_X_FAILURE
+          //     : SupportArticleURL.TRANSACTION_FAILURE,
         }
       }
     case PendingModalError.WRAP_ERROR:
       return {
         title: <Trans>Wrap failed</Trans>,
-        message: (
-          <Trans>
-            Swaps on the Uniswap Protocol can start and end with ETH. However, during the swap ETH is wrapped into WETH.
-          </Trans>
-        ),
+        message: <Trans>Swaps on the Uniswap Protocol can start and end with ETH. However, during the swap ETH is wrapped into WETH.</Trans>,
         supportArticleURL: SupportArticleURL.WETH_EXPLAINER,
       }
     default:
       return {
         title: <Trans>Unknown Error</Trans>,
-        message: (
-          <Trans>
-            Your swap could not be executed. Please check your network connection and your slippage settings.
-          </Trans>
-        ),
+        message: <Trans>Your swap could not be executed. Please check your network connection and your slippage settings.</Trans>,
       }
   }
 }
@@ -109,13 +88,7 @@ export default function Error({ errorType, trade, swapResult, onRetry }: ErrorMo
   return (
     <Container gap="md">
       <Section gap="md">
-        <AlertTriangle
-          data-testid="pending-modal-failure-icon"
-          strokeWidth={1}
-          stroke={theme.surface1}
-          fill={theme.critical}
-          size="64px"
-        />
+        <AlertTriangle data-testid="pending-modal-failure-icon" strokeWidth={1} stroke={theme.surface1} fill={theme.critical} size="64px" />
         <ThemedText.SubHeader>{title}</ThemedText.SubHeader>
         {trade && <TradeSummary trade={trade} />}
         <ThemedText.BodyPrimary>
@@ -132,10 +105,7 @@ export default function Error({ errorType, trade, swapResult, onRetry }: ErrorMo
           <Trans>Try again</Trans>
         </ButtonPrimary>
         {swapResult && swapResult.type === TradeFillType.Classic && (
-          <ExternalLink
-            href={getExplorerLink(swapResult.response.chainId, swapResult.response.hash, ExplorerDataType.TRANSACTION)}
-            color="neutral2"
-          >
+          <ExternalLink href={getExplorerLink(swapResult.response.chainId, swapResult.response.hash, ExplorerDataType.TRANSACTION)} color="neutral2">
             <Trans>View on Explorer</Trans>
           </ExternalLink>
         )}

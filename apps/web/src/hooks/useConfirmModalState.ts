@@ -16,7 +16,7 @@ import { tradeMeaningfullyDiffers } from 'utils/tradeMeaningFullyDiffer'
 import { ConfirmModalState } from 'components/ConfirmSwapModal'
 import { PendingModalError } from 'components/ConfirmSwapModal/Error'
 import { useMaxAmountIn } from './useMaxAmountIn'
-import { Allowance, AllowanceState } from './usePermit2Allowance'
+import { Allowance, AllowanceState } from './useSwapRouter2Allowance'
 import usePrevious from './usePrevious'
 import useWrapCallback from './useWrapCallback'
 
@@ -68,9 +68,9 @@ export function useConfirmModalState({
     if (allowance.state === AllowanceState.REQUIRED && allowance.needsSetupApproval) {
       steps.push(ConfirmModalState.APPROVING_TOKEN)
     }
-    if (allowance.state === AllowanceState.REQUIRED && allowance.needsPermitSignature) {
-      steps.push(ConfirmModalState.PERMITTING)
-    }
+    // if (allowance.state === AllowanceState.REQUIRED && allowance.needsPermitSignature) {
+    //   steps.push(ConfirmModalState.PERMITTING)
+    // }
     steps.push(ConfirmModalState.PENDING_CONFIRMATION)
     return steps
   }, [allowance, trade])
@@ -131,9 +131,9 @@ export function useConfirmModalState({
           allowance.approve().catch((e) => catchUserReject(e, PendingModalError.TOKEN_APPROVAL_ERROR))
           break
         case ConfirmModalState.PERMITTING:
-          setConfirmModalState(ConfirmModalState.PERMITTING)
-          invariant(allowance.state === AllowanceState.REQUIRED, 'Allowance should be required')
-          allowance.permit().catch((e) => catchUserReject(e, PendingModalError.TOKEN_APPROVAL_ERROR))
+          // setConfirmModalState(ConfirmModalState.PERMITTING)
+          // invariant(allowance.state === AllowanceState.REQUIRED, 'Allowance should be required')
+          // allowance.permit().catch((e) => catchUserReject(e, PendingModalError.TOKEN_APPROVAL_ERROR))
           break
         case ConfirmModalState.PENDING_CONFIRMATION:
           setConfirmModalState(ConfirmModalState.PENDING_CONFIRMATION)
@@ -182,7 +182,7 @@ export function useConfirmModalState({
   useEffect(() => {
     if (
       allowance.state === AllowanceState.REQUIRED &&
-      allowance.needsPermitSignature &&
+      // allowance.needsPermitSignature &&
       // If the token approval switched from missing to fulfilled, trigger the next step (permit2 signature).
       !allowance.needsSetupApproval &&
       previousSetupApprovalNeeded
@@ -231,6 +231,7 @@ export function useConfirmModalState({
   const [priceUpdate, setPriceUpdate] = useState<number>()
   useEffect(() => {
     if (lastExecutionPrice && !trade.executionPrice.equalTo(lastExecutionPrice)) {
+      // @ts-ignore
       setPriceUpdate(getPriceUpdateBasisPoints(lastExecutionPrice, trade.executionPrice))
       setLastExecutionPrice(trade.executionPrice)
     }

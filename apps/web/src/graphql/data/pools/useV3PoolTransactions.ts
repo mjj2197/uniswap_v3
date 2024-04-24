@@ -1,12 +1,13 @@
 import { useMemo } from 'react'
 import { Token, usePoolTransactionsQuery } from '../../thegraph/__generated__/types-and-hooks'
 import { ApolloError } from '@apollo/client'
-import { TableTransaction, V3PoolTransactionType } from '../../data/useV3Transactions'
+import { TableTransaction, V3PoolTransactionType } from 'graphql/data/useV3Transactions'
+import { PoolToken } from 'graphql/data/pools/useV3Pools'
 
 export function useV3PoolTransactions(
   address: string,
   filter: V3PoolTransactionType[] = [V3PoolTransactionType.SELL, V3PoolTransactionType.BUY, V3PoolTransactionType.BURN, V3PoolTransactionType.MINT],
-  token0?: Token
+  token0?: PoolToken
 ): {
   loading: boolean
   error: ApolloError | undefined
@@ -22,19 +23,19 @@ export function useV3PoolTransactions(
 
   for (const t of data?.swaps ?? []) {
     unfilteredTransaction.push({
-      type: t.pool.token0.id === token0?.id ? V3PoolTransactionType.SELL : V3PoolTransactionType.BUY,
+      type: t.pool.token0.id === token0?.address ? V3PoolTransactionType.SELL : V3PoolTransactionType.BUY,
       hash: t.transaction.id,
       timestamp: t.timestamp,
       origin: t.origin,
       sender: t.sender,
       token0: {
-        id: t.pool.token0.id,
+        address: t.pool.token0.id,
         name: t.pool.token0.name,
         symbol: t.pool.token0.symbol,
         amount: t.amount0,
       },
       token1: {
-        id: t.pool.token1.id,
+        address: t.pool.token1.id,
         name: t.pool.token1.name,
         symbol: t.pool.token1.symbol,
         amount: t.amount1,
@@ -50,13 +51,13 @@ export function useV3PoolTransactions(
       origin: t.origin,
       owner: t.owner,
       token0: {
-        id: t.pool.token0.id,
+        address: t.pool.token0.id,
         name: t.pool.token0.name,
         symbol: t.pool.token0.symbol,
         amount: t.amount0,
       },
       token1: {
-        id: t.pool.token1.id,
+        address: t.pool.token1.id,
         name: t.pool.token1.name,
         symbol: t.pool.token1.symbol,
         amount: t.amount1,
@@ -72,13 +73,13 @@ export function useV3PoolTransactions(
       origin: t.origin,
       owner: t.owner,
       token0: {
-        id: t.pool.token0.id,
+        address: t.pool.token0.id,
         name: t.pool.token0.name,
         symbol: t.pool.token0.symbol,
         amount: t.amount0,
       },
       token1: {
-        id: t.pool.token1.id,
+        address: t.pool.token1.id,
         name: t.pool.token1.name,
         symbol: t.pool.token1.symbol,
         amount: t.amount1,
@@ -87,6 +88,7 @@ export function useV3PoolTransactions(
     })
   }
 
+  // @ts-ignore
   const filteredTransactions = unfilteredTransaction?.filter((tx): tx is TableTransaction => tx.type && filter.includes(tx.type)) ?? []
 
   return useMemo(() => ({ data: filteredTransactions, loading, error }), [filteredTransactions, loading, error])

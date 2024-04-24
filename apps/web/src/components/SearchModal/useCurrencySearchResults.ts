@@ -12,11 +12,7 @@ import { getTokenFilter } from 'lib/hooks/useTokenList/filtering'
 import { getSortedPortfolioTokens, tokenQuerySortComparator } from 'lib/hooks/useTokenList/sorting'
 import { useMemo } from 'react'
 import { UserAddedToken } from 'types/tokens'
-import {
-  Token as GqlToken,
-  TokenSortableField,
-  useSearchPopularTokensWebQuery,
-} from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
+import { Chain, Token as GqlToken, TokenSortableField, useSearchPopularTokensWebQuery } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 import { FeatureFlags } from 'uniswap/src/features/experiments/flags'
 import { useFeatureFlag } from 'uniswap/src/features/experiments/hooks'
 
@@ -43,12 +39,7 @@ function isEmpty(query: string | undefined): query is undefined {
   return !query || query.length === 0
 }
 
-export function useCurrencySearchResults({
-  searchQuery,
-  filters,
-  selectedCurrency,
-  otherSelectedCurrency,
-}: CurrencySearchParams): CurrencySearchResults {
+export function useCurrencySearchResults({ searchQuery, filters, selectedCurrency, otherSelectedCurrency }: CurrencySearchParams): CurrencySearchResults {
   const { chainId } = useWeb3React()
 
   const gqlTokenListsEnabled = useFeatureFlag(FeatureFlags.GqlTokenLists)
@@ -61,7 +52,9 @@ export function useCurrencySearchResults({
   )
   const { data: popularTokens, loading: popularTokensLoading } = useSearchPopularTokensWebQuery({
     variables: {
-      chain: chainIdToBackendName(chainId),
+      // FIXME: 临时修改
+      chain: Chain.Ethereum,
+      // chain: chainIdToBackendName(ChainId.X1),
       orderBy: TokenSortableField.Popularity,
     },
     skip: !gqlTokenListsEnabled,
@@ -112,9 +105,7 @@ export function useCurrencySearchResults({
 
     if (balancesLoading) {
       const sortedCombinedTokens =
-        !isEmpty(searchQuery) && !gqlTokenListsEnabled
-          ? filteredListTokens.filter(getTokenFilter(searchQuery)).sort(tokenQuerySortComparator(searchQuery))
-          : filteredListTokens
+        !isEmpty(searchQuery) && !gqlTokenListsEnabled ? filteredListTokens.filter(getTokenFilter(searchQuery)).sort(tokenQuerySortComparator(searchQuery)) : filteredListTokens
       return {
         sortedCombinedTokens,
         portfolioTokens: [],
@@ -152,10 +143,7 @@ export function useCurrencySearchResults({
       return true
     }
 
-    const sortedCombinedTokens =
-      !isEmpty(searchQuery) && !gqlTokenListsEnabled
-        ? mergedTokens.filter(getTokenFilter(searchQuery)).sort(tokenQuerySortComparator(searchQuery))
-        : mergedTokens
+    const sortedCombinedTokens = !isEmpty(searchQuery) && !gqlTokenListsEnabled ? mergedTokens.filter(getTokenFilter(searchQuery)).sort(tokenQuerySortComparator(searchQuery)) : mergedTokens
 
     return {
       sortedCombinedTokens: sortedCombinedTokens.filter(currencyFilter),
@@ -179,19 +167,13 @@ export function useCurrencySearchResults({
   ])
 
   // if no results on main list, expand into inactive
-  const filteredInactiveTokens = useSearchInactiveTokenLists(
-    !filters?.onlyShowCurrenciesWithBalance && sortedCombinedTokens.length === 0 ? searchQuery : undefined
-  )
+  const filteredInactiveTokens = useSearchInactiveTokenLists(!filters?.onlyShowCurrenciesWithBalance && sortedCombinedTokens.length === 0 ? searchQuery : undefined)
 
   const finalCurrencyList: CurrencyListRow[] = useMemo(() => {
     // If we're using gql token lists, we don't want to show tokens from token lists.
     const inactiveTokens = gqlTokenListsEnabled ? [] : filteredInactiveTokens
     if (!isEmpty(searchQuery) || portfolioTokens.length === 0) {
-      return [
-        new CurrencyListSectionTitle(searchQuery ? t`Search results` : t`Popular tokens`),
-        ...sortedCombinedTokens.map(currencyListRowMapper),
-        ...inactiveTokens.map(currencyListRowMapper),
-      ]
+      return [new CurrencyListSectionTitle(searchQuery ? t`Search results` : t`Popular tokens`), ...sortedCombinedTokens.map(currencyListRowMapper), ...inactiveTokens.map(currencyListRowMapper)]
     } else if (sortedTokensWithoutPortfolio.length === 0 && inactiveTokens.length === 0) {
       return [new CurrencyListSectionTitle(t`Your tokens`), ...portfolioTokens.map(currencyListRowMapper)]
     } else {
@@ -203,14 +185,7 @@ export function useCurrencySearchResults({
         ...inactiveTokens.map(currencyListRowMapper),
       ]
     }
-  }, [
-    gqlTokenListsEnabled,
-    filteredInactiveTokens,
-    searchQuery,
-    portfolioTokens,
-    sortedTokensWithoutPortfolio,
-    sortedCombinedTokens,
-  ])
+  }, [gqlTokenListsEnabled, filteredInactiveTokens, searchQuery, portfolioTokens, sortedTokensWithoutPortfolio, sortedCombinedTokens])
 
   return {
     loading: searchResultsLoading || popularTokensLoading || balancesLoading,

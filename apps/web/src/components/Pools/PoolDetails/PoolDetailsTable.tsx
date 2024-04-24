@@ -10,9 +10,10 @@ import { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { ClickableStyle, ThemedText } from 'theme/components'
-import { ProtocolVersion, Token } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
+import { Token } from 'graphql/thegraph/__generated__/types-and-hooks'
 
 import { PoolDetailsTransactionsTable } from './PoolDetailsTransactionsTable'
+import { PoolToken } from 'graphql/data/pools/useV3Pools'
 
 enum PoolDetailsTableTabs {
   TRANSACTIONS = 'transactions',
@@ -25,7 +26,7 @@ const TableHeader = styled(ThemedText.HeadlineMedium)<{ active: boolean }>`
   user-select: none;
 `
 
-export function PoolDetailsTableTab({ poolAddress, token0, token1, protocolVersion }: { poolAddress: string; token0?: Token; token1?: Token; protocolVersion?: ProtocolVersion }) {
+export function PoolDetailsTableTab({ poolAddress, token0, token1 }: { poolAddress: string; token0?: PoolToken; token1?: PoolToken }) {
   const [activeTable, setActiveTable] = useState<PoolDetailsTableTabs>(PoolDetailsTableTabs.TRANSACTIONS)
   const chainName = validateUrlChainParam(useParams<{ chainName?: string }>().chainName)
   const chainId = supportedChainIdFromGQLChain(chainName)

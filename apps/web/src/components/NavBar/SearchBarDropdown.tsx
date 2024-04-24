@@ -133,7 +133,8 @@ interface SearchBarDropdownProps {
 export const SearchBarDropdown = (props: SearchBarDropdownProps) => {
   const { isLoading } = props
   const { chainId } = useWeb3React()
-  const showChainComingSoonBadge = chainId && BACKEND_NOT_YET_SUPPORTED_CHAIN_IDS.includes(chainId) && !isLoading
+  // const showChainComingSoonBadge = chainId && BACKEND_NOT_YET_SUPPORTED_CHAIN_IDS.includes(chainId) && !isLoading
+  const showChainComingSoonBadge = chainId && !isLoading
 
   return (
     <Column overflow="hidden" className={clsx(styles.searchBarDropdownNft, styles.searchBarScrollable)}>
@@ -156,13 +157,7 @@ export const SearchBarDropdown = (props: SearchBarDropdownProps) => {
   )
 }
 
-function SearchBarDropdownContents({
-  toggleOpen,
-  tokens,
-  collections,
-  queryText,
-  hasInput,
-}: SearchBarDropdownProps): JSX.Element {
+function SearchBarDropdownContents({ toggleOpen, tokens, collections, queryText, hasInput }: SearchBarDropdownProps): JSX.Element {
   const [hoveredIndex, setHoveredIndex] = useState<number | undefined>(0)
   const { data: searchHistory } = useRecentlySearchedAssets()
   const shortenedHistory = useMemo(() => searchHistory?.slice(0, 2) ?? [...Array<SearchToken>(2)], [searchHistory])
@@ -171,10 +166,7 @@ function SearchBarDropdownContents({
   const isTokenPage = pathname.includes('/tokens')
   const shouldDisableNFTRoutes = useDisableNFTRoutes()
 
-  const { data: trendingCollections, loading: trendingCollectionsAreLoading } = useTrendingCollections(
-    3,
-    HistoryDuration.Day
-  )
+  const { data: trendingCollections, loading: trendingCollectionsAreLoading } = useTrendingCollections(3, HistoryDuration.Day)
 
   const formattedTrendingCollections = useMemo(() => {
     return !trendingCollectionsAreLoading
@@ -196,16 +188,11 @@ function SearchBarDropdownContents({
   const { data: trendingTokenData } = useTrendingTokens(useWeb3React().chainId)
 
   const trendingTokensLength = isTokenPage ? 3 : 2
-  const trendingTokens = useMemo(
-    () => trendingTokenData?.slice(0, trendingTokensLength) ?? [...Array<SearchToken>(trendingTokensLength)],
-    [trendingTokenData, trendingTokensLength]
-  )
+  const trendingTokens = useMemo(() => trendingTokenData?.slice(0, trendingTokensLength) ?? [...Array<SearchToken>(trendingTokensLength)], [trendingTokenData, trendingTokensLength])
 
   const totalSuggestions = hasInput
     ? tokens.length + collections.length
-    : Math.min(shortenedHistory.length, 2) +
-      (isNFTPage || !isTokenPage ? formattedTrendingCollections?.length ?? 0 : 0) +
-      (isTokenPage || !isNFTPage ? trendingTokens?.length ?? 0 : 0)
+    : Math.min(shortenedHistory.length, 2) + (isNFTPage || !isTokenPage ? formattedTrendingCollections?.length ?? 0 : 0) + (isTokenPage || !isNFTPage ? trendingTokens?.length ?? 0 : 0)
 
   // Navigate search results via arrow keys
   useEffect(() => {
@@ -236,8 +223,7 @@ function SearchBarDropdownContents({
 
   const hasVerifiedCollection = collections.some((collection) => collection.isVerified)
   const hasKnownToken = tokens.some(isKnownToken)
-  const showCollectionsFirst =
-    (isNFTPage && (hasVerifiedCollection || !hasKnownToken)) || (!isNFTPage && !hasKnownToken && hasVerifiedCollection)
+  const showCollectionsFirst = (isNFTPage && (hasVerifiedCollection || !hasKnownToken)) || (!isNFTPage && !hasKnownToken && hasVerifiedCollection)
 
   const trace = JSON.stringify(useTrace({ section: InterfaceSectionName.NAVBAR_SEARCH }))
 

@@ -11,20 +11,20 @@ export enum TransSortMethod {
 }
 
 export type TableTransaction = {
-  type: TransactionType | TokenTransactionType | V3PoolTransactionType
+  type: TransactionType | TokenTransactionType | V3PoolTransactionType | V3PoolTransactionType
   hash: string
   timestamp: string
   sender?: string
   owner?: string
   origin?: string
   token0: {
-    id: string
+    address: string
     name: string
     symbol: string
     amount: string
   }
   token1: {
-    id: string
+    address: string
     name: string
     symbol: string
     amount: string
@@ -58,13 +58,13 @@ export function useV3Transactions(filter: TransactionType[] = [TransactionType.S
         owner: m.owner,
         origin: m.origin,
         token0: {
-          id: m.pool.token0.id,
+          address: m.pool.token0.id,
           name: m.pool.token0.name,
           symbol: m.pool.token0.symbol,
           amount: m.amount0,
         },
         token1: {
-          id: m.pool.token1.id,
+          address: m.pool.token1.id,
           name: m.pool.token1.name,
           symbol: m.pool.token1.symbol,
           amount: m.amount1,
@@ -80,13 +80,13 @@ export function useV3Transactions(filter: TransactionType[] = [TransactionType.S
         owner: m.owner,
         origin: m.origin,
         token0: {
-          id: m.pool.token0.id,
+          address: m.pool.token0.id,
           name: m.pool.token0.name,
           symbol: m.pool.token0.symbol,
           amount: m.amount0,
         },
         token1: {
-          id: m.pool.token1.id,
+          address: m.pool.token1.id,
           name: m.pool.token1.name,
           symbol: m.pool.token1.symbol,
           amount: m.amount1,
@@ -103,13 +103,13 @@ export function useV3Transactions(filter: TransactionType[] = [TransactionType.S
         origin: m.origin,
         sender: m.sender,
         token0: {
-          id: m.pool.token0.id,
+          address: m.pool.token0.id,
           name: m.pool.token0.name,
           symbol: m.pool.token0.symbol,
           amount: m.amount0,
         },
         token1: {
-          id: m.pool.token1.id,
+          address: m.pool.token1.id,
           name: m.pool.token1.name,
           symbol: m.pool.token1.symbol,
           amount: m.amount1,
@@ -121,6 +121,7 @@ export function useV3Transactions(filter: TransactionType[] = [TransactionType.S
     return [...accum, ...mintEntries, ...burnEntries, ...swapEntries]
   }, [])
 
+  // @ts-ignore
   const filteredTransactions = unfilteredTransaction?.filter((tx): tx is TableTransaction => tx.type && filter.includes(tx.type)) ?? []
 
   return useMemo(() => ({ data: filteredTransactions, loading, error }), [filteredTransactions, loading, error])

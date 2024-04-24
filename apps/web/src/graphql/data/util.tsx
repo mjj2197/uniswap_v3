@@ -8,9 +8,26 @@ import { ExploreTab } from 'pages/Explore'
 import { useEffect } from 'react'
 import { DefaultTheme } from 'styled-components'
 import { ThemeColors } from 'theme/colors'
-import { ContractInput, HistoryDuration, PriceSource, TokenStandard } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
+import { Chain as Chain0, ContractInput, HistoryDuration, PriceSource, TokenStandard } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 import { getNativeTokenDBAddress } from 'utils/nativeTokens'
 import dayjs from 'dayjs'
+
+export enum Chain {
+  Arbitrum = 'ARBITRUM',
+  Avalanche = 'AVALANCHE',
+  Base = 'BASE',
+  Blast = 'BLAST',
+  Bnb = 'BNB',
+  Celo = 'CELO',
+  Ethereum = 'ETHEREUM',
+  EthereumGoerli = 'ETHEREUM_GOERLI',
+  EthereumSepolia = 'ETHEREUM_SEPOLIA',
+  Optimism = 'OPTIMISM',
+  Polygon = 'POLYGON',
+  X1 = 'XLAYER',
+  X1_TESTNET = 'XLAYER_TESTNET',
+  UnknownChain = 'UNKNOWN_CHAIN',
+}
 
 export enum PollingInterval {
   Slow = ms(`5m`),
@@ -18,10 +35,7 @@ export enum PollingInterval {
   Fast = AVERAGE_L1_BLOCK_TIME,
   LightningMcQueen = ms(`3s`), // approx block interval for polygon
 }
-export enum Chain {
-  X1 = 'xlayer',
-  X1_TESTNET = 'xlayer-testnet',
-}
+
 // Polls a query only when the current component is mounted, as useQuery's pollInterval prop will continue to poll after unmount
 export function usePollQueryWhileMounted<T, K extends OperationVariables>(queryResult: QueryResult<T, K>, interval: PollingInterval) {
   const { startPolling, stopPolling } = queryResult
@@ -63,7 +77,7 @@ export function isPricePoint(p: PricePoint | undefined): p is PricePoint {
   return p !== undefined
 }
 
-export const GQL_MAINNET_CHAINS_MUTABLE = [Chain.X1, Chain.X1_TESTNET]
+export const GQL_MAINNET_CHAINS_MUTABLE = [Chain0.Ethereum]
 
 const GQL_MAINNET_CHAINS = [Chain.X1] as const
 
@@ -90,13 +104,11 @@ export function isGqlSupportedChain(chainId: number | undefined): chainId is Gql
 
 export function toContractInput(currency: Currency): ContractInput {
   const chain = chainIdToBackendName(currency.chainId)
+  // @ts-ignore
   return { chain, address: currency.isToken ? currency.address : getNativeTokenDBAddress(chain) }
 }
 
-export function gqlToCurrency(
-  token: { address?: string; chain: Chain; standard?: TokenStandard; decimals?: number; name?: string; symbol?: string },
-  chainId: ChainId = ChainId.X1
-): Currency | undefined {
+export function gqlToCurrency(token: { address?: string; standard?: TokenStandard; decimals?: number; name?: string; symbol?: string }, chainId: ChainId = ChainId.X1): Currency | undefined {
   if (!chainId) return undefined
   if (token.standard === TokenStandard.Native || token.address === NATIVE_CHAIN_ID || !token.address) return nativeOnChain(chainId)
   else return new Token(chainId, token.address, token.decimals ?? 18, token.symbol ?? undefined, token.name ?? undefined)

@@ -9,6 +9,7 @@ import { UnitagAddressResponse, UnitagUsernameResponse } from 'uniswap/src/featu
 import { ONE_MINUTE_MS } from 'utilities/src/time/time'
 
 const restLink = new RestLink({
+  // @ts-ignore
   uri: `${uniswapUrls.unitagsApiUrl}`,
   headers: {
     'x-request-source': REQUEST_SOURCE,

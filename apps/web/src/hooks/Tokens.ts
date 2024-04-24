@@ -340,6 +340,7 @@ export function useCurrency(address?: string, chainId?: ChainId, skip?: boolean)
     address === NATIVE_CHAIN_ID || address?.toLowerCase() === 'native' || address?.toLowerCase() === 'eth'
   const { data } = useSimpleTokenQuery({
     variables: {
+      // @ts-ignore
       chain: backendChainName,
       address: isNative ? getNativeTokenDBAddress(backendChainName) : address ?? '',
     },

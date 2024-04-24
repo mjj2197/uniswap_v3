@@ -74,6 +74,7 @@ export function useSwapRouterV2Callback(trade: ClassicTrade | undefined, options
             fee: options.feeOptions,
             recipient: account,
             slippageTolerance: options.slippageTolerance,
+            // @ts-ignore
             deadlineOrPreviousBlockhash: deadline.toString(),
           })
 

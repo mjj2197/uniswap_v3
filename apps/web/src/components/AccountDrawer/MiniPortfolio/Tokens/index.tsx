@@ -16,16 +16,16 @@ import { NumberType, useFormatter } from 'utils/formatNumbers'
 import { PortfolioLogo } from '../PortfolioLogo'
 import PortfolioRow, { PortfolioSkeleton, PortfolioTabWrapper } from '../PortfolioRow'
 import { useToggleAccountDrawer } from '../hooks'
-
+import { useAppSelector } from 'state/hooks'
+import { AppState } from 'state/reducer'
 import { STABLECOINS } from 'constants/tokens'
-import { Token } from '@jaguarswap/sdk-core'
+import { ChainId, Token } from '@jaguarswap/sdk-core'
 
 export default function Tokens({ account }: { account: string }) {
-  const { chainId } = useWeb3React() // we cannot fetch balances cross-chain
+  const chainId = useAppSelector((state: AppState) => state.application.chainId)
   const toggleWalletDrawer = useToggleAccountDrawer()
-
-  const stableCoins = STABLECOINS[chainId]
-  const nativeToken = nativeOnChain(chainId)
+  const stableCoins = STABLECOINS[chainId as ChainId]
+  // const nativeToken = nativeOnChain(chainId)
 
   const nativeBalance = useNativeCurrencyBalances([account])
   const [data, loading] = useTokenBalancesWithLoadingIndicator(account, stableCoins)
@@ -42,72 +42,72 @@ export default function Tokens({ account }: { account: string }) {
   const nativeAmount = nativeBalance[account]
   return (
     <PortfolioTabWrapper>
-      {nativeAmount && <TokenRow key={nativeAmount.address} token={nativeAmount} isNative />}
+      {/* {nativeAmount && <TokenRow key={nativeAmount.address} token={nativeAmount.currency} isNative />}
       {(stableCoins as Token[]).map((token) => {
         if (data[token.address]) {
           return <TokenRow key={token.address} token={data[token.address]} />
         }
         return null
-      })}
+      })} */}
     </PortfolioTabWrapper>
   )
 }
 
-const TokenBalanceText = styled(ThemedText.BodySecondary)`
-  ${EllipsisStyle}
-`
-const TokenNameText = styled(ThemedText.SubHeader)`
-  ${EllipsisStyle}
-`
+// const TokenBalanceText = styled(ThemedText.BodySecondary)`
+//   ${EllipsisStyle}
+// `
+// const TokenNameText = styled(ThemedText.SubHeader)`
+//   ${EllipsisStyle}
+// `
 
-function TokenRow({ token, isNative }: { token: PortfolioToken, isNative?: boolean }) {
-  const navigate = useNavigate()
-  const toggleWalletDrawer = useToggleAccountDrawer()
+// function TokenRow({ token, isNative }: { token: PortfolioToken; isNative?: boolean }) {
+//   const navigate = useNavigate()
+//   const toggleWalletDrawer = useToggleAccountDrawer()
 
-  const currency = token.currency
-  if (!currency) {
-    logSentryErrorForUnsupportedChain({
-      extras: { token },
-      errorMessage: 'Token from unsupported chain received from Mini Portfolio Token Balance Query',
-    })
-    return null
-  }
-  const navigateToTokenDetails = useCallback(async () => {
-    navigate(
-      getTokenDetailsURL({
-        address: currency.address,
-        chain: CHAIN_ID_TO_BACKEND_NAME[currency.chainId],
-      })
-    )
-    toggleWalletDrawer()
-  }, [navigate, currency, toggleWalletDrawer])
+//   const currency = token.currency
+//   if (!currency) {
+//     logSentryErrorForUnsupportedChain({
+//       extras: { token },
+//       errorMessage: 'Token from unsupported chain received from Mini Portfolio Token Balance Query',
+//     })
+//     return null
+//   }
+//   const navigateToTokenDetails = useCallback(async () => {
+//     navigate(
+//       getTokenDetailsURL({
+//         address: currency.address,
+//         chain: CHAIN_ID_TO_BACKEND_NAME[currency.chainId],
+//       })
+//     )
+//     toggleWalletDrawer()
+//   }, [navigate, currency, toggleWalletDrawer])
 
-  const logoImage = getInitialUrl(currency.address, currency.chainId, currency.isNative)
-  const { formatNumber } = useFormatter()
+//   const logoImage = getInitialUrl(currency.address, currency.chainId, currency.isNative)
+//   const { formatNumber } = useFormatter()
 
-  return (
-    <TraceEvent
-      events={[BrowserEvent.onClick]}
-      name={SharedEventName.ELEMENT_CLICKED}
-      element={InterfaceElementName.MINI_PORTFOLIO_TOKEN_ROW}
-      properties={{ chain_id: currency.chainId, token_name: currency?.name, address: currency?.address }}
-    >
-      <PortfolioRow
-        left={<PortfolioLogo chainId={currency.chainId} currencies={[currency]} images={[logoImage]} size="40px" />}
-        title={<TokenNameText>{currency?.name}</TokenNameText>}
-        descriptor={<TokenBalanceText>{currency?.symbol}</TokenBalanceText>}
-        onClick={navigateToTokenDetails}
-        right={
-          <>
-            <ThemedText.SubHeader>
-              {formatNumber({
-                input: token.toFixed(2),
-                type: isNative ? NumberType.TokenNonTx : NumberType.PortfolioBalance,
-              })}
-            </ThemedText.SubHeader>
-          </>
-        }
-      />
-    </TraceEvent>
-  )
-}
+//   return (
+//     <TraceEvent
+//       events={[BrowserEvent.onClick]}
+//       name={SharedEventName.ELEMENT_CLICKED}
+//       element={InterfaceElementName.MINI_PORTFOLIO_TOKEN_ROW}
+//       properties={{ chain_id: currency.chainId, token_name: currency?.name, address: currency?.address }}
+//     >
+//       <PortfolioRow
+//         left={<PortfolioLogo chainId={currency.chainId} currencies={[currency]} images={[logoImage]} size="40px" />}
+//         title={<TokenNameText>{currency?.name}</TokenNameText>}
+//         descriptor={<TokenBalanceText>{currency?.symbol}</TokenBalanceText>}
+//         onClick={navigateToTokenDetails}
+//         right={
+//           <>
+//             <ThemedText.SubHeader>
+//               {formatNumber({
+//                 input: token.toFixed(2),
+//                 type: isNative ? NumberType.TokenNonTx : NumberType.PortfolioBalance,
+//               })}
+//             </ThemedText.SubHeader>
+//           </>
+//         }
+//       />
+//     </TraceEvent>
+//   )
+// }

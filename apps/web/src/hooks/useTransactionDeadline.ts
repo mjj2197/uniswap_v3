@@ -30,7 +30,7 @@ export function useGetTransactionDeadline(): () => Promise<BigNumber | undefined
 }
 
 function timestampToDeadline(chainId?: number, blockTimestamp?: BigNumber, ttl?: number) {
-  if (blockTimestamp && chainId && L2_CHAIN_IDS.includes(chainId)) return blockTimestamp.add(L2_DEADLINE_FROM_NOW)
+  // if (blockTimestamp && chainId && L2_CHAIN_IDS.includes(chainId)) return blockTimestamp.add(L2_DEADLINE_FROM_NOW)
   if (blockTimestamp && ttl) return blockTimestamp.add(ttl)
   return undefined
 }

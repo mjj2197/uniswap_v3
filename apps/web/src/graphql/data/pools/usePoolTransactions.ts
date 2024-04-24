@@ -44,12 +44,7 @@ export function usePoolTransactions(
   address: string,
   chainId?: ChainId,
   // sortState: PoolTxTableSortState, TODO(WEB-3706): Implement sorting when BE supports
-  filter: PoolTableTransactionType[] = [
-    PoolTableTransactionType.BUY,
-    PoolTableTransactionType.SELL,
-    PoolTableTransactionType.BURN,
-    PoolTableTransactionType.MINT,
-  ],
+  filter: PoolTableTransactionType[] = [PoolTableTransactionType.BUY, PoolTableTransactionType.SELL, PoolTableTransactionType.BURN, PoolTableTransactionType.MINT],
   token0?: Token,
   protocolVersion: ProtocolVersion = ProtocolVersion.V3,
   first = PoolTransactionDefaultQuerySize
@@ -60,6 +55,7 @@ export function usePoolTransactions(
     data: dataV3,
     fetchMore: fetchMoreV3,
   } = useV3PoolTransactionsQuery({
+    // @ts-ignore
     variables: { first, chain: chainIdToBackendName(chainId), address },
     skip: protocolVersion !== ProtocolVersion.V3,
   })
@@ -96,19 +92,13 @@ export function usePoolTransactions(
               ? {
                   v3Pool: {
                     ...fetchMoreResult.v3Pool,
-                    transactions: [
-                      ...((prev as V3PoolTransactionsQuery).v3Pool?.transactions ?? []),
-                      ...fetchMoreResult.v3Pool.transactions,
-                    ],
+                    transactions: [...((prev as V3PoolTransactionsQuery).v3Pool?.transactions ?? []), ...fetchMoreResult.v3Pool.transactions],
                   },
                 }
               : {
                   v2Pair: {
                     ...fetchMoreResult.v2Pair,
-                    transactions: [
-                      ...((prev as V2PairTransactionsQuery).v2Pair?.transactions ?? []),
-                      ...fetchMoreResult.v2Pair.transactions,
-                    ],
+                    transactions: [...((prev as V2PairTransactionsQuery).v2Pair?.transactions ?? []), ...fetchMoreResult.v2Pair.transactions],
                   },
                 }
           loadingMore.current = false
@@ -133,8 +123,8 @@ export function usePoolTransactions(
               ? PoolTableTransactionType.SELL
               : PoolTableTransactionType.BUY
             : tx.type === PoolTransactionType.Remove
-            ? PoolTableTransactionType.BURN
-            : PoolTableTransactionType.MINT
+              ? PoolTableTransactionType.BURN
+              : PoolTableTransactionType.MINT
         if (!filter.includes(type)) return undefined
         return {
           timestamp: tx.timestamp,

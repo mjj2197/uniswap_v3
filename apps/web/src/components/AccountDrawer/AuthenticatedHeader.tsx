@@ -110,7 +110,7 @@ export default function AuthenticatedHeader({ account, openSettings }: { account
   const resetSellAssets = useSellAsset((state) => state.reset)
   const clearCollectionFilters = useWalletCollections((state) => state.clearCollectionFilters)
 
-  const nativeToken = nativeOnChain(chainId)
+  // const nativeToken = nativeOnChain(chainId)
   // const shouldShowBuyFiatButton = !isPathBlocked('/buy')
   const { formatNumber, formatDelta } = useFormatter()
 
@@ -159,7 +159,7 @@ export default function AuthenticatedHeader({ account, openSettings }: { account
   return (
     <AuthenticatedHeaderWrapper>
       <HeaderWrapper>
-        <Status account={account} ensUsername={ENSName} uniswapUsername={unitag?.username} connection={connection} />
+        {connection && <Status account={account} ensUsername={ENSName} uniswapUsername={unitag?.username} connection={connection} />}
         <IconContainer>
           <IconButton hideHorizontal={showDisconnectConfirm} data-testid="wallet-settings" onClick={openSettings} Icon={Settings} />
           <TraceEvent events={[BrowserEvent.onClick]} name={SharedEventName.ELEMENT_CLICKED} element={InterfaceElementName.DISCONNECT_WALLET_BUTTON}>

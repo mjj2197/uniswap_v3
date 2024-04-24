@@ -18,7 +18,7 @@ import { manualChainOutageAtom } from 'featureFlags/flags/outageBanner'
 import { getTokenExploreURL, isBackendSupportedChain, validateUrlChainParam } from 'graphql/data/util'
 import { useOnGlobalChainSwitch } from 'hooks/useGlobalChainSwitch'
 import { useResetAtom } from 'jotai/utils'
-import { Chain } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
+import { Chain } from 'graphql/data/util'
 import { useExploreParams } from './redirects'
 import RecentTransactions from './tables/RecentTransactions'
 
@@ -156,7 +156,7 @@ const Explore = ({ initialTab }: { initialTab?: ExploreTab }) => {
     <Trace page={InterfacePageName.EXPLORE_PAGE} properties={{ chainName: chain }} shouldLogImpression>
       <ExploreContainer>
         {/* FIXME: 修改chart 模块 */}
-        {/* <ExploreChartsSection /> */}
+        <ExploreChartsSection />
         <NavWrapper ref={tabNavRef}>
           <TabBar data-testid="explore-navbar">
             {Pages.map(({ title, loggingElementName, key }, index) => {

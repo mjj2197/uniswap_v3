@@ -275,6 +275,7 @@ export function SwapForm({ disableTokenInputs = false, onCurrencyChange }: SwapF
   const allowance = useSwapRouter2Allowance(
     maximumAmountIn ?? (parsedAmounts[Field.INPUT]?.currency.isToken ? (parsedAmounts[Field.INPUT] as CurrencyAmount<Token>) : undefined),
     // isSupportedChain(chainId) ? UNIVERSAL_ROUTER_ADDRESS(chainId) : undefined,
+    // @ts-ignore
     SWAP_ROUTER_02_ADDRESSES(chainId),
     trade?.fillType
   )
@@ -286,6 +287,7 @@ export function SwapForm({ disableTokenInputs = false, onCurrencyChange }: SwapF
   }, [fiatValueTradeInput.data, fiatValueTradeOutput.data, outputFeeFiatValue])
 
   // the callback to execute the swap
+  // @ts-ignore
   const swapCallback = useSwapCallback(trade, swapFiatValues, allowedSlippage, allowance.state === AllowanceState.ALLOWED ? allowance.permitSignature : undefined)
 
   const handleContinueToReview = useCallback(() => {
@@ -501,7 +503,7 @@ export function SwapForm({ disableTokenInputs = false, onCurrencyChange }: SwapF
                 }}
                 color={theme.neutral1}
               >
-                {isDarkMode ? <ArrowUpDownDark/> : <ArrowUpDownLight />}
+                {isDarkMode ? <ArrowUpDownDark /> : <ArrowUpDownLight />}
               </ArrowContainer>
             </TraceEvent>
           </ArrowWrapper>

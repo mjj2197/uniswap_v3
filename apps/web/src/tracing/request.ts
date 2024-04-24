@@ -1,7 +1,6 @@
 import { INFURA_PREFIX_TO_CHAIN_ID } from 'constants/networks'
-import { CHAIN_ID_TO_BACKEND_NAME } from 'graphql/data/util'
+import { CHAIN_ID_TO_BACKEND_NAME, Chain } from 'graphql/data/util'
 import { TraceContext } from 'tracing/types'
-import { Chain } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 import { trace as startTrace } from './trace'
 
 export function patchFetch(api: Pick<typeof globalThis, 'fetch'>) {
@@ -81,6 +80,7 @@ export function getTraceContext(url: URL, init?: RequestInit, force = false): Tr
       return {
         name: `${url.host} ${operation}`,
         op: 'http.graphql.query',
+        // @ts-ignore
         tags: { host: url.host, operation, chain, address },
       }
     } else {
@@ -102,6 +102,7 @@ export function getTraceContext(url: URL, init?: RequestInit, force = false): Tr
     } catch {
       // ignore the error
     }
+    // @ts-ignore
     return { name: `${url.host} ${method}`, op: 'http.json_rpc', tags: { host: url.host, method, chain } }
   } else if (force) {
     return {

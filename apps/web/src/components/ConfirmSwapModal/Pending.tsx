@@ -20,12 +20,7 @@ import { TransactionStatus } from 'uniswap/src/data/graphql/uniswap-data-api/__g
 import { ExplorerDataType, getExplorerLink } from 'utils/getExplorerLink'
 
 import { isLimitTrade } from 'state/routing/utils'
-import {
-  AnimatedEntranceConfirmationIcon,
-  AnimatedEntranceSubmittedIcon,
-  LoadingIndicatorOverlay,
-  LogoContainer,
-} from '../AccountDrawer/MiniPortfolio/Activity/Logos'
+import { AnimatedEntranceConfirmationIcon, AnimatedEntranceSubmittedIcon, LoadingIndicatorOverlay, LogoContainer } from '../AccountDrawer/MiniPortfolio/Activity/Logos'
 import { slideInAnimation, slideOutAnimation } from './animations'
 import { TradeSummary } from './TradeSummary'
 
@@ -63,15 +58,7 @@ const StepTitleAnimationContainer = styled(Column)<{ disableEntranceAnimation?: 
   }
 `
 
-function getTitle({
-  trade,
-  swapPending,
-  swapConfirmed,
-}: {
-  trade?: InterfaceTrade
-  swapPending: boolean
-  swapConfirmed: boolean
-}): ReactNode {
+function getTitle({ trade, swapPending, swapConfirmed }: { trade?: InterfaceTrade; swapPending: boolean; swapConfirmed: boolean }): ReactNode {
   if (isLimitTrade(trade)) {
     if (swapPending) return t`Limit submitted`
     if (swapConfirmed) return t`Limit filled!`
@@ -106,11 +93,11 @@ export function Pending({
   const { chainId } = useWeb3React()
 
   const swapStatus = useSwapTransactionStatus(swapResult)
-  const uniswapXOrder = useOrder(swapResult?.type === TradeFillType.UniswapX ? swapResult.response.orderHash : '')
+  // const uniswapXOrder = useOrder(swapResult?.type === TradeFillType.UniswapX ? swapResult.response.orderHash : '')
+  const uniswapXOrder = useOrder('')
 
   const limitPlaced = isLimitTrade(initialTrade) && uniswapXOrder?.status === UniswapXOrderStatus.OPEN
-  const swapConfirmed =
-    swapStatus === TransactionStatus.Confirmed || uniswapXOrder?.status === UniswapXOrderStatus.FILLED
+  const swapConfirmed = swapStatus === TransactionStatus.Confirmed || uniswapXOrder?.status === UniswapXOrderStatus.FILLED
   const wrapConfirmed = useIsTransactionConfirmed(wrapTxHash)
 
   const swapPending = swapResult !== undefined && !swapConfirmed

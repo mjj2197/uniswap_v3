@@ -66,6 +66,7 @@ export function useV3TokenTransactions(
     })
   }
 
+  // @ts-ignore
   const filteredTransactions = unfilteredTransaction?.filter((tx): tx is TableTransaction => tx.type && filter.includes(tx.type)) ?? []
 
   return useMemo(() => ({ data: filteredTransactions, loading, error }), [filteredTransactions, loading, error])

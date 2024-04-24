@@ -57,28 +57,17 @@ const AutoBadge = styled(ThemedText.LabelMicro).attrs({ fontWeight: 535 })`
 export function FOTTooltipContent() {
   return (
     <>
-      <Trans>
-        Some tokens take a fee when they are bought or sold, which is set by the token issuer. Uniswap does not receive
-        any of these fees.
-      </Trans>{' '}
-      <ExternalLink href="https://support.uniswap.org/hc/en-us/articles/18673568523789-What-is-a-token-fee-">
-        Learn more
-      </ExternalLink>
+      <Trans>Some tokens take a fee when they are bought or sold, which is set by the token issuer. Uniswap does not receive any of these fees.</Trans>{' '}
+      <ExternalLink href="https://support.uniswap.org/hc/en-us/articles/18673568523789-What-is-a-token-fee-">Learn more</ExternalLink>
     </>
   )
 }
 
 function SwapFeeTooltipContent({ hasFee }: { hasFee: boolean }) {
   const message = hasFee ? (
-    <Trans>
-      This fee is applied on select token pairs to ensure the best experience with Jaguarswap. It is paid in the output
-      token and has already been factored into the quote.
-    </Trans>
+    <Trans>This fee is applied on select token pairs to ensure the best experience with Jaguarswap. It is paid in the output token and has already been factored into the quote.</Trans>
   ) : (
-    <Trans>
-      This fee is applied on select token pairs to ensure the best experience with Jaguarswap. There is no fee associated
-      with this swap.
-    </Trans>
+    <Trans>This fee is applied on select token pairs to ensure the best experience with Jaguarswap. There is no fee associated with this swap.</Trans>
   )
   return (
     <>
@@ -137,7 +126,10 @@ function useLineItem(props: SwapLineItemProps): LineItemData | undefined {
     case SwapLineItemType.EXCHANGE_RATE:
       return {
         Label: () => (isLimitTrade(trade) ? <Trans>Limit price</Trans> : <Trans>Rate</Trans>),
-        Value: () => <TradePrice price={trade.executionPrice} />,
+        Value: () => {
+          // @ts-ignore
+          return <TradePrice price={trade.executionPrice} />
+        },
         TooltipBody: !isPreview ? () => <RoutingTooltip trade={trade} /> : undefined,
         tooltipSize: isUniswapX ? TooltipSize.Small : TooltipSize.Large,
       }
@@ -185,12 +177,7 @@ function useLineItem(props: SwapLineItemProps): LineItemData | undefined {
       if (trade.tradeType === TradeType.EXACT_INPUT) return
       return {
         Label: () => <Trans>Pay at most</Trans>,
-        TooltipBody: () => (
-          <Trans>
-            The maximum amount you are guaranteed to spend. If the price slips any further, your transaction will
-            revert.
-          </Trans>
-        ),
+        TooltipBody: () => <Trans>The maximum amount you are guaranteed to spend. If the price slips any further, your transaction will revert.</Trans>,
         Value: () => <CurrencyAmountRow amount={trade.maximumAmountIn(allowedSlippage ?? new Percent(0))} />,
         loaderWidth: 70,
       }
@@ -198,12 +185,7 @@ function useLineItem(props: SwapLineItemProps): LineItemData | undefined {
       if (trade.tradeType === TradeType.EXACT_OUTPUT) return
       return {
         Label: () => <Trans>Receive at least</Trans>,
-        TooltipBody: () => (
-          <Trans>
-            The minimum amount you are guaranteed to receive. If the price slips any further, your transaction will
-            revert.
-          </Trans>
-        ),
+        TooltipBody: () => <Trans>The minimum amount you are guaranteed to receive. If the price slips any further, your transaction will revert.</Trans>,
         Value: () => <CurrencyAmountRow amount={trade.minimumAmountOut(allowedSlippage ?? new Percent(0))} />,
         loaderWidth: 70,
       }

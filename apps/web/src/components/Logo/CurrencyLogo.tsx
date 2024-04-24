@@ -15,7 +15,8 @@ export default function CurrencyLogo(
       chainId={props.currency?.chainId}
       address={props.currency?.wrapped.address}
       symbol={props.symbol ?? props.currency?.symbol}
-      primaryImg={(props.currency?.tokenInfo ? props.currency?.tokenInfo : props.currency as TokenInfo)?.logoURI}
+      // FIXME: 先删除掉，看有什么影响
+      // primaryImg={(props.currency?.tokenInfo ? props.currency?.tokenInfo : props.currency as TokenInfo)?.logoURI}
       {...props}
     />
   )

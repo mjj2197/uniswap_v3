@@ -2,7 +2,7 @@ import { useWeb3React } from '@web3-react/core'
 import { CHAIN_ID_TO_BACKEND_NAME } from 'graphql/data/util'
 import { useEffect } from 'react'
 import { useAppSelector } from 'state/hooks'
-import { Chain } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
+import { Chain } from 'graphql/data/util'
 
 export const useOnGlobalChainSwitch = (callback: (chainId: number, chain?: Chain) => void) => {
   const { chainId } = useWeb3React()

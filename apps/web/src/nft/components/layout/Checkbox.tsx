@@ -1,5 +1,4 @@
 import { ApprovedCheckmarkIcon } from 'nft/components/icons'
-import React from 'react'
 import styled from 'styled-components'
 import { ClickableStyle } from 'theme/components'
 

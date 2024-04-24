@@ -18,7 +18,7 @@ if (UNISWAP_GATEWAY_DNS_URL === undefined) {
 const CLIENT_PARAMS = {
   // protocols: [Protocol.V2, Protocol.V3, Protocol.MIXED],
   protocols: [Protocol.V3],
-  debugRouting: true
+  debugRouting: true,
 }
 
 const protocols: Protocol[] = [Protocol.V2, Protocol.V3, Protocol.MIXED]
@@ -53,7 +53,7 @@ function getRoutingAPIConfig(args: GetQuoteArgs): RoutingConfig {
     // If the user has opted out of UniswapX during the opt-out transition period, we should respect that preference and only request classic quotes.
     routerPreference === RouterPreference.API ||
     routerPreference === INTERNAL_ROUTER_PREFERENCE_PRICE ||
-    !isUniswapXSupportedChain(tokenInChainId)
+    !isUniswapXSupportedChain()
   ) {
     return [classic]
   }
@@ -66,18 +66,20 @@ export const routingApi = createApi({
   baseQuery: fetchBaseQuery(),
   endpoints: (build) => ({
     getQuote: build.query<TradeResult, GetQuoteArgs>({
+      // @ts-ignore
       queryFn(args, _api, _extraOptions, fetch) {
         return trace({ name: 'Quote', op: 'quote', data: { ...args } }, async (trace) => {
           logSwapQuoteRequest(args.tokenInChainId, args.routerPreference, false)
 
           try {
+            // @ts-ignore
             return trace.child({ name: 'Quote on client', op: 'quote.client' }, async (clientTrace) => {
               const router = getRouter(args.tokenInChainId)
               try {
                 const quoteResult = await getClientSideQuote(args, router, CLIENT_PARAMS)
                 if (quoteResult.state === QuoteState.SUCCESS) {
                   const trade = await transformQuoteToTrade(args, quoteResult.data, QuoteMethod.CLIENT_SIDE_FALLBACK)
-                  console.log("🚀 trade data", trade)
+                  console.log('🚀 trade data', trade)
                   return {
                     data: { ...trade, latencyMs: trace.now() },
                   }

@@ -110,6 +110,7 @@ export function useTopPools(sortState: PoolTableSortState, chainId?: ChainId) {
     error: errorV3,
     data: dataV3,
   } = useTopV3PoolsQuery({
+    // @ts-ignore
     variables: { first: 100, chain: chainIdToBackendName(chainId) },
   })
   const {

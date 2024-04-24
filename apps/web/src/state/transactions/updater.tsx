@@ -32,7 +32,7 @@ export default function Updater() {
   const { chainId } = useWeb3React()
   const addPopup = useAddPopup()
   // speed up popup dismissal time if on L2
-  const isL2 = Boolean(chainId && L2_CHAIN_IDS.includes(chainId))
+  const isL2 = false
   const transactions = useAppSelector((state) => state.transactions)
   const pendingTransactions = useMemo(() => {
     if (!chainId || !transactions[chainId]) return {}

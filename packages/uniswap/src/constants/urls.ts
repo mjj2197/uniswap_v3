@@ -40,7 +40,7 @@ export const uniswapUrls = {
   extensionFeedbackFormUrl: 'https://forms.gle/RGFhKnABUjdPiYQH6', // TODO(EXT-668): Remove this after F&F launch
   interfaceTokensUrl: `https://${UNISWAP_APP_HOSTNAME}/explore/tokens`,
   interfaceNftItemUrl: `https://${UNISWAP_APP_HOSTNAME}/nfts/asset`,
-  unitagsApiUrl: getUnitagsApiUrl(),
+  // unitagsApiUrl: getUnitagsApiUrl(),
   tradingApiPaths: {
     quote: getTradingApiQuotePath(),
     approval: getTradingApiApprovalPath(),
@@ -84,9 +84,9 @@ function getUniswapStatsigProxyUrl(): string {
   return `${config.uniswapApiBaseUrl}/v1/statsig-proxy`
 }
 
-function getUnitagsApiUrl(): string {
-  return config.unitagsApiUrl
-}
+// function getUnitagsApiUrl(): string {
+//   return config.unitagsApiUrl
+// }
 
 function getTradingApiQuotePath(): string {
   return `${TRADING_API_BASE_PATH}/quote`

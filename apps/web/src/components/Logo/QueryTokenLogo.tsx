@@ -1,8 +1,8 @@
-import { ChainId } from '@jaguarswap/sdk-core'
+import { ChainId, Token } from '@jaguarswap/sdk-core'
 import { PortfolioLogo } from 'components/AccountDrawer/MiniPortfolio/PortfolioLogo'
 import { SearchToken } from 'graphql/data/SearchTokens'
 import { TokenQueryData } from 'graphql/data/Token'
-import { TokenData } from 'graphql/data/useV3Token'
+import { TableToken } from 'graphql/data/useV3Tokens'
 import { gqlToCurrency } from 'graphql/data/util'
 import { useMemo } from 'react'
 import { useAppSelector } from 'state/hooks'
@@ -13,18 +13,14 @@ import { AssetLogoBaseProps } from './AssetLogo'
 
 export default function QueryTokenLogo(
   props: AssetLogoBaseProps & {
-    token?: TokenData | TokenQueryData | SearchToken
+    token?: TableToken | TokenQueryData | SearchToken
   }
 ) {
-  const chainId = useAppSelector((state: AppState) => state.application.id)
+  const chainId = useAppSelector((state: AppState) => state.application.chainId)
 
-  const currency = props.token ? gqlToCurrency(props.token, chainId) : undefined
+  const currency = props.token ? gqlToCurrency(props.token, chainId as ChainId) : undefined
 
-  const logoUrl = getInitialUrl(
-    currency.address,
-    currency.chainId,
-    currency.isNative
-  )
+  const logoUrl = getInitialUrl((currency as Token)?.address, currency?.chainId, currency?.isNative)
 
-  return <PortfolioLogo currencies={useMemo(() => [currency], [currency])} chainId={chainId} images={[logoUrl]} {...props} />
+  return <PortfolioLogo currencies={useMemo(() => [currency], [currency])} chainId={chainId as ChainId} images={[logoUrl]} {...props} />
 }

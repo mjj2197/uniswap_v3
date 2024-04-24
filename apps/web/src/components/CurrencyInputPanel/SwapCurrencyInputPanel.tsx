@@ -318,7 +318,7 @@ const SwapCurrencyInputPanel = forwardRef<HTMLInputElement, SwapCurrencyInputPan
 
         <Container hideInput={hideInput}>
           <WalletContainer>
-            <Text variant="subheading2" userSelect="none" fontWeight={600}>
+            <Text variant="subheading2" userSelect="none" fontWeight="bold">
               {label}
             </Text>
             {Boolean(!hideInput && !hideBalance) && (

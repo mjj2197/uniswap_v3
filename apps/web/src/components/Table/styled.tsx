@@ -20,6 +20,7 @@ import { Z_INDEX } from 'theme/zIndex'
 import { Token } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 import { useAppSelector } from 'state/hooks'
 import { AppState } from 'state/reducer'
+import { PoolToken } from 'graphql/data/pools/useV3Pools'
 
 export const SHOW_RETURN_TO_TOP_OFFSET = 500
 export const LOAD_MORE_BOTTOM_OFFSET = 50
@@ -239,13 +240,13 @@ const TokenSymbolText = styled(ThemedText.BodyPrimary)`
  * @param token
  * @returns JSX.Element showing the Token's Logo, Chain logo if non-mainnet, and Token Symbol
  */
-export const TokenLinkCell = ({ token }: { token: Token }) => {
+export const TokenLinkCell = ({ token }: { token: PoolToken }) => {
   const chainId = useAppSelector((state: AppState) => state.application.chainId) ?? ChainId.X1
 
   const unwrappedToken = unwrapToken(chainId, token)
   const isNative = unwrappedToken.address === NATIVE_CHAIN_ID
   const nativeCurrency = nativeOnChain(chainId)
-  const logo = getInitialUrl(token.address ?? token.id, chainId)
+  const logo = getInitialUrl(token.address, chainId)
   return (
     <StyledInternalLink
       to={getTokenDetailsURL({

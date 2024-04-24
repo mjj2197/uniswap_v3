@@ -31,6 +31,7 @@ import { shortenAddress } from 'utilities/src/addresses'
 import { useFormatter } from 'utils/formatNumbers'
 import { ExplorerDataType, getExplorerLink } from 'utils/getExplorerLink'
 import { DetailBubble } from './shared'
+import { PoolToken } from 'graphql/data/pools/useV3Pools'
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -61,8 +62,8 @@ const IconBubble = styled(LoadingBubble)`
 interface PoolDetailsBreadcrumbProps {
   chainId?: number
   poolAddress?: string
-  token0?: Token
-  token1?: Token
+  token0?: PoolToken
+  token1?: PoolToken
   loading?: boolean
 }
 
@@ -113,8 +114,8 @@ const PoolDetailsTitle = ({
   protocolVersion,
   toggleReversed,
 }: {
-  token0?: Token
-  token1?: Token
+  token0?: PoolToken
+  token1?: PoolToken
   chainId?: number
   feeTier?: number
   protocolVersion?: ProtocolVersion
@@ -171,7 +172,7 @@ const ContractsDropdownRow = ({
 }: {
   address?: string
   chainId?: number
-  tokens: (Token | undefined)[]
+  tokens: (PoolToken | undefined)[]
 }) => {
   const theme = useTheme()
   const currency = tokens[0] && gqlToCurrency(tokens[0])
@@ -199,7 +200,7 @@ const ContractsDropdownRow = ({
       <ContractsDropdownRowContainer>
         <Row gap="sm">
           {isPool ? (
-            <DoubleTokenAndChainLogo chainId={chainId} tokens={tokens} size={24} />
+            <DoubleTokenAndChainLogo chainId={chainId} tokens={[tokens[0]?.address, tokens[1]?.address]} size={24} />
           ) : (
             <CurrencyLogo currency={currency} size="24px" />
           )}
@@ -229,8 +230,8 @@ const PoolDetailsHeaderActions = ({
   chainId?: number
   poolAddress?: string
   poolName: string
-  token0?: Token
-  token1?: Token
+  token0?: PoolToken
+  token1?: PoolToken
 }) => {
   const theme = useTheme()
 
@@ -278,8 +279,8 @@ const StyledLink = styled(Link)`
 interface PoolDetailsHeaderProps {
   chainId?: number
   poolAddress?: string
-  token0?: Token
-  token1?: Token
+  token0?: PoolToken
+  token1?: PoolToken
   feeTier?: number
   protocolVersion?: ProtocolVersion
   toggleReversed: React.DispatchWithoutAction
@@ -299,7 +300,7 @@ export function PoolDetailsHeader({
   const screenSize = useScreenSize()
   const shouldColumnBreak = !screenSize['sm']
   const poolName = `${token0?.symbol} / ${token1?.symbol}`
-  const tokens = [token0, token1]
+  const tokens = [token0?.address, token1?.address]
 
   if (loading) {
     return (
@@ -378,7 +379,7 @@ export function DoubleTokenAndChainLogo({
   size = 32,
 }: {
   chainId: number
-  tokens: Array<Token | undefined>
+  tokens: Array<string | undefined>
   size?: number
 }) {
   return (
@@ -421,21 +422,22 @@ export function DoubleTokenLogo({
   size = 32,
 }: {
   chainId: number
-  tokens: Array<Token | undefined>
+  tokens: Array<string | undefined>
   size?: number
 }) {
-  const token0IsNative = tokens?.[0]?.address === NATIVE_CHAIN_ID
-  const token1IsNative = tokens?.[1]?.address === NATIVE_CHAIN_ID
+  const token0IsNative = tokens[0] === NATIVE_CHAIN_ID
+  const token1IsNative = tokens[0] === NATIVE_CHAIN_ID
+
   const [src, nextSrc] = useTokenLogoSource({
-    address: tokens?.[0]?.address,
+    address: tokens?.[0],
     chainId,
-    primaryImg: token0IsNative ? undefined : tokens?.[0]?.project?.logo?.url,
+    primaryImg: token0IsNative ? undefined : undefined,
     isNative: token0IsNative,
   })
   const [src2, nextSrc2] = useTokenLogoSource({
-    address: tokens?.[1]?.address,
+    address: tokens?.[1],
     chainId,
-    primaryImg: token1IsNative ? undefined : tokens?.[1]?.project?.logo?.url,
+    primaryImg: token1IsNative ? undefined : undefined,
     isNative: token1IsNative,
   })
 

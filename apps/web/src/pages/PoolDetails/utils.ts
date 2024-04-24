@@ -1,7 +1,7 @@
 import { t } from '@lingui/macro'
-import { PoolData } from 'graphql/data/pools/usePoolData'
+import { TablePool } from 'graphql/data/pools/useV3Pools'
 
-export const getPoolDetailPageTitle = (poolData?: PoolData) => {
+export const getPoolDetailPageTitle = (poolData?: TablePool) => {
   const token0Symbol = poolData?.token0.symbol
   const token1Symbol = poolData?.token1.symbol
 

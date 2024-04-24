@@ -41,11 +41,10 @@ const styledMobileMenuCss = css`
 
 function useWalletSupportedChains(): ChainId[] {
   const { connector } = useWeb3React()
-  const connectionType = getConnection(connector).type
+  const connectionType = getConnection(connector)?.type
 
   switch (connectionType) {
     case ConnectionType.WALLET_CONNECT_V2:
-    case ConnectionType.UNISWAP_WALLET_V2:
       return getSupportedChainIdsFromWalletConnectSession((connector as WalletConnectV2).provider?.session)
     default:
       return NETWORK_SELECTOR_CHAINS
@@ -112,13 +111,7 @@ export const ChainSelector = ({ leftAlign }: { leftAlign?: boolean }) => {
     <DropdownSelector
       isOpen={isOpen}
       toggleOpen={() => setIsOpen(!isOpen)}
-      menuLabel={
-        !isSupported ? (
-          <AlertTriangle size={20} color={theme.neutral2} />
-        ) : (
-          <ChainLogo chainId={chainId} size={20} testId="chain-selector-logo" />
-        )
-      }
+      menuLabel={!isSupported ? <AlertTriangle size={20} color={theme.neutral2} /> : <ChainLogo chainId={chainId} size={20} testId="chain-selector-logo" />}
       tooltipText={isSupported ? undefined : t`Your wallet's current network is unsupported.`}
       dataTestId="chain-selector"
       optionsContainerTestId="chain-selector-options"
@@ -134,13 +127,7 @@ export const ChainSelector = ({ leftAlign }: { leftAlign?: boolean }) => {
             />
           ))}
           {unsupportedChains.map((selectorChain) => (
-            <ChainSelectorRow
-              disabled
-              onSelectChain={() => undefined}
-              targetChain={selectorChain}
-              key={selectorChain}
-              isPending={false}
-            />
+            <ChainSelectorRow disabled onSelectChain={() => undefined} targetChain={selectorChain} key={selectorChain} isPending={false} />
           ))}
         </>
       }

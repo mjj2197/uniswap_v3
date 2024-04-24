@@ -206,7 +206,6 @@ export function useDerivedMintInfo(
     pairState,
     currencyBalances,
     parsedAmounts,
-    price,
     noLiquidity,
     liquidityMinted,
     poolTokenPercentage,

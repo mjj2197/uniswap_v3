@@ -13,6 +13,7 @@ import { InterfaceTrade } from 'state/routing/types'
 import { isSubmittableTrade } from 'state/routing/utils'
 import styled, { useTheme } from 'styled-components'
 import { ThemedText } from 'theme/components'
+import { Currency, Price } from '@jaguarswap/sdk-core'
 import { useFormatter } from 'utils/formatNumbers'
 
 import GasEstimateTooltip from './GasEstimateTooltip'
@@ -73,7 +74,7 @@ export default function SwapDetailsDropdown(props: SwapDetailsProps) {
           <RowFixed>
             {trade ? (
               <LoadingOpacityContainer $loading={syncing} data-testid="trade-price-container">
-                <TradePrice price={trade.executionPrice} />
+                <TradePrice price={trade.executionPrice as Price<Currency, Currency>} />
               </LoadingOpacityContainer>
             ) : loading || syncing ? (
               <ThemedText.DeprecatedMain fontSize={14}>

@@ -14,13 +14,7 @@ import { RowBetween } from 'components/Row'
 import { DataQuality } from 'components/Tokens/TokenDetails/ChartSection/util'
 import { MAX_WIDTH_MEDIA_BREAKPOINT } from 'components/Tokens/constants'
 import { useDailyProtocolTVL, useHistoricalProtocolVolume } from 'graphql/data/protocolStats'
-import {
-  TimePeriod,
-  chainIdToBackendName,
-  getProtocolColor,
-  supportedChainIdFromGQLChain,
-  validateUrlChainParam,
-} from 'graphql/data/util'
+import { TimePeriod, chainIdToBackendName, getProtocolColor, supportedChainIdFromGQLChain, validateUrlChainParam } from 'graphql/data/util'
 import { useScreenSize } from 'hooks/useScreenSize'
 import { useExploreParams } from 'pages/Explore/redirects'
 import { ReactNode, useMemo, useState } from 'react'
@@ -102,6 +96,7 @@ function VolumeChartSection({ chainId }: { chainId: number }) {
   }
 
   const { entries, loading, dataQuality } = useHistoricalProtocolVolume(
+    // @ts-ignore
     chainIdToBackendName(chainId),
     isSmallScreen ? HistoryDuration.Month : timeGranularityToHistoryDuration(timePeriod)
   )
@@ -118,13 +113,7 @@ function VolumeChartSection({ chainId }: { chainId: number }) {
 
   const cumulativeVolume = useMemo(() => getCumulativeVolume(entries), [entries])
   if (isSmallScreen) {
-    return (
-      <MinimalStatDisplay
-        title={<Trans>Uniswap volume</Trans>}
-        value={cumulativeVolume}
-        time={<Trans>Past month</Trans>}
-      />
-    )
+    return <MinimalStatDisplay title={<Trans>Uniswap volume</Trans>} value={cumulativeVolume} time={<Trans>Past month</Trans>} />
   }
 
   return (
@@ -134,21 +123,13 @@ function VolumeChartSection({ chainId }: { chainId: number }) {
           <Trans>Uniswap volume</Trans>
         </SectionTitle>
         <div style={{ position: 'absolute', right: 0 }}>
-          <StyledTimePeriodSelector
-            options={TIME_SELECTOR_OPTIONS}
-            timePeriod={timePeriod}
-            onChangeTimePeriod={setTimePeriod}
-          />
+          <StyledTimePeriodSelector options={TIME_SELECTOR_OPTIONS} timePeriod={timePeriod} onChangeTimePeriod={setTimePeriod} />
         </div>
       </RowBetween>
       {(() => {
         if (dataQuality === DataQuality.INVALID) {
-          const errorText = loading ? undefined : (
-            <Trans>Unable to display historical volume data for the current chain.</Trans>
-          )
-          return (
-            <ChartSkeleton hideYAxis type={ChartType.VOLUME} height={EXPLORE_CHART_HEIGHT_PX} errorText={errorText} />
-          )
+          const errorText = loading ? undefined : <Trans>Unable to display historical volume data for the current chain.</Trans>
+          return <ChartSkeleton hideYAxis type={ChartType.VOLUME} height={EXPLORE_CHART_HEIGHT_PX} errorText={errorText} />
         }
         return (
           <StyledChart Model={CustomVolumeChartModel<StackedHistogramData>} params={params}>
@@ -170,6 +151,7 @@ function VolumeChartSection({ chainId }: { chainId: number }) {
 function TVLChartSection({ chainId }: { chainId: number }) {
   const theme = useTheme()
 
+  // @ts-ignore
   const { entries, loading, dataQuality } = useDailyProtocolTVL(chainIdToBackendName(chainId))
   const lastEntry = entries[entries.length - 1]
   const params = useMemo(
@@ -193,9 +175,7 @@ function TVLChartSection({ chainId }: { chainId: number }) {
       </SectionTitle>
       {(() => {
         if (dataQuality === DataQuality.INVALID) {
-          const errorText = loading ? undefined : (
-            <Trans>Unable to display historical TVL data for the current chain.</Trans>
-          )
+          const errorText = loading ? undefined : <Trans>Unable to display historical TVL data for the current chain.</Trans>
           return <ChartSkeleton hideYAxis type={ChartType.TVL} height={EXPLORE_CHART_HEIGHT_PX} errorText={errorText} />
         }
 

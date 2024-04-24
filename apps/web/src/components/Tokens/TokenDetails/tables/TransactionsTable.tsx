@@ -1,4 +1,3 @@
-import React from 'react'
 import { ApolloError } from '@apollo/client'
 import { Trans } from '@lingui/macro'
 import { createColumnHelper } from '@tanstack/react-table'
@@ -123,7 +122,7 @@ export function TransactionsTable({ chainId, referenceToken }: { chainId: ChainI
             <Row gap="8px" justify="flex-end">
               <ThemedText.BodyPrimary>
                 {formatNumber({
-                  input: Math.abs(transaction.getValue?.().token0.amount) || 0,
+                  input: Math.abs(Number.parseFloat(transaction.getValue?.().token0.amount ?? 0)) || 0,
                 })}
               </ThemedText.BodyPrimary>
               <TokenLinkCell token={transaction.getValue?.().token0} />
@@ -145,7 +144,7 @@ export function TransactionsTable({ chainId, referenceToken }: { chainId: ChainI
             <Row gap="8px" justify="flex-end">
               <ThemedText.BodyPrimary>
                 {formatNumber({
-                  input: Math.abs(transaction.getValue?.().token1.amount) || 0,
+                  input: Math.abs(Number.parseFloat(transaction.getValue?.().token1.amount)) || 0,
                 })}
               </ThemedText.BodyPrimary>
               <TokenLinkCell token={transaction.getValue?.().token1} />
@@ -164,7 +163,7 @@ export function TransactionsTable({ chainId, referenceToken }: { chainId: ChainI
         ),
         cell: (makerAddress) => (
           <Cell loading={showLoadingSkeleton} minWidth={150}>
-            <StyledExternalLink href={getExplorerLink(chainId, makerAddress.getValue?.(), ExplorerDataType.ADDRESS)}>{shortenAddress(makerAddress.getValue?.())}</StyledExternalLink>
+            <StyledExternalLink href={getExplorerLink(chainId, makerAddress.getValue?.() ?? '', ExplorerDataType.ADDRESS)}>{shortenAddress(makerAddress.getValue?.())}</StyledExternalLink>
           </Cell>
         ),
       }),

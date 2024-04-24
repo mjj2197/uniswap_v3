@@ -39,7 +39,7 @@ export const TESTNET_CHAIN_IDS = [ChainId.X1_TESTNET] as const
 /**
  * All the chain IDs that are running the Ethereum protocol.
  */
-export const L1_CHAIN_IDS = [ChainId.X1,ChainId.X1_TESTNET] as const
+export const L1_CHAIN_IDS = [ChainId.X1, ChainId.X1_TESTNET] as const
 
 export type SupportedL1ChainId = (typeof L1_CHAIN_IDS)[number]
 

@@ -1,5 +1,5 @@
 import { Trans } from '@lingui/macro'
-import { Currency } from '@jaguarswap/sdk-core'
+import type { Currency } from '@jaguarswap/sdk-core'
 import Column from 'components/Column'
 import CurrencyLogo from 'components/Logo/CurrencyLogo'
 import Row from 'components/Row'
@@ -8,17 +8,17 @@ import { LoadingBubble } from 'components/Tokens/loading'
 import { chainIdToBackendName, getTokenDetailsURL, unwrapToken } from 'graphql/data/util'
 import { useCurrency } from 'hooks/Tokens'
 import { useScreenSize } from 'hooks/useScreenSize'
-import { ReactNode, useMemo } from 'react'
+import { type ReactNode, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Text } from 'rebass'
 import styled, { css, useTheme } from 'styled-components'
 import { BREAKPOINTS } from 'theme'
 import { ClickableStyle, ThemedText } from 'theme/components'
-import { Token } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
+import type { Token } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 import { NumberType, useFormatter } from 'utils/formatNumbers'
 
 import { NATIVE_CHAIN_ID, nativeOnChain } from 'constants/tokens'
-import { PoolData } from 'graphql/data/pools/usePoolData'
+import type { PoolToken, TablePool } from 'graphql/data/pools/useV3Pools'
 import { DetailBubble } from './shared'
 
 const HeaderText = styled(Text)`
@@ -99,7 +99,11 @@ const rightBarChartStyles = css`
   border-left: 1px solid ${({ theme }) => theme.surface2};
 `
 
-const BalanceChartSide = styled.div<{ percent: number; $color: string; isLeft: boolean }>`
+const BalanceChartSide = styled.div<{
+  percent: number
+  $color: string
+  isLeft: boolean
+}>`
   height: 8px;
   width: ${({ percent }) => percent * 100}%;
   background: ${({ $color }) => $color};
@@ -117,7 +121,7 @@ const StatHeaderBubble = styled(LoadingBubble)`
   border-radius: 8px;
 `
 
-type TokenFullData = Token & {
+type TokenFullData = PoolToken & {
   price: number
   tvl: number
   percent: number
@@ -126,7 +130,7 @@ type TokenFullData = Token & {
 
 const PoolBalanceTokenNames = ({ token, chainId }: { token: TokenFullData; chainId?: number }) => {
   const isScreenSize = useScreenSize()
-  const screenIsNotLarge = isScreenSize['lg']
+  const screenIsNotLarge = isScreenSize.lg
   const { formatNumber } = useFormatter()
   const unwrappedToken = chainId ? unwrapToken(chainId, token) : token
   const isNative = unwrappedToken?.address === NATIVE_CHAIN_ID
@@ -145,9 +149,7 @@ const PoolBalanceTokenNames = ({ token, chainId }: { token: TokenFullData; chain
           chain: chainIdToBackendName(chainId),
         })}
       >
-        {screenIsNotLarge && (
-          <CurrencyLogo currency={currency} size="16px" style={{ marginRight: '4px', marginLeft: '4px' }} />
-        )}
+        {screenIsNotLarge && <CurrencyLogo currency={currency} size="16px" style={{ marginRight: '4px', marginLeft: '4px' }} />}
         {unwrappedToken.symbol}
       </StyledLink>
     </PoolBalanceTokenNamesContainer>
@@ -155,7 +157,7 @@ const PoolBalanceTokenNames = ({ token, chainId }: { token: TokenFullData; chain
 }
 
 interface PoolDetailsStatsProps {
-  poolData?: PoolData
+  poolData?: TablePool
   isReversed?: boolean
   chainId?: number
   loading?: boolean
@@ -171,19 +173,19 @@ export function PoolDetailsStats({ poolData, isReversed, chainId, loading }: Poo
 
   const [token0, token1] = useMemo(() => {
     if (poolData && poolData.token0 && poolData.token0Price && poolData.token1 && poolData.token1Price) {
-      const fullWidth = poolData?.tvlToken0 * poolData?.token0Price + poolData?.tvlToken1 * poolData?.token1Price
+      const fullWidth = poolData?.totalValueLockedToken0 ?? 0 * poolData?.token0Price + (poolData?.totalValueLockedToken1 ?? 0) * poolData?.token1Price
       const token0FullData: TokenFullData = {
         ...poolData?.token0,
         price: poolData?.token0Price,
-        tvl: poolData?.totalValueLockedToken0,
-        percent: (poolData?.totalValueLockedToken0 * poolData?.token0Price) / fullWidth,
+        tvl: poolData?.totalValueLockedToken0 ?? 0,
+        percent: (poolData?.totalValueLockedToken0 ?? 0 * poolData?.token0Price) / fullWidth,
         currency: currency0,
       }
       const token1FullData: TokenFullData = {
         ...poolData?.token1,
         price: poolData?.token1Price,
-        tvl: poolData?.totalValueLockedToken1,
-        percent: (poolData?.totalValueLockedToken1 * poolData?.token1Price) / fullWidth,
+        tvl: poolData?.totalValueLockedToken0 ?? 0,
+        percent: (poolData?.totalValueLockedToken1 ?? 0 * poolData?.token1Price) / fullWidth,
         currency: currency1,
       }
       return isReversed ? [token1FullData, token0FullData] : [token0FullData, token1FullData]
@@ -228,9 +230,7 @@ export function PoolDetailsStats({ poolData, isReversed, chainId, loading }: Poo
           </Row>
         )}
       </StatItemColumn>
-      {poolData?.tvl && (
-        <StatItem title={<Trans>TVL</Trans>} value={poolData.tvl} delta={poolData.tvlUSDChange} />
-      )}
+      {poolData?.tvlUSD && <StatItem title={<Trans>TVL</Trans>} value={poolData.tvlUSD} delta={poolData.volumeChange} />}
       {/* {poolData?.volumeUSD24H !== undefined && (
         <StatItem title={<Trans>24H volume</Trans>} value={poolData.volumeUSD24H} delta={poolData.volumeUSD24HChange} />
       )}

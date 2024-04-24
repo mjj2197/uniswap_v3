@@ -7,12 +7,12 @@ import type { createPopper } from '@popperjs/core'
 import { useWeb3React } from '@web3-react/core'
 import failOnConsole from 'jest-fail-on-console'
 import { disableNetConnect, restore as restoreNetConnect } from 'nock'
-import React from 'react'
 import { Readable } from 'stream'
 import { toBeVisible } from 'test-utils/matchers'
 import { mocked } from 'test-utils/mocked'
 import { useFeatureFlag } from 'uniswap/src/features/experiments/hooks'
 import { TextDecoder, TextEncoder } from 'util'
+import React from 'react'
 
 // Sets origin to the production origin, because some tests depend on this.
 // This prevents each test file from needing to set this manually.

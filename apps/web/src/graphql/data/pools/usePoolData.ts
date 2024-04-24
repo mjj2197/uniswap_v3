@@ -3,12 +3,7 @@ import { V2_BIPS } from 'graphql/data/pools/useTopPools'
 import { chainIdToBackendName } from 'graphql/data/util'
 import ms from 'ms'
 import { useMemo } from 'react'
-import {
-  ProtocolVersion,
-  Token,
-  useV2PairQuery,
-  useV3PoolQuery,
-} from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
+import { ProtocolVersion, Token, useV2PairQuery, useV3PoolQuery } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 
 export interface PoolData {
   // basic pool info
@@ -48,14 +43,9 @@ function calc24HVolChange(historicalVolume?: (VolumeChange | undefined)[]) {
   const dayAgo = (currentTime - ms('1d')) / 1000
   const twoDaysAgo = (currentTime - ms('2d')) / 1000
 
-  const volume24h = historicalVolume
-    .filter((entry): entry is VolumeChange => entry?.timestamp !== undefined && entry.timestamp >= dayAgo)
-    .reduce((acc, cur) => acc + cur.value, 0)
+  const volume24h = historicalVolume.filter((entry): entry is VolumeChange => entry?.timestamp !== undefined && entry.timestamp >= dayAgo).reduce((acc, cur) => acc + cur.value, 0)
   const volume48h = historicalVolume
-    .filter(
-      (entry): entry is VolumeChange =>
-        entry?.timestamp !== undefined && entry.timestamp >= twoDaysAgo && entry.timestamp < dayAgo
-    )
+    .filter((entry): entry is VolumeChange => entry?.timestamp !== undefined && entry.timestamp >= twoDaysAgo && entry.timestamp < dayAgo)
     .reduce((acc, cur) => acc + cur.value, 0)
   return ((volume24h - volume48h) / volume48h) * 100
 }
@@ -79,6 +69,7 @@ export function usePoolData(
     error: errorV3,
     data: dataV3,
   } = useV3PoolQuery({
+    // @ts-ignore
     variables: { chain: chainIdToBackendName(chainId), address: poolAddress },
   })
   const {

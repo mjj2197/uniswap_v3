@@ -2,10 +2,7 @@ import { ChainId } from '@jaguarswap/sdk-core'
 import { PoolTableSortState, TablePool, V2_BIPS, calculateTurnover, sortPools } from 'graphql/data/pools/useTopPools'
 import { chainIdToBackendName } from 'graphql/data/util'
 import { useCallback, useMemo, useRef } from 'react'
-import {
-  useTopV2PairsQuery,
-  useTopV3PoolsQuery,
-} from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
+import { useTopV2PairsQuery, useTopV3PoolsQuery } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 
 const DEFAULT_QUERY_SIZE = 20
 
@@ -19,6 +16,7 @@ export function usePoolsFromTokenAddress(tokenAddress: string, sortState: PoolTa
     variables: {
       first: DEFAULT_QUERY_SIZE,
       tokenAddress,
+      // @ts-ignore
       chain: chainIdToBackendName(chainId),
     },
   })

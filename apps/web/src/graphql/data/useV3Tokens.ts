@@ -5,7 +5,8 @@ import { OrderDirection } from 'graphql/data/util'
 
 import { get2DayChange } from './util'
 import { useDeltaTimestamps } from './util'
-import { Chain } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
+import { Chain } from 'graphql/data/util'
+import { ApolloError } from '@apollo/client'
 
 export enum TokenSortMethod {
   PRICE = 'Price',
@@ -90,7 +91,7 @@ function sortTokens(tokens: TableToken[], sortState: TokenSortState) {
 
 export function useV3Tokens(sortState: TokenSortState): {
   loading: boolean
-  error: boolean
+  error: ApolloError | undefined
   data: TableToken[]
 } {
   const { data: allTokens, error: allTokensError } = useAllTokensQuery()
@@ -135,7 +136,7 @@ export function useV3Tokens(sortState: TokenSortState): {
   if (anyError || anyLoading) {
     return {
       loading: anyLoading,
-      error: anyError,
+      error: allTokensError || error,
       data: [],
     }
   }
@@ -216,5 +217,5 @@ export function useV3Tokens(sortState: TokenSortState): {
   const unfilteredTokens = sortTokens(unsortedTokens, sortState)
 
   // const filteredPools = useFilteredPools(unfilteredPools).slice(0, 100)
-  return { data: unfilteredTokens, loading: anyLoading, error: anyError }
+  return { data: unfilteredTokens, loading: anyLoading, error: allTokensError }
 }

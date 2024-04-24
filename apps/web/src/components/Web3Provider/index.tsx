@@ -57,6 +57,7 @@ function Updater() {
       sendAnalyticsEvent(InterfaceEventName.CHAIN_CHANGED, {
         result: WalletConnectionResult.SUCCEEDED,
         wallet_address: account,
+        // @ts-ignore
         wallet_type: getConnection(connector).getProviderInfo().name,
         chain_id: chainId,
         previousConnectedChainId,
@@ -70,11 +71,10 @@ function Updater() {
   const [connectedWallets, addConnectedWallet] = useConnectedWallets()
   useEffect(() => {
     if (account && account !== previousAccount) {
+      // @ts-ignore
       const walletType = getConnection(connector).getProviderInfo().name
       const peerWalletAgent = provider ? getWalletMeta(provider)?.agent : undefined
-      const isReconnect = connectedWallets.some(
-        (wallet) => wallet.account === account && wallet.walletType === walletType
-      )
+      const isReconnect = connectedWallets.some((wallet) => wallet.account === account && wallet.walletType === walletType)
 
       provider
         ?.send('web3_clientVersion', [])

@@ -85,18 +85,7 @@ enum PositionStatus {
 }
 
 function PositionRow({ positionInfo }: { positionInfo: PositionInfo }) {
-  const tokens = [
-    {
-      id: positionInfo.details.token0,
-      address: positionInfo.details.token0,
-      chain: chainIdToBackendName(positionInfo.chainId),
-    },
-    {
-      id: positionInfo.details.token0,
-      address: positionInfo.details.token1,
-      chain: chainIdToBackendName(positionInfo.chainId),
-    },
-  ]
+  const tokens = [positionInfo.details.token0,positionInfo.details.token1]
   const { chainId: walletChainId, connector } = useWeb3React()
   const navigate = useNavigate()
   const switchChain = useSwitchChain()

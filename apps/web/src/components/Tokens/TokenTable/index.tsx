@@ -7,7 +7,7 @@ import Row from 'components/Row'
 import { Table } from 'components/Table'
 import { Cell } from 'components/Table/Cell'
 import { MAX_WIDTH_MEDIA_BREAKPOINT } from 'components/Tokens/constants'
-import { TokenData, useV3Tokens, TokenSortMethod } from 'graphql/data/useV3Tokens'
+import { TableToken, useV3Tokens, TokenSortMethod } from 'graphql/data/useV3Tokens'
 import { OrderDirection, chainIdToBackendName, getTokenDetailsURL, supportedChainIdFromGQLChain, validateUrlChainParam } from 'graphql/data/util'
 import { ReactElement, ReactNode, useMemo } from 'react'
 import styled from 'styled-components'
@@ -65,7 +65,7 @@ function useSetSortMethod(newSortMethod: TokenSortMethod) {
   }, [sortMethod, setSortMethod, setSortAscending, newSortMethod])
 }
 
-function TokenDescription({ token }: { token: TokenData }) {
+function TokenDescription({ token }: { token: TableToken }) {
   return (
     <Row gap="sm">
       <QueryTokenLogo token={token} size="28px" />
@@ -125,9 +125,9 @@ function TokenTable({
   loadMore,
   chainId,
 }: {
-  tokens?: readonly TokenData[]
+  tokens?: readonly TableToken[]
   loading: boolean
-  error?: ApolloError
+  error?: ApolloError | undefined
   loadMore?: ({ onComplete }: { onComplete?: () => void }) => void
   chainId: ChainId
 }) {
@@ -173,6 +173,7 @@ function TokenTable({
               search_token_address_input: filterString,
             },
           },
+          // @ts-ignore
           linkState: { preloadedLogoSrc: token?.project?.logoUrl },
         }
       }) ?? [],

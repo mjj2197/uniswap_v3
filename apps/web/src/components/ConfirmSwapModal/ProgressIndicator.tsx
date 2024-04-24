@@ -82,7 +82,8 @@ export default function ProgressIndicator({
   }, [blockConfirmationTime, estimatedTransactionTime])
 
   const swapStatus = useSwapTransactionStatus(swapResult)
-  const uniswapXOrder = useOrder(swapResult?.type === TradeFillType.UniswapX ? swapResult.response.orderHash : '')
+  // const uniswapXOrder = useOrder(swapResult?.type === TradeFillType.UniswapX ? swapResult.response.orderHash : '')
+  const uniswapXOrder = useOrder('')
 
   const swapConfirmed =
     swapStatus === TransactionStatus.Confirmed || uniswapXOrder?.status === UniswapXOrderStatus.FILLED

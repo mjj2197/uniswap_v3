@@ -1,7 +1,7 @@
 import { ChainId, Currency } from '@jaguarswap/sdk-core'
 import { NATIVE_CHAIN_ID } from 'constants/tokens'
 import { supportedChainIdFromGQLChain } from 'graphql/data/util'
-import { Chain, TokenStandard } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
+import { TokenStandard, Chain } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 
 export type CurrencyKey = string
 
@@ -14,11 +14,7 @@ export function currencyKey(currency: Currency): CurrencyKey {
   return buildCurrencyKey(currency.chainId, currency.isToken ? currency.address : NATIVE_CHAIN_ID)
 }
 
-export function currencyKeyFromGraphQL(contract: {
-  address?: string
-  chain: Chain
-  standard?: TokenStandard
-}): CurrencyKey {
+export function currencyKeyFromGraphQL(contract: { address?: string; chain: Chain; standard?: TokenStandard }): CurrencyKey {
   const chainId = supportedChainIdFromGQLChain(contract.chain)
   const address = contract.standard === TokenStandard.Native ? NATIVE_CHAIN_ID : contract.address
   if (!address) throw new Error('Non-native token missing address')

@@ -72,7 +72,7 @@ const TokenIconRing = styled(motion.div)<{
   height: ${(props) => `${props.size}px`};
   background-color: rgba(0,0,0,0);
   border: 1px solid ${(props) => `${props.color}`};
-  
+
   transform-origin: center center;
   position: absolute;
   pointer-events: all;
@@ -132,6 +132,7 @@ export function Token(props: {
   const tokenPromoQuery = useTokenPromoQuery({
     variables: {
       address: address !== NATIVE_CHAIN_ID ? address : undefined,
+      // @ts-ignore
       chain,
     },
     skip: standard !== TokenStandard.ERC20,

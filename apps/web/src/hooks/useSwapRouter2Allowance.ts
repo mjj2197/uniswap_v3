@@ -41,8 +41,8 @@ export default function useSwapRouter2Allowance(amount?: CurrencyAmount<Token>, 
   const token = amount?.currency
 
   const { tokenAllowance, isSyncing: isApprovalSyncing } = useTokenAllowance(token, account, spender)
-  const updateTokenAllowance = useUpdateTokenAllowance(amount, spender)
-  const revokeTokenAllowance = useRevokeTokenAllowance(token, spender)
+  const updateTokenAllowance = useUpdateTokenAllowance(amount, spender!)
+  const revokeTokenAllowance = useRevokeTokenAllowance(token, spender!)
   const isApproved = useMemo(() => {
     if (!amount || !tokenAllowance) return false
     return tokenAllowance.greaterThan(amount) || tokenAllowance.equalTo(amount)

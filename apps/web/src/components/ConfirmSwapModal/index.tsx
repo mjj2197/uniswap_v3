@@ -5,7 +5,7 @@ import { AutoColumn } from 'components/Column'
 import { MODAL_TRANSITION_DURATION } from 'components/Modal'
 import { Field } from 'components/swap/constants'
 import { useConfirmModalState } from 'hooks/useConfirmModalState'
-import { Allowance, AllowanceState } from 'hooks/usePermit2Allowance'
+import { Allowance, AllowanceState } from 'hooks/useSwapRouter2Allowance'
 import { SwapResult } from 'hooks/useSwapCallback'
 import { UniswapXOrderStatus } from 'lib/hooks/orders/types'
 import { useCallback, useEffect, useMemo } from 'react'
@@ -76,16 +76,7 @@ export function ConfirmSwapModal({
   onCurrencySelection: (field: Field, currency: Currency) => void
   onDismiss: () => void
 }) {
-  const {
-    confirmModalState,
-    pendingModalSteps,
-    priceUpdate,
-    doesTradeDiffer,
-    approvalError,
-    wrapTxHash,
-    startSwapFlow,
-    onCancel,
-  } = useConfirmModalState({
+  const { confirmModalState, pendingModalSteps, priceUpdate, doesTradeDiffer, approvalError, wrapTxHash, startSwapFlow, onCancel } = useConfirmModalState({
     trade,
     originalTrade,
     allowance,
@@ -99,14 +90,15 @@ export function ConfirmSwapModal({
 
   // Get status depending on swap type
   const swapStatus = useSwapTransactionStatus(swapResult)
-  const uniswapXOrder = useOrder(swapResult?.type === TradeFillType.UniswapX ? swapResult.response.orderHash : '')
+  // const uniswapXOrder = useOrder(swapResult?.type === TradeFillType.UniswapX ? swapResult.response.orderHash : '')
 
   // Has the transaction been confirmed onchain?
-  const swapConfirmed =
-    swapStatus === TransactionStatus.Confirmed || uniswapXOrder?.status === UniswapXOrderStatus.FILLED
+  // const swapConfirmed = swapStatus === TransactionStatus.Confirmed || uniswapXOrder?.status === UniswapXOrderStatus.FILLED
+  const swapConfirmed = swapStatus === TransactionStatus.Confirmed
 
   // Has a limit order been submitted?
-  const limitPlaced = isLimitTrade(trade) && uniswapXOrder?.status === UniswapXOrderStatus.OPEN
+  // const limitPlaced = isLimitTrade(trade) && uniswapXOrder?.status === UniswapXOrderStatus.OPEN
+  const limitPlaced = false
 
   // Has the transaction failed locally (i.e. before network or submission), or has it been reverted onchain?
   const localSwapFailure = Boolean(swapError) && !didUserReject(swapError)
@@ -120,37 +112,36 @@ export function ConfirmSwapModal({
   }, [approvalError, swapError])
 
   // Determine which view to show based on confirm modal state and other conditions
-  const { showPreview, showDetails, showProgressIndicator, showAcceptChanges, showConfirming, showSuccess, showError } =
-    useMemo(() => {
-      const showAcceptChanges = confirmModalState !== ConfirmModalState.PENDING_CONFIRMATION && doesTradeDiffer
-      let showPreview, showDetails, showProgressIndicator, showConfirming, showSuccess, showError
-      if (errorType) {
-        // When any type of error is encountered (except for SignatureExpiredError, which has special retry logic)
-        showError = true
-      } else if (swapConfirmed || limitPlaced) {
-        showSuccess = true
-      } else if (confirmModalState === ConfirmModalState.REVIEWING || showAcceptChanges) {
-        // When swap is in review, either initially or to accept changes, show the swap details
-        showPreview = true
-        showDetails = true
-      } else if (pendingModalSteps.length > 1) {
-        // When a multi-step swap is in progress (i.e. not in review and not yet confirmed), show the progress indicator
-        showPreview = true
-        showProgressIndicator = true
-      } else {
-        // When a single-step swap requires confirmation, show a loading spinner (possibly followed by a submission icon)
-        showConfirming = true
-      }
-      return {
-        showPreview,
-        showDetails,
-        showProgressIndicator,
-        showAcceptChanges,
-        showConfirming,
-        showSuccess,
-        showError,
-      }
-    }, [confirmModalState, doesTradeDiffer, errorType, limitPlaced, pendingModalSteps.length, swapConfirmed])
+  const { showPreview, showDetails, showProgressIndicator, showAcceptChanges, showConfirming, showSuccess, showError } = useMemo(() => {
+    const showAcceptChanges = confirmModalState !== ConfirmModalState.PENDING_CONFIRMATION && doesTradeDiffer
+    let showPreview, showDetails, showProgressIndicator, showConfirming, showSuccess, showError
+    if (errorType) {
+      // When any type of error is encountered (except for SignatureExpiredError, which has special retry logic)
+      showError = true
+    } else if (swapConfirmed || limitPlaced) {
+      showSuccess = true
+    } else if (confirmModalState === ConfirmModalState.REVIEWING || showAcceptChanges) {
+      // When swap is in review, either initially or to accept changes, show the swap details
+      showPreview = true
+      showDetails = true
+    } else if (pendingModalSteps.length > 1) {
+      // When a multi-step swap is in progress (i.e. not in review and not yet confirmed), show the progress indicator
+      showPreview = true
+      showProgressIndicator = true
+    } else {
+      // When a single-step swap requires confirmation, show a loading spinner (possibly followed by a submission icon)
+      showConfirming = true
+    }
+    return {
+      showPreview,
+      showDetails,
+      showProgressIndicator,
+      showAcceptChanges,
+      showConfirming,
+      showSuccess,
+      showError,
+    }
+  }, [confirmModalState, doesTradeDiffer, errorType, limitPlaced, pendingModalSteps.length, swapConfirmed])
 
   // Reset modal state if user rejects the swap
   useEffect(() => {
@@ -164,10 +155,7 @@ export function ConfirmSwapModal({
   const onModalDismiss = useCallback(() => {
     if (trade && doesTradeDiffer && confirmModalState !== ConfirmModalState.PENDING_CONFIRMATION) {
       // If the user dismissed the modal while showing the price update, log the event as rejected.
-      sendAnalyticsEvent(
-        SwapEventName.SWAP_PRICE_UPDATE_ACKNOWLEDGED,
-        formatSwapPriceUpdatedEventProperties(trade, priceUpdate, SwapPriceUpdateUserResponse.REJECTED)
-      )
+      sendAnalyticsEvent(SwapEventName.SWAP_PRICE_UPDATE_ACKNOWLEDGED, formatSwapPriceUpdatedEventProperties(trade, priceUpdate, SwapPriceUpdateUserResponse.REJECTED))
     }
     onDismiss()
     setTimeout(() => {
@@ -207,9 +195,7 @@ export function ConfirmSwapModal({
                   swapResult={swapResult}
                   allowedSlippage={allowedSlippage}
                   isLoading={isPreviewTrade(trade)}
-                  disabledConfirm={
-                    showAcceptChanges || isPreviewTrade(trade) || allowance.state === AllowanceState.LOADING
-                  }
+                  disabledConfirm={showAcceptChanges || isPreviewTrade(trade) || allowance.state === AllowanceState.LOADING}
                   fiatValueInput={fiatValueInput}
                   fiatValueOutput={fiatValueOutput}
                   showAcceptChanges={Boolean(showAcceptChanges)}
@@ -253,9 +239,7 @@ export function ConfirmSwapModal({
           </Container>
         )}
         {/* Error screen handles all error types with custom messaging and retry logic */}
-        {errorType && showError && (
-          <SwapError trade={trade} swapResult={swapResult} errorType={errorType} onRetry={startSwapFlow} />
-        )}
+        {errorType && showError && <SwapError trade={trade} swapResult={swapResult} errorType={errorType} onRetry={startSwapFlow} />}
       </SwapModal>
     </ThemeProvider>
   )

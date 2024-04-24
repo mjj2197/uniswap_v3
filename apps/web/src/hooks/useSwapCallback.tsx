@@ -60,14 +60,17 @@ export function useSwapCallback(
   // )
 
   // const swapCallback = isUniswapXTrade(trade) ? uniswapXSwapCallback : useUniversalRouterSwapCallback
-  const swapCallback = useSwapRouterV2Callback(trade, {
-    slippageTolerance: allowedSlippage,
-    permit: permitSignature,
-  })
+  const swapCallback = isClassicTrade(trade)
+    ? useSwapRouterV2Callback(trade, {
+        slippageTolerance: allowedSlippage,
+        permit: permitSignature,
+      })
+    : undefined
 
   return useCallback(async () => {
     if (!trade) throw new Error('missing trade')
     if (!account || !chainId) throw new Error('wallet must be connected to swap')
+    if (!swapCallback) throw new Error('error trade')
 
     const result = await swapCallback()
 
@@ -75,7 +78,7 @@ export function useSwapCallback(
       type: TransactionType.SWAP,
       inputCurrencyId: currencyId(trade.inputAmount.currency),
       outputCurrencyId: currencyId(trade.outputAmount.currency),
-      isUniswapXOrder: result.type === TradeFillType.UniswapX,
+      isUniswapXOrder: false,
       ...(trade.tradeType === TradeType.EXACT_INPUT
         ? {
             tradeType: TradeType.EXACT_INPUT,

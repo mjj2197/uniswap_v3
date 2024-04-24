@@ -28,7 +28,7 @@ export function TokenDetailsPoolsTable({ chainId, referenceToken }: { chainId: C
 
   return (
     <div data-testid={`tdp-pools-table-${referenceToken.address.toLowerCase()}`}>
-      <PoolsTable pools={pools} loading={loading} error={combinedError} chainId={chainId} maxHeight={600} hiddenColumns={HIDDEN_COLUMNS} loadMore={loading} />
+      <PoolsTable pools={pools} loading={loading} error={combinedError} chainId={chainId} maxHeight={600} hiddenColumns={HIDDEN_COLUMNS} />
     </div>
   )
 }

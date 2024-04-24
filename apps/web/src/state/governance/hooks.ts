@@ -8,7 +8,7 @@ import { toUtf8String, Utf8ErrorFuncs, Utf8ErrorReason } from '@ethersproject/st
 import { t } from '@lingui/macro'
 import GovernorAlphaJSON from '@uniswap/governance/build/GovernorAlpha.json'
 import UniJSON from '@uniswap/governance/build/Uni.json'
-import { ChainId, CurrencyAmount, GOVERNANCE_ALPHA_V0_ADDRESSES, GOVERNANCE_ALPHA_V1_ADDRESSES, GOVERNANCE_BRAVO_ADDRESSES, Token } from '@jaguarswap/sdk-core'
+import { ChainId, CurrencyAmount, GOVERNANCE_ALPHA_V0_ADDRESSES, GOVERNANCE_ALPHA_V1_ADDRESSES, GOVERNANCE_BRAVO_ADDRESSES, Token, UNI_ADDRESSES } from '@jaguarswap/sdk-core'
 import { useWeb3React } from '@web3-react/core'
 import { LATEST_GOVERNOR_INDEX } from 'constants/governance'
 import { POLYGON_PROPOSAL_TITLE } from 'constants/proposals/polygon_proposal_title'
@@ -18,6 +18,7 @@ import { useSingleCallResult, useSingleContractMultipleData } from 'lib/hooks/mu
 import { useCallback, useMemo } from 'react'
 import GOVERNOR_BRAVO_ABI from 'uniswap/src/abis/governor-bravo.json'
 import { calculateGasMargin } from 'utils/calculateGasMargin'
+import { UNI } from '../../constants/tokens'
 
 import { BRAVO_START_BLOCK, MOONBEAN_START_BLOCK, ONE_BIP_START_BLOCK, POLYGON_START_BLOCK, UNISWAP_GRANTS_START_BLOCK } from '../../constants/proposals'
 import { useLogs } from '../logs/hooks'
@@ -38,6 +39,12 @@ function useGovernanceBravoContract(): Contract | null {
 }
 
 const useLatestGovernanceContract = useGovernanceBravoContract
+
+function useUniContract() {
+  const { chainId } = useWeb3React()
+  const uniAddress = useMemo(() => (chainId ? UNI[chainId]?.address : undefined), [chainId])
+  return useContract(uniAddress, UniJSON.abi, true)
+}
 
 interface ProposalDetail {
   target: string

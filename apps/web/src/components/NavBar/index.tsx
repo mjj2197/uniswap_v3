@@ -18,7 +18,6 @@ import styled from 'styled-components'
 
 import { useAccountDrawer } from 'components/AccountDrawer/MiniPortfolio/hooks'
 import { Z_INDEX } from 'theme/zIndex'
-import { Chain } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 import { useIsNavSearchInputVisible } from '../../nft/hooks/useIsNavSearchInputVisible'
 import { Bag } from './Bag'
 import Blur from './Blur'

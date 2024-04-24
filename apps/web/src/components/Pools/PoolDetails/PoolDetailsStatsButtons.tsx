@@ -12,6 +12,7 @@ import { SwapWrapperOuter } from 'components/swap/styled'
 import { LoadingBubble } from 'components/Tokens/loading'
 import TokenSafetyMessage from 'components/TokenSafety/TokenSafetyMessage'
 import { checkWarning, getPriorityWarning, NotFoundWarning } from 'constants/tokenSafety'
+import { PoolToken } from 'graphql/data/pools/useV3Pools'
 import { chainIdToBackendName, gqlToCurrency } from 'graphql/data/util'
 import { useScreenSize } from 'hooks/useScreenSize'
 import { useSwitchChain } from 'hooks/useSwitchChain'
@@ -132,13 +133,13 @@ const MobileBalance = styled(Column)`
 
 interface PoolDetailsStatsButtonsProps {
   chainId?: number
-  token0?: Token
-  token1?: Token
+  token0?: PoolToken
+  token1?: PoolToken
   feeTier?: number
   loading?: boolean
 }
 
-function findMatchingPosition(positions: PositionInfo[], token0?: Token, token1?: Token, feeTier?: number) {
+function findMatchingPosition(positions: PositionInfo[], token0?: PoolToken, token1?: PoolToken, feeTier?: number) {
   return positions?.find(
     (position) =>
       (position?.details.token0.toLowerCase() === token0?.address ||
@@ -164,6 +165,7 @@ export function PoolDetailsStatsButtons({ chainId, token0, token1, feeTier, load
   const { data: balanceQuery } = useCachedPortfolioBalancesQuery({ account })
   const { balance0, balance1, balance0Fiat, balance1Fiat } = useMemo(() => {
     const filteredBalances = balanceQuery?.portfolios?.[0]?.tokenBalances?.filter(
+      // @ts-ignore
       (tokenBalance) => tokenBalance?.token?.chain === chainIdToBackendName(chainId)
     )
     const tokenBalance0 = filteredBalances?.find((tokenBalance) => tokenBalance?.token?.address === token0?.address)

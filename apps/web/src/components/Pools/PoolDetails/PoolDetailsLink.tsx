@@ -20,6 +20,7 @@ import { ExplorerDataType, getExplorerLink } from 'utils/getExplorerLink'
 import { NATIVE_CHAIN_ID } from 'constants/tokens'
 import { DoubleTokenAndChainLogo } from './PoolDetailsHeader'
 import { DetailBubble, SmallDetailBubble } from './shared'
+import { PoolToken } from 'graphql/data/pools/useV3Pools'
 
 const TokenName = styled(ThemedText.BodyPrimary)`
   display: none;
@@ -81,7 +82,7 @@ const ButtonsRow = styled(Row)`
 interface PoolDetailsLinkProps {
   address?: string
   chainId?: number
-  tokens: (Token | undefined)[]
+  tokens: (PoolToken | undefined)[]
   loading?: boolean
 }
 
@@ -149,7 +150,7 @@ export function PoolDetailsLink({ address, chainId, tokens, loading }: PoolDetai
         ref={onTextRender}
       >
         {isPool ? (
-          <DoubleTokenAndChainLogo chainId={chainId} tokens={tokens} size={20} />
+          <DoubleTokenAndChainLogo chainId={chainId} tokens={[tokens[0]?.address, tokens[1]?.address]} size={20} />
         ) : (
           <CurrencyLogo currency={currency} size="20px" />
         )}

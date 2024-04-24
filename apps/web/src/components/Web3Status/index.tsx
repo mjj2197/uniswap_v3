@@ -162,9 +162,7 @@ function Web3StatusInner() {
   // - initialized:   account and ENS are available
   // Subsequent connections are always considered initialized, and will not display startup/initializing states.
   const initialConnection = useRef(getRecentConnectionMeta())
-  const isConnectionInitializing = Boolean(
-    initialConnection.current?.address === account && initialConnection.current?.ENSName && ENSLoading
-  )
+  const isConnectionInitializing = Boolean(initialConnection.current?.address === account && initialConnection.current?.ENSName && ENSLoading)
   const isConnectionInitialized = connectionReady && !isConnectionInitializing
   // Clear the initial connection once initialized so it does not interfere with subsequent connections.
   useEffect(() => {
@@ -175,8 +173,10 @@ function Web3StatusInner() {
   // Persist the connection if it changes, so it can be used to initialize the next session's connection.
   useEffect(() => {
     if (account || ENSName) {
+      // @ts-ignore
       const { rdns } = connection.getProviderInfo()
       dispatch(
+        // @ts-ignore
         updateRecentConnectionMeta({ type: connection.type, address: account, ENSName: ENSName ?? undefined, rdns })
       )
     }
@@ -197,20 +197,10 @@ function Web3StatusInner() {
 
   if (account) {
     return (
-      <TraceEvent
-        events={[BrowserEvent.onClick]}
-        name={InterfaceEventName.MINI_PORTFOLIO_TOGGLED}
-        properties={{ type: 'open' }}
-      >
-        <Web3StatusConnected
-          disabled={Boolean(switchingChain)}
-          data-testid="web3-status-connected"
-          onClick={handleWalletDropdownClick}
-          pending={hasPendingActivity}
-        >
-          {!hasPendingActivity && (
-            <StatusIcon account={account} size={24} connection={connection} showMiniIcons={false} />
-          )}
+      <TraceEvent events={[BrowserEvent.onClick]} name={InterfaceEventName.MINI_PORTFOLIO_TOGGLED} properties={{ type: 'open' }}>
+        <Web3StatusConnected disabled={Boolean(switchingChain)} data-testid="web3-status-connected" onClick={handleWalletDropdownClick} pending={hasPendingActivity}>
+          {/* @ts-ignore */}
+          {!hasPendingActivity && <StatusIcon account={account} size={24} connection={connection} showMiniIcons={false} />}
           {hasPendingActivity ? (
             <RowBetween>
               <Text>
@@ -229,16 +219,8 @@ function Web3StatusInner() {
     )
   } else {
     return (
-      <TraceEvent
-        events={[BrowserEvent.onClick]}
-        name={InterfaceEventName.CONNECT_WALLET_BUTTON_CLICKED}
-        element={InterfaceElementName.CONNECT_WALLET_BUTTON}
-      >
-        <Web3StatusConnectWrapper
-          tabIndex={0}
-          onKeyPress={(e) => e.key === 'Enter' && handleWalletDropdownClick()}
-          onClick={handleWalletDropdownClick}
-        >
+      <TraceEvent events={[BrowserEvent.onClick]} name={InterfaceEventName.CONNECT_WALLET_BUTTON_CLICKED} element={InterfaceElementName.CONNECT_WALLET_BUTTON}>
+        <Web3StatusConnectWrapper tabIndex={0} onKeyPress={(e) => e.key === 'Enter' && handleWalletDropdownClick()} onClick={handleWalletDropdownClick}>
           <StyledConnectButton tabIndex={-1} data-testid="navbar-connect-wallet">
             <Trans>Connect</Trans>
           </StyledConnectButton>

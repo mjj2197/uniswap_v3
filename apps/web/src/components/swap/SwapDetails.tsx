@@ -5,7 +5,7 @@ import { TraceEvent, useTrace } from 'analytics'
 import AnimatedDropdown from 'components/AnimatedDropdown'
 import Column from 'components/Column'
 import SpinningLoader from 'components/Loader/SpinningLoader'
-import { Allowance, AllowanceState } from 'hooks/usePermit2Allowance'
+import { Allowance, AllowanceState } from 'hooks/useSwapRouter2Allowance'
 import { SwapResult } from 'hooks/useSwapCallback'
 import ms from 'ms'
 import { ReactNode, useMemo, useState } from 'react'
@@ -86,9 +86,7 @@ function DropdownController({ open, onClick }: { open: boolean; onClick: () => v
     <DropdownButton onClick={onClick}>
       <Separator />
       <DropdownControllerWrapper>
-        <ThemedText.BodySmall color="neutral2">
-          {open ? <Trans>Show less</Trans> : <Trans>Show more</Trans>}
-        </ThemedText.BodySmall>
+        <ThemedText.BodySmall color="neutral2">{open ? <Trans>Show less</Trans> : <Trans>Show more</Trans>}</ThemedText.BodySmall>
         {open ? <ExpandoIconOpened /> : <ExpandoIconClosed />}
       </DropdownControllerWrapper>
       <Separator />
@@ -138,7 +136,7 @@ export function SwapDetails({
       return {
         buttonText: isLimitTrade(trade) ? t`Approve and submit` : t`Approve and swap`,
       }
-    } else if (allowance && allowance.state === AllowanceState.REQUIRED && allowance.needsPermitSignature) {
+    } else if (allowance && allowance.state === AllowanceState.REQUIRED) {
       return {
         buttonText: t`Sign and swap`,
       }
@@ -198,13 +196,7 @@ export function SwapDetails({
               ...analyticsContext,
             }}
           >
-            <ConfirmButton
-              data-testid="confirm-swap-button"
-              onClick={onConfirm}
-              disabled={disabledConfirm}
-              $borderRadius="12px"
-              id={InterfaceElementName.CONFIRM_SWAP_BUTTON}
-            >
+            <ConfirmButton data-testid="confirm-swap-button" onClick={onConfirm} disabled={disabledConfirm} $borderRadius="12px" id={InterfaceElementName.CONFIRM_SWAP_BUTTON}>
               {isLoading ? (
                 <ThemedText.HeadlineSmall color="neutral2">
                   <Row>
@@ -216,9 +208,7 @@ export function SwapDetails({
                 <Text fontSize={20}>{callToAction.buttonText}</Text>
               )}
             </ConfirmButton>
-            {callToAction.helpLink && (
-              <HelpLink href={callToAction.helpLink.url}>{callToAction.helpLink.text}</HelpLink>
-            )}
+            {callToAction.helpLink && <HelpLink href={callToAction.helpLink.url}>{callToAction.helpLink.text}</HelpLink>}
           </TraceEvent>
 
           {swapErrorMessage ? <SwapCallbackError error={swapErrorMessage} /> : null}
@@ -240,50 +230,15 @@ function AnimatedLineItem(props: SwapLineItemProps & { open: boolean; delay: num
   return <SwapLineItem {...props} {...animatedProps} />
 }
 
-function SwapLineItems({
-  showMore,
-  trade,
-  allowedSlippage,
-  syncing,
-}: {
-  showMore: boolean
-  trade: InterfaceTrade
-  allowedSlippage: Percent
-  syncing: boolean
-}) {
+function SwapLineItems({ showMore, trade, allowedSlippage, syncing }: { showMore: boolean; trade: InterfaceTrade; allowedSlippage: Percent; syncing: boolean }) {
   return (
     <>
-      <SwapLineItem
-        trade={trade}
-        allowedSlippage={allowedSlippage}
-        syncing={syncing}
-        type={SwapLineItemType.EXCHANGE_RATE}
-      />
+      <SwapLineItem trade={trade} allowedSlippage={allowedSlippage} syncing={syncing} type={SwapLineItemType.EXCHANGE_RATE} />
       <ExpandableLineItems trade={trade} allowedSlippage={allowedSlippage} open={showMore} />
-      <SwapLineItem
-        trade={trade}
-        allowedSlippage={allowedSlippage}
-        syncing={syncing}
-        type={SwapLineItemType.INPUT_TOKEN_FEE_ON_TRANSFER}
-      />
-      <SwapLineItem
-        trade={trade}
-        allowedSlippage={allowedSlippage}
-        syncing={syncing}
-        type={SwapLineItemType.OUTPUT_TOKEN_FEE_ON_TRANSFER}
-      />
-      <SwapLineItem
-        trade={trade}
-        allowedSlippage={allowedSlippage}
-        syncing={syncing}
-        type={SwapLineItemType.SWAP_FEE}
-      />
-      <SwapLineItem
-        trade={trade}
-        allowedSlippage={allowedSlippage}
-        syncing={syncing}
-        type={SwapLineItemType.NETWORK_COST}
-      />
+      <SwapLineItem trade={trade} allowedSlippage={allowedSlippage} syncing={syncing} type={SwapLineItemType.INPUT_TOKEN_FEE_ON_TRANSFER} />
+      <SwapLineItem trade={trade} allowedSlippage={allowedSlippage} syncing={syncing} type={SwapLineItemType.OUTPUT_TOKEN_FEE_ON_TRANSFER} />
+      <SwapLineItem trade={trade} allowedSlippage={allowedSlippage} syncing={syncing} type={SwapLineItemType.SWAP_FEE} />
+      <SwapLineItem trade={trade} allowedSlippage={allowedSlippage} syncing={syncing} type={SwapLineItemType.NETWORK_COST} />
     </>
   )
 }

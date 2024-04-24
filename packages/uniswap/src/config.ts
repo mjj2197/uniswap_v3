@@ -24,27 +24,27 @@ import {
 import { isNonJestDev } from 'utilities/src/environment'
 
 export interface Config {
-  appsflyerApiKey: string
-  appsflyerAppId: string
-  fiatOnRampApiUrl: string
-  moonpayApiKey: string
-  moonpayApiUrl: string
-  moonpayWidgetApiUrl: string
+  // appsflyerApiKey: string
+  // appsflyerAppId: string
+  // fiatOnRampApiUrl: string
+  // moonpayApiKey: string
+  // moonpayApiUrl: string
+  // moonpayWidgetApiUrl: string
   uniswapApiBaseUrl: string
-  uniswapApiKey: string
-  uniswapAppUrl: string
-  infuraProjectId: string
-  onesignalAppId: string
-  sentryDsn: string
-  simpleHashApiKey: string
-  simpleHashApiUrl: string
-  statSigProxyUrl: string
-  walletConnectProjectId: string
-  quicknodeBnbRpcUrl: string
-  unitagsApiUrl: string
-  tradingApiKey: string
-  tradingApiUrl: string
-  firebaseAppCheckDebugToken: string
+  // uniswapApiKey: string
+  // uniswapAppUrl: string
+  // infuraProjectId: string
+  // onesignalAppId: string
+  // sentryDsn: string
+  // simpleHashApiKey: string
+  // simpleHashApiUrl: string
+  // statSigProxyUrl: string
+  // walletConnectProjectId: string
+  // quicknodeBnbRpcUrl: string
+  // unitagsApiUrl: string
+  // tradingApiKey: string
+  // tradingApiUrl: string
+  // firebaseAppCheckDebugToken: string
 }
 
 const _config: Config = {

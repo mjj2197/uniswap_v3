@@ -1,5 +1,4 @@
 import { DialogContent, DialogOverlay } from '@reach/dialog'
-import React from 'react'
 import { animated, easings, useSpring, useTransition } from 'react-spring'
 import { useGesture } from 'react-use-gesture'
 import styled, { css } from 'styled-components'

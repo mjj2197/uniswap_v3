@@ -5,7 +5,6 @@ import { Table } from 'components/Table'
 import { Cell } from 'components/Table/Cell'
 import { Filter } from 'components/Table/Filter'
 import { FilterHeaderRow, HeaderArrow, HeaderSortText, TimestampCell } from 'components/Table/styled'
-import { PoolTableTransaction, PoolTableTransactionType } from 'graphql/data/pools/usePoolTransactions'
 import { supportedChainIdFromGQLChain, validateUrlChainParam } from 'graphql/data/util'
 import { OrderDirection, Transaction_OrderBy, Token } from 'graphql/thegraph/__generated__/types-and-hooks'
 import { useActiveLocalCurrency } from 'hooks/useActiveLocalCurrency'
@@ -16,9 +15,9 @@ import { ExternalLink, ThemedText } from 'theme/components'
 import { shortenAddress } from 'utilities/src/addresses'
 import { NumberType, useFormatter } from 'utils/formatNumbers'
 import { ExplorerDataType, getExplorerLink } from 'utils/getExplorerLink'
-import { useV3PoolTransactions } from '../../../graphql/data/pools/useV3PoolTransactions'
-import { PoolTransactionType } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
-import { V3PoolTransactionType } from '../../../graphql/data/useV3Transactions'
+import { useV3PoolTransactions } from 'graphql/data/pools/useV3PoolTransactions'
+import { TableTransaction, V3PoolTransactionType } from 'graphql/data/useV3Transactions'
+import { PoolToken } from 'graphql/data/pools/useV3Pools'
 
 const StyledExternalLink = styled(ExternalLink)`
   color: ${({ theme }) => theme.neutral2};
@@ -52,26 +51,26 @@ const PoolTransactionColumnWidth: { [key in PoolTransactionColumn]: number } = {
   [PoolTransactionColumn.OutputAmount]: 125,
 }
 
-function getTransactionMaker(type: V3PoolTransactionType, pool: PoolTableTransaction) {
+function getTransactionMaker(type: V3PoolTransactionType, pool: TableTransaction): string | void {
   switch (type) {
     case V3PoolTransactionType.SELL:
     case V3PoolTransactionType.BUY:
-      return pool.sender
+      return pool.origin
     case V3PoolTransactionType.MINT:
     case V3PoolTransactionType.BURN:
-      return pool.origin
+      return pool.owner
     default:
       break
   }
 }
 
-export function PoolDetailsTransactionsTable({ poolAddress, token0, token1 }: { poolAddress: string; token0?: Token; token1?: Token }) {
+export function PoolDetailsTransactionsTable({ poolAddress, token0, token1 }: { poolAddress: string; token0?: PoolToken; token1?: PoolToken }) {
   const chainName = validateUrlChainParam(useParams<{ chainName?: string }>().chainName)
   const chainId = supportedChainIdFromGQLChain(chainName)
   const activeLocalCurrency = useActiveLocalCurrency()
   const { formatNumber, formatFiatPrice } = useFormatter()
   const [filterModalIsOpen, toggleFilterModal] = useReducer((s) => !s, false)
-  const [filter, setFilters] = useState<PoolTableTransactionType[]>([PoolTableTransactionType.BUY, PoolTableTransactionType.SELL, PoolTableTransactionType.BURN, PoolTableTransactionType.MINT])
+  const [filter, setFilters] = useState<V3PoolTransactionType[]>([V3PoolTransactionType.BUY, V3PoolTransactionType.SELL, V3PoolTransactionType.BURN, V3PoolTransactionType.MINT])
 
   const [sortState] = useState<PoolTxTableSortState>({
     sortBy: Transaction_OrderBy.Timestamp,
@@ -80,8 +79,9 @@ export function PoolDetailsTransactionsTable({ poolAddress, token0, token1 }: { 
   const { data: transactions, loading, error } = useV3PoolTransactions(poolAddress, filter, token0)
 
   const showLoadingSkeleton = loading || !!error
+  const anyError = Boolean(error);
   const columns = useMemo(() => {
-    const columnHelper = createColumnHelper<PoolTableTransaction>()
+    const columnHelper = createColumnHelper<TableTransaction>()
     return [
       columnHelper.accessor((row) => row, {
         id: 'timestamp',
@@ -104,8 +104,8 @@ export function PoolDetailsTransactionsTable({ poolAddress, token0, token1 }: { 
       columnHelper.accessor(
         (row) => {
           let color, text
-          if (row.type === PoolTableTransactionType.BUY || row.type === PoolTableTransactionType.SELL) {
-            if (row.token0.id.toLowerCase() === token0?.address?.toLowerCase()) {
+          if (row.type === V3PoolTransactionType.BUY || row.type === V3PoolTransactionType.SELL) {
+            if (row.token0.address.toLowerCase() === token0?.address?.toLowerCase()) {
               color = 'success'
               text = (
                 <span>
@@ -121,8 +121,8 @@ export function PoolDetailsTransactionsTable({ poolAddress, token0, token1 }: { 
               )
             }
           } else {
-            color = row.type === PoolTableTransactionType.MINT ? 'success' : 'critical'
-            text = row.type === PoolTableTransactionType.MINT ? <Trans>Add</Trans> : <Trans>Remove</Trans>
+            color = row.type === V3PoolTransactionType.MINT ? 'success' : 'critical'
+            text = row.type === V3PoolTransactionType.MINT ? <Trans>Add</Trans> : <Trans>Remove</Trans>
           }
           return <ThemedText.BodyPrimary color={color}>{text}</ThemedText.BodyPrimary>
         },
@@ -131,7 +131,7 @@ export function PoolDetailsTransactionsTable({ poolAddress, token0, token1 }: { 
           header: () => (
             <Cell minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.Type]} justifyContent="flex-start">
               <FilterHeaderRow modalOpen={filterModalIsOpen} onClick={() => toggleFilterModal()}>
-                <Filter allFilters={Object.values(PoolTableTransactionType)} activeFilter={filter} setFilters={setFilters} isOpen={filterModalIsOpen} toggleFilterModal={toggleFilterModal} />
+                <Filter allFilters={Object.values(V3PoolTransactionType)} activeFilter={filter} setFilters={setFilters} isOpen={filterModalIsOpen} toggleFilterModal={toggleFilterModal} />
                 <ThemedText.BodySecondary>
                   <Trans>Type</Trans>
                 </ThemedText.BodySecondary>
@@ -162,7 +162,7 @@ export function PoolDetailsTransactionsTable({ poolAddress, token0, token1 }: { 
       }),
       columnHelper.accessor(
         (row) => {
-          return row.token0.id.toLowerCase() === token0?.address?.toLowerCase() ? row.token0.amount : row.token1.amount
+          return row.token0.address.toLowerCase() === token0?.address?.toLowerCase() ? row.token0.amount : row.token1.amount
         },
         {
           id: 'input-amount',
@@ -173,14 +173,14 @@ export function PoolDetailsTransactionsTable({ poolAddress, token0, token1 }: { 
           ),
           cell: (inputTokenAmount) => (
             <Cell loading={showLoadingSkeleton} minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.InputAmount]} justifyContent="flex-end" grow>
-              <ThemedText.BodyPrimary>{formatNumber({ input: Math.abs(inputTokenAmount.getValue?.() ?? 0), type: NumberType.TokenTx })}</ThemedText.BodyPrimary>
+              <ThemedText.BodyPrimary>{formatNumber({ input: Math.abs(Number.parseFloat(inputTokenAmount.getValue?.() ?? 0)), type: NumberType.TokenTx })}</ThemedText.BodyPrimary>
             </Cell>
           ),
         }
       ),
       columnHelper.accessor(
         (row) => {
-          return row.token0.id.toLowerCase() === token0?.address?.toLowerCase() ? row.token1.amount : row.token0.amount
+          return row.token0.address.toLowerCase() === token0?.address?.toLowerCase() ? row.token1.amount : row.token0.amount
         },
         {
           id: 'output-amount',
@@ -191,12 +191,12 @@ export function PoolDetailsTransactionsTable({ poolAddress, token0, token1 }: { 
           ),
           cell: (outputTokenAmount) => (
             <Cell loading={showLoadingSkeleton} minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.OutputAmount]} justifyContent="flex-end" grow>
-              <ThemedText.BodyPrimary>{formatNumber({ input: Math.abs(outputTokenAmount.getValue?.() ?? 0), type: NumberType.TokenTx })}</ThemedText.BodyPrimary>
+              <ThemedText.BodyPrimary>{formatNumber({ input: Math.abs(Number.parseFloat(outputTokenAmount.getValue?.() ?? 0)), type: NumberType.TokenTx })}</ThemedText.BodyPrimary>
             </Cell>
           ),
         }
       ),
-      columnHelper.accessor((row) => getTransactionMaker(row.type, row), {
+      columnHelper.accessor((row) => getTransactionMaker(row.type as V3PoolTransactionType, row), {
         id: 'maker-address',
         header: () => (
           <Cell minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.MakerAddress]} justifyContent="flex-end" grow>
@@ -207,8 +207,8 @@ export function PoolDetailsTransactionsTable({ poolAddress, token0, token1 }: { 
         ),
         cell: (makerAddress) => (
           <Cell loading={showLoadingSkeleton} minWidth={PoolTransactionColumnWidth[PoolTransactionColumn.MakerAddress]} justifyContent="flex-end" grow>
-            <StyledExternalLink href={getExplorerLink(chainId, makerAddress.getValue?.(), ExplorerDataType.ADDRESS)}>
-              <ThemedText.BodyPrimary>{shortenAddress(makerAddress.getValue?.(), 0)}</ThemedText.BodyPrimary>
+            <StyledExternalLink href={getExplorerLink(chainId, makerAddress.getValue?.() ?? "", ExplorerDataType.ADDRESS)}>
+              <ThemedText.BodyPrimary>{shortenAddress(makerAddress.getValue?.() ?? "", 0)}</ThemedText.BodyPrimary>
             </StyledExternalLink>
           </Cell>
         ),

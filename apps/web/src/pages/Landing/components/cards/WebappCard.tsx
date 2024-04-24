@@ -185,6 +185,7 @@ function Token({ chainId, address }: { chainId: ChainId; address: string }) {
   const tokenPromoQuery = useTokenPromoQuery({
     variables: {
       address: currency?.wrapped.address,
+      // @ts-ignore
       chain: chainIdToBackendName(chainId),
     },
   })

@@ -10,6 +10,7 @@ export function useNetworkSupportsV2() {
   return (
     chainId &&
     ((isV2EverywhereEnabled && SUPPORTED_V2POOL_CHAIN_IDS.includes(chainId)) ||
+    // @ts-ignore
       SUPPORTED_V2POOL_CHAIN_IDS_DEPRECATED.includes(chainId))
   )
 }

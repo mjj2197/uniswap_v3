@@ -112,6 +112,7 @@ export const deprecatedInjectedConnection: Connection = {
     return false
   },
 }
+// @ts-ignore
 const [web3Injected2, web3InjectedHooks2] = initializeConnector<OKXConnector>((actions) => new OKXConnector({ actions, onError }))
 
 export const OKXConnection: Connection = {
@@ -255,6 +256,7 @@ export const connections = [
   // deprecatedNetworkConnection,
 ]
 
+// @ts-ignore
 export function getConnection(c: Connector | ConnectionType) {
   if (c instanceof Connector) {
     const connection = connections.find((connection) => connection.connector === c)

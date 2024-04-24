@@ -20,7 +20,7 @@ import { isAddress } from 'utilities/src/addresses'
 import { getNativeTokenDBAddress } from 'utils/nativeTokens'
 import { LoadedTDPContext, MultiChainMap, PendingTDPContext, TDPProvider } from './TDPContext'
 import { getTokenPageTitle } from './utils'
-import { useTokensByIdQuery } from '../../graphql/thegraph/__generated__/types-and-hooks'
+import { useTokensByIdQuery } from 'graphql/thegraph/__generated__/types-and-hooks'
 
 const StyledPrefetchBalancesWrapper = styled(PrefetchBalancesWrapper)`
   display: contents;
@@ -56,26 +56,28 @@ function useTDPCurrency(tokenQuery: ReturnType<typeof useTokenWebQuery>, tokenAd
 }
 
 /** Returns a map to store addresses and balances of the TDP token on other chains */
-function useMultiChainMap(tokenQuery: ReturnType<typeof useTokenWebQuery>) {
+function useMultiChainMap(tokenQuery: ReturnType<typeof useTokensByIdQuery>) {
   const { account } = useWeb3React()
 
   // Build map to store addresses and balances of this token on other chains
   const { data: balanceQuery } = useCachedPortfolioBalancesQuery({ account })
   return useMemo(() => {
-    const tokenBalances = balanceQuery?.portfolios?.[0]?.tokenBalances
-    const tokensAcrossChains = tokenQuery.data?.token?.project?.tokens
-    if (!tokensAcrossChains) return {}
-    return tokensAcrossChains.reduce<MultiChainMap>((map, current) => {
-      if (current) {
-        if (!map[current.chain]) map[current.chain] = {}
-        const update = map[current.chain] ?? {}
-        update.address = current.address
-        update.balance = tokenBalances?.find((tokenBalance) => tokenBalance?.token?.id === current.id)
-        map[current.chain] = update
-      }
-      return map
-    }, {})
-  }, [balanceQuery?.portfolios, tokenQuery.data?.token?.project?.tokens])
+    return {}
+    // const tokenBalances = balanceQuery?.portfolios?.[0]?.tokenBalances
+    // const tokensAcrossChains = tokenQuery.data?.token?.project?.tokens
+    // if (!tokensAcrossChains) return {}
+    // return tokensAcrossChains.reduce<MultiChainMap>((map, current) => {
+    //   if (current) {
+    //     if (!map[current.chain]) map[current.chain] = {}
+    //     const update = map[current.chain] ?? {}
+    //     update.address = current.address
+    //     update.balance = tokenBalances?.find((tokenBalance) => tokenBalance?.token?.id === current.id)
+    //     map[current.chain] = update
+    //   }
+    //   return map
+    // }, {})
+  // }, [balanceQuery?.portfolios, tokenQuery.data?.token?.project?.tokens])
+  }, [])
 }
 
 function useCreateTDPContext(): PendingTDPContext | LoadedTDPContext {
@@ -89,12 +91,13 @@ function useCreateTDPContext(): PendingTDPContext | LoadedTDPContext {
   const tokenDBAddress = isNative ? getNativeTokenDBAddress(currencyChain) : tokenAddress
 
   const tokenQuery = useTokensByIdQuery({
-    variables: { address: tokenDBAddress },
+    variables: { address: tokenDBAddress ?? "" },
   })
   const chartState = useCreateTDPChartState(tokenDBAddress, currencyChain)
 
   const multiChainMap = useMultiChainMap(tokenQuery)
 
+  // @ts-ignore
   const { currency, currencyWasFetchedOnChain } = useTDPCurrency(tokenQuery, tokenAddress, currencyChainId, isNative)
 
   const warning = checkWarning(tokenAddress, currencyChainId)
@@ -102,9 +105,11 @@ function useCreateTDPContext(): PendingTDPContext | LoadedTDPContext {
   // Extract color for page usage
   const theme = useTheme()
   const { preloadedLogoSrc } = (useLocation().state as { preloadedLogoSrc?: string }) ?? {}
+  // @ts-ignore
   const extractedColorSrc = tokenQuery.data?.token?.project?.logoUrl ?? preloadedLogoSrc
   const extractedAccent1 = useSrcColor(extractedColorSrc, { backgroundColor: theme.surface2, darkMode: theme.darkMode })
 
+  // @ts-ignore
   return useMemo(() => {
     return {
       currency,

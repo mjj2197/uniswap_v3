@@ -1,13 +1,7 @@
 import { ChainId } from '@jaguarswap/sdk-core'
 import { chainIdToBackendName } from 'graphql/data/util'
 import { useCallback, useMemo, useRef } from 'react'
-import {
-  Chain,
-  PoolTransaction,
-  PoolTransactionType,
-  useV2TokenTransactionsQuery,
-  useV3TokenTransactionsQuery,
-} from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
+import { Chain, PoolTransaction, PoolTransactionType, useV2TokenTransactionsQuery, useV3TokenTransactionsQuery } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 
 export enum TokenTransactionType {
   BUY = 'Buy',
@@ -16,11 +10,7 @@ export enum TokenTransactionType {
 
 const TokenTransactionDefaultQuerySize = 25
 
-export function useTokenTransactions(
-  address: string,
-  chainId: ChainId,
-  filter: TokenTransactionType[] = [TokenTransactionType.BUY, TokenTransactionType.SELL]
-) {
+export function useTokenTransactions(address: string, chainId: ChainId, filter: TokenTransactionType[] = [TokenTransactionType.BUY, TokenTransactionType.SELL]) {
   const {
     data: dataV3,
     loading: loadingV3,
@@ -29,6 +19,7 @@ export function useTokenTransactions(
   } = useV3TokenTransactionsQuery({
     variables: {
       address: address.toLowerCase(),
+      // @ts-ignore
       chain: chainIdToBackendName(chainId),
       first: TokenTransactionDefaultQuerySize,
     },
@@ -90,10 +81,7 @@ export function useTokenTransactions(
                 ...prev.token,
                 id: prev?.token?.id ?? '',
                 chain: prev?.token?.chain ?? Chain.Ethereum,
-                v2Transactions: [
-                  ...(prev.token?.v2Transactions ?? []),
-                  ...(fetchMoreResult.token?.v2Transactions ?? []),
-                ],
+                v2Transactions: [...(prev.token?.v2Transactions ?? []), ...(fetchMoreResult.token?.v2Transactions ?? [])],
               },
             }
             loadingMoreV2.current = false
@@ -113,10 +101,7 @@ export function useTokenTransactions(
           }
           const tokenBeingSold = parseFloat(tx.token0Quantity) < 0 ? tx.token0 : tx.token1
           const isSell = tokenBeingSold.address?.toLowerCase() === address.toLowerCase()
-          return (
-            tx.type === PoolTransactionType.Swap &&
-            filter.includes(isSell ? TokenTransactionType.SELL : TokenTransactionType.BUY)
-          )
+          return tx.type === PoolTransactionType.Swap && filter.includes(isSell ? TokenTransactionType.SELL : TokenTransactionType.BUY)
         }) ?? []),
         ...(dataV2?.token?.v2Transactions?.filter((tx) => {
           if (!tx) {
@@ -124,15 +109,10 @@ export function useTokenTransactions(
           }
           const tokenBeingSold = parseFloat(tx.token0Quantity) < 0 ? tx.token0 : tx.token1
           const isSell = tokenBeingSold.address?.toLowerCase() === address.toLowerCase()
-          return (
-            tx.type === PoolTransactionType.Swap &&
-            filter.includes(isSell ? TokenTransactionType.SELL : TokenTransactionType.BUY)
-          )
+          return tx.type === PoolTransactionType.Swap && filter.includes(isSell ? TokenTransactionType.SELL : TokenTransactionType.BUY)
         }) ?? []),
       ]
-        .sort((a, b): number =>
-          a?.timestamp && b?.timestamp ? b.timestamp - a.timestamp : a?.timestamp === null ? -1 : 1
-        )
+        .sort((a, b): number => (a?.timestamp && b?.timestamp ? b.timestamp - a.timestamp : a?.timestamp === null ? -1 : 1))
         .slice(0, querySizeRef.current),
     [address, dataV2?.token?.v2Transactions, dataV3?.token?.v3Transactions, filter]
   )

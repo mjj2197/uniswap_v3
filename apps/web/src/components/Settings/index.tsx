@@ -111,7 +111,7 @@ export default function SettingsTab({
   hideRoutingSettings?: boolean
 }) {
   const { chainId: connectedChainId } = useWeb3React()
-  const showDeadlineSettings = Boolean(chainId && !L2_CHAIN_IDS.includes(chainId))
+  const showDeadlineSettings = true
   const node = useRef<HTMLDivElement | null>(null)
   const isOpen = useModalIsOpen(ApplicationModal.SETTINGS)
 
@@ -126,7 +126,8 @@ export default function SettingsTab({
   useOnClickOutside(node, isOpenDesktop ? closeMenu : undefined)
   useDisableScrolling(isOpen)
 
-  const uniswapXEnabled = chainId && isUniswapXSupportedChain(chainId)
+  const uniswapXEnabled = false
+  // const uniswapXEnabled = chainId && isUniswapXSupportedChain(chainId)
   const showRoutingSettings = Boolean(uniswapXEnabled && !hideRoutingSettings)
 
   const isChainSupported = isSupportedChain(chainId)

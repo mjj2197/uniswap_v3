@@ -60,15 +60,18 @@ export function useSearchTokens(searchQuery: string | undefined, chainId: number
     const selectionMap: { [projectId: string]: SearchToken } = {}
     const filteredTokens = data?.searchTokens?.filter(
       (token): token is Token =>
+        // @ts-ignore
         token !== undefined && (BACKEND_SUPPORTED_CHAINS as ReadonlyArray<Chain>).includes(token.chain)
     )
     filteredTokens?.forEach((token) => {
       if (token.project?.id) {
         const existing = selectionMap[token.project.id]
+        // @ts-ignore
         selectionMap[token.project.id] = dedupeCrosschainTokens(token, existing, searchChain)
       }
     })
     return Object.values(selectionMap).sort(
+      // @ts-ignore
       searchTokenSortFunction.bind(null, searchChain, WRAPPED_NATIVE_CURRENCY[chainId]?.address)
     )
   }, [data, chainId])
