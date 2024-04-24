@@ -324,11 +324,6 @@ const SwapCurrencyInputPanel = forwardRef<HTMLInputElement, SwapCurrencyInputPan
             {Boolean(!hideInput && !hideBalance) && (
               <FiatRow>
                 <RowBetween>
-                  <LoadingOpacityContainer $loading={loading}>
-                    {fiatValue && (
-                      <FiatValue fiatValue={fiatValue} priceImpact={priceImpact} testId={`fiat-value-${id}`} />
-                    )}
-                  </LoadingOpacityContainer>
                   {account ? (
                     <RowFixed style={{ height: '16px' }}>
                       <ThemedText.DeprecatedBody
@@ -421,7 +416,7 @@ const SwapCurrencyInputPanel = forwardRef<HTMLInputElement, SwapCurrencyInputPan
             </Tooltip>
           </PrefetchBalancesWrapper>
             {!hideInput && (
-              <div style={{ display: 'flex', flexGrow: 1 }} onClick={handleDisabledNumericalInputClick}>
+              <div style={{ display: 'flex', alignItems: 'end', flexDirection: 'column' }} onClick={handleDisabledNumericalInputClick}>
                 <StyledNumericalInput
                   className="token-amount-input"
                   value={value}
@@ -432,6 +427,11 @@ const SwapCurrencyInputPanel = forwardRef<HTMLInputElement, SwapCurrencyInputPan
                   ref={ref}
                   maxDecimals={currency?.decimals}
                 />
+                <LoadingOpacityContainer $loading={loading}>
+                  {fiatValue && (
+                    <FiatValue fiatValue={fiatValue} priceImpact={priceImpact} testId={`fiat-value-${id}`} />
+                  )}
+                </LoadingOpacityContainer>
               </div>
             )}
           </InputRow>

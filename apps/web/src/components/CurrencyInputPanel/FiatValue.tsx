@@ -41,14 +41,16 @@ export function FiatValue({
 
   return (
     <Row gap="sm">
-      <ThemedText.BodySmall color="neutral2" data-testid={testId}>
+      <ThemedText.BodySmall color="neutral2" data-testid={testId} lineHeight={fiatValue.data ? "20px" : "0px"}>
         {fiatValue.data ? (
           formatNumber({
             input: fiatValue.data,
             type: NumberType.FiatTokenPrice,
           })
         ) : (
-          <MouseoverTooltip text={<Trans>Not enough liquidity to show accurate USD value.</Trans>}>-</MouseoverTooltip>
+          <MouseoverTooltip text={<Trans>Not enough liquidity to show accurate USD value.</Trans>}>
+            {/* - */}
+          </MouseoverTooltip>
         )}
       </ThemedText.BodySmall>
       {priceImpact && (
