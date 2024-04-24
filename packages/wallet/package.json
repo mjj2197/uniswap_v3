@@ -19,7 +19,7 @@
     "@ethersproject/providers": "5.7.2",
     "@ethersproject/units": "5.7.0",
     "@gorhom/bottom-sheet": "4.5.1",
-    "@jaguarswap/sdk-core": "4.4.2",
+    "@jaguarswap/sdk-core": "4.4.3",
     "@jaguarswap/v3-sdk": "3.11.0",
     "@react-native-community/netinfo": "9.3.0",
     "@react-native-firebase/app-check": "18.4.0",
