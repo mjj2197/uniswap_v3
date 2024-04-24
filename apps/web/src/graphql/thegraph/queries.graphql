@@ -247,7 +247,6 @@ query PoolTransactions($address: String!) {
       }
     }
     owner
-    sender
     origin
     amount0
     amount1
@@ -258,6 +257,8 @@ query PoolTransactions($address: String!) {
     transaction {
       id
     }
+    origin
+    sender
     pool {
       token0 {
         id
@@ -270,7 +271,6 @@ query PoolTransactions($address: String!) {
         name
       }
     }
-    origin
     amount0
     amount1
     amountUSD
@@ -280,6 +280,8 @@ query PoolTransactions($address: String!) {
     transaction {
       id
     }
+    owner
+    origin
     pool {
       token0 {
         id
@@ -292,7 +294,6 @@ query PoolTransactions($address: String!) {
         name
       }
     }
-    owner
     amount0
     amount1
     amountUSD
@@ -337,6 +338,7 @@ query Transactions {
         }
       }
       origin
+      sender
       amount0
       amount1
       amountUSD

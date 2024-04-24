@@ -55,7 +55,8 @@ export function useV3Transactions(filter: TransactionType[] = [TransactionType.S
         type: TransactionType.MINT,
         hash: t.id,
         timestamp: t.timestamp,
-        sender: m.origin,
+        owner: m.owner,
+        origin: m.origin,
         token0: {
           id: m.pool.token0.id,
           name: m.pool.token0.name,
@@ -76,7 +77,8 @@ export function useV3Transactions(filter: TransactionType[] = [TransactionType.S
         type: TransactionType.BURN,
         hash: t.id,
         timestamp: t.timestamp,
-        sender: m.origin,
+        owner: m.owner,
+        origin: m.origin,
         token0: {
           id: m.pool.token0.id,
           name: m.pool.token0.name,
@@ -98,7 +100,8 @@ export function useV3Transactions(filter: TransactionType[] = [TransactionType.S
         hash: t.id,
         type: TransactionType.SWAP,
         timestamp: t.timestamp,
-        sender: m.origin,
+        origin: m.origin,
+        sender: m.sender,
         token0: {
           id: m.pool.token0.id,
           name: m.pool.token0.name,
