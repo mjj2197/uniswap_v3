@@ -26,6 +26,7 @@ export function useV3PoolTransactions(
       hash: t.transaction.id,
       timestamp: t.timestamp,
       origin: t.origin,
+      sender: t.sender,
       token0: {
         id: t.pool.token0.id,
         name: t.pool.token0.name,
@@ -46,7 +47,7 @@ export function useV3PoolTransactions(
       type: V3PoolTransactionType.MINT,
       hash: t.transaction.id,
       timestamp: t.timestamp,
-      sender: t.sender,
+      origin: t.origin,
       owner: t.owner,
       token0: {
         id: t.pool.token0.id,
@@ -68,6 +69,7 @@ export function useV3PoolTransactions(
       type: V3PoolTransactionType.BURN,
       hash: t.transaction.id,
       timestamp: t.timestamp,
+      origin: t.origin,
       owner: t.owner,
       token0: {
         id: t.pool.token0.id,

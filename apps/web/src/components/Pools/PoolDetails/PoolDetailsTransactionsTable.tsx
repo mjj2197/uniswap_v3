@@ -56,10 +56,10 @@ function getTransactionMaker(type: V3PoolTransactionType, pool: PoolTableTransac
   switch (type) {
     case V3PoolTransactionType.SELL:
     case V3PoolTransactionType.BUY:
-      return pool.origin
+      return pool.sender
     case V3PoolTransactionType.MINT:
     case V3PoolTransactionType.BURN:
-      return pool.owner
+      return pool.origin
     default:
       break
   }
@@ -162,7 +162,6 @@ export function PoolDetailsTransactionsTable({ poolAddress, token0, token1 }: { 
       }),
       columnHelper.accessor(
         (row) => {
-          console.log('%c⧭', 'color: #00b300', row.token0.id.toLowerCase() === token0?.address?.toLowerCase() ? row.token0.amount : row.token1.amount1)
           return row.token0.id.toLowerCase() === token0?.address?.toLowerCase() ? row.token0.amount : row.token1.amount
         },
         {
@@ -181,7 +180,6 @@ export function PoolDetailsTransactionsTable({ poolAddress, token0, token1 }: { 
       ),
       columnHelper.accessor(
         (row) => {
-          console.log('%c⧭', 'color: #1d5673', row.token0.id.toLowerCase() === token0?.address?.toLowerCase() ? row.token1.amount1 : row.token0.amount)
           return row.token0.id.toLowerCase() === token0?.address?.toLowerCase() ? row.token1.amount : row.token0.amount
         },
         {

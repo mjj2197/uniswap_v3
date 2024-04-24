@@ -8,11 +8,10 @@ import styled from 'styled-components'
 import { ThemedText } from 'theme/components'
 import { useIsDarkMode } from 'theme/components/ThemeToggle'
 
-import darkImage from '../../assets/images/404-page-dark.png'
-import lightImage from '../../assets/images/404-page-light.png'
+import darkImage from '../../assets/images/404.png'
 
 const Image = styled.img`
-  max-width: 510px;
+  max-width: 210px;
   width: 100%;
   padding: 0 75px;
 `
@@ -33,7 +32,6 @@ const PageWrapper = styled(Container)`
   gap: 50px;
 
   @media screen and (min-width: ${({ theme }) => theme.breakpoint.md}px) {
-    justify-content: space-between;
     padding-top: 64px;
   }
 `
@@ -43,7 +41,7 @@ export default function NotFound() {
   const isMobile = useIsMobile()
 
   const Title = isMobile ? ThemedText.LargeHeader : ThemedText.Hero
-  const Paragraph = isMobile ? ThemedText.HeadlineMedium : ThemedText.HeadlineLarge
+  const Paragraph = isMobile ? ThemedText.HeadlineMedium : ThemedText.HeadlineMedium
 
   return (
     <PageWrapper>
@@ -55,7 +53,7 @@ export default function NotFound() {
               <Trans>Page not found!</Trans>
             </Paragraph>
           </Container>
-          <Image src={isDarkMode ? darkImage : lightImage} alt="Liluni" />
+          <Image src={isDarkMode ? darkImage : darkImage} alt="Liluni" />
         </Header>
         <SmallButtonPrimary as={Link} to="/">
           <Trans>Oops, take me back to Swap</Trans>

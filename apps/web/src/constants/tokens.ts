@@ -107,7 +107,7 @@ export const TOKEN_SHORTHANDS: { [shorthand: string]: { [chainId in ChainId]?: s
   },
 }
 
-const STABLECOINS: { [chainId in ChainId]: Token[] } = {
+export const STABLECOINS: { [chainId in ChainId]: Token[] } = {
   [ChainId.X1]: [USDC, USDT, DAI],
   [ChainId.X1_TESTNET]: [USDC_X1_TestNet, USDT_X1_TestNet, DAI_X1_TestNet],
 }

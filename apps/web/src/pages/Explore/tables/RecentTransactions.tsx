@@ -127,7 +127,7 @@ export default function RecentTransactions() {
           </Cell>
         ),
       }),
-      columnHelper.accessor((transaction) => transaction.sender, {
+      columnHelper.accessor((transaction) => transaction.origin || transaction.sender, {
         id: 'maker-address',
         header: () => (
           <Cell minWidth={150}>

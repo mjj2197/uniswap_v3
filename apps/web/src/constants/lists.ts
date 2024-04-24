@@ -1,5 +1,5 @@
 // TODO: 替换成我们的 token list，这里是暂时在token 下拉列表中的 token
-export const UNI_LIST = 'https://cloudflare-ipfs.com/ipns/tokens.uniswap.org'
+export const UNI_LIST = 'https://raw.githubusercontent.com/JaguarX-com/assets/master/blockchains/xlayer/tokenlist.json'
 
 // default lists to be 'active' aka searched across
 export const DEFAULT_ACTIVE_LIST_URLS: string[] = [UNI_LIST]
