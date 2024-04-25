@@ -1,10 +1,7 @@
-import { exploreSearchStringAtom } from 'components/Tokens/state'
 import { OrderDirection } from 'graphql/data/util'
-import { useAtomValue } from 'jotai/utils'
-import { useMemo } from 'react'
 
-import { useAllV3PoolsQuery, usePoolsBulkQuery } from '../../thegraph/__generated__/types-and-hooks'
-import useBlocksFromTimestamp from '../../thegraph/BlocksFromTimestampQuery'
+import { useAllV3PoolsQuery, usePoolsBulkQuery } from 'graphql/thegraph/__generated__/types-and-hooks'
+import useBlocksFromTimestamp from 'graphql/thegraph/BlocksFromTimestampQuery'
 import { get2DayChange, useDeltaTimestamps } from '../util'
 
 export interface TablePool {

@@ -1,25 +1,35 @@
-import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client'
+import { ApolloClient, HttpLink, concat, ApolloLink, InMemoryCache } from '@apollo/client'
 import { createSubscriptionLink } from 'utilities/src/apollo/SubscriptionLink'
 import { splitSubscription } from 'utilities/src/apollo/splitSubscription'
 import { ChainId } from '@jaguarswap/sdk-core'
+
+import store from 'state/index'
 
 const CHAIN_SUBGRAPH_URL: Record<number, string> = {
   [ChainId.X1]: 'https://main-subgraph.jaguarex.com/subgraphs/name/jaguarswap/uniswap-v3',
   [ChainId.X1_TESTNET]: 'https://subgraph.jaguarex.com/subgraphs/name/jaguarswap/uniswap-v3',
 }
-const CHAIN_SUBGRAPH_URL_BLOCK: Record<number, string> = {
-  [ChainId.X1]: 'https://main-subgraph.jaguarex.com/subgraphs/name/jaguarswap/x1layer-blocks',
-  [ChainId.X1_TESTNET]: 'https://subgraph.jaguarex.com/subgraphs/name/jaguarswap/x1layer-blocks',
-}
 
 const httpLink = new HttpLink({ uri: CHAIN_SUBGRAPH_URL[ChainId.X1] })
+// This middleware will allow us to dynamically update the uri for the requests based off chainId
+// For more information: https://www.apollographql.com/docs/react/networking/advanced-http-networking/
 
+const authMiddleware = new ApolloLink((operation, forward) => {
+  // add the authorization to the headers
+  const chainId = store.getState().application.chainId
+
+  operation.setContext(() => ({
+    uri: chainId && CHAIN_SUBGRAPH_URL[chainId] ? CHAIN_SUBGRAPH_URL[chainId] : CHAIN_SUBGRAPH_URL[ChainId.X1],
+  }))
+
+  return forward(operation)
+})
 export const apolloClient = new ApolloClient({
   connectToDevTools: true,
-  link: httpLink,
+  link: concat(authMiddleware, httpLink),
   headers: {
     'Content-Type': 'application/json',
-    Origin: 'https://app.uniswap.org',
+    Origin: 'https://www.jaguarex.com',
   },
   cache: new InMemoryCache({
     typePolicies: {
@@ -48,4 +58,4 @@ export const apolloClient = new ApolloClient({
 
 // This is done after creating the client so that client may be passed to `createSubscriptionLink`.
 const subscriptionLink = createSubscriptionLink({ uri: CHAIN_SUBGRAPH_URL[ChainId.X1], token: '' }, apolloClient)
-apolloClient.setLink(splitSubscription(subscriptionLink, httpLink))
+apolloClient.setLink(concat(authMiddleware, splitSubscription(subscriptionLink, httpLink)))
