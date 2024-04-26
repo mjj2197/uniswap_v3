@@ -53,8 +53,8 @@ export function useSwapRouterV2Callback(trade: ClassicTrade | undefined, options
   const blockNumber = useBlockNumber()
   const getDeadline = useGetTransactionDeadline()
   const isAutoSlippage = useUserSlippageTolerance()[0] === 'auto'
-  const { data } = useCachedPortfolioBalancesQuery({ account })
-  const portfolioBalanceUsd = data?.portfolios?.[0]?.tokensTotalDenominatedValue?.value
+  // const { data } = useCachedPortfolioBalancesQuery({ account })
+  // const portfolioBalanceUsd = data?.portfolios?.[0]?.tokensTotalDenominatedValue?.value
 
   return useCallback(
     (): Promise<{ type: TradeFillType.Classic; response: TransactionResponse; deadline?: BigNumber }> =>

@@ -59,13 +59,10 @@ export function useSwapCallback(
   //   }
   // )
 
-  // const swapCallback = isUniswapXTrade(trade) ? uniswapXSwapCallback : useUniversalRouterSwapCallback
-  const swapCallback = isClassicTrade(trade)
-    ? useSwapRouterV2Callback(trade, {
-        slippageTolerance: allowedSlippage,
-        permit: permitSignature,
-      })
-    : undefined
+  const swapCallback = useSwapRouterV2Callback(isClassicTrade(trade) ? trade : undefined, {
+    slippageTolerance: allowedSlippage,
+    permit: permitSignature,
+  })
 
   return useCallback(async () => {
     if (!trade) throw new Error('missing trade')
