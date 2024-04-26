@@ -10,6 +10,13 @@ export type ChartQueryResult<TDataType, TChartType extends ChartType> = {
   dataQuality: DataQuality
 }
 
+export type V3ChartQueryResult<TDataType, SDataType> = {
+  tvl: TDataType[]
+  volume: SDataType[]
+  loading: boolean
+  dataQuality: DataQuality
+}
+
 export enum DataQuality {
   VALID,
   INVALID,

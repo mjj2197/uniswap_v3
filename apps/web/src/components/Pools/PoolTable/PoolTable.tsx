@@ -297,21 +297,21 @@ export function PoolsTable({
             ),
           })
         : null,
-      !hiddenColumns?.includes(PoolTableColumns.VolumeWeek)
-        ? columnHelper.accessor((row) => row.volumeWeek, {
-            id: 'volumeWeek',
-            header: () => (
-              <Cell minWidth={120} grow>
-                <PoolTableHeader category={PoolSortFields.VolumeWeek} isCurrentSortMethod={sortMethod === PoolSortFields.VolumeWeek} direction={orderDirection} />
-              </Cell>
-            ),
-            cell: (volumeWeek) => (
-              <Cell minWidth={120} loading={showLoadingSkeleton} grow>
-                <ThemedText.BodyPrimary>{formatNumber({ input: volumeWeek.getValue?.(), type: NumberType.FiatTokenStats })}</ThemedText.BodyPrimary>
-              </Cell>
-            ),
-          })
-        : null,
+      // !hiddenColumns?.includes(PoolTableColumns.VolumeWeek)
+      //   ? columnHelper.accessor((row) => row.volumeWeek, {
+      //       id: 'volumeWeek',
+      //       header: () => (
+      //         <Cell minWidth={120} grow>
+      //           <PoolTableHeader category={PoolSortFields.VolumeWeek} isCurrentSortMethod={sortMethod === PoolSortFields.VolumeWeek} direction={orderDirection} />
+      //         </Cell>
+      //       ),
+      //       cell: (volumeWeek) => (
+      //         <Cell minWidth={120} loading={showLoadingSkeleton} grow>
+      //           <ThemedText.BodyPrimary>{formatNumber({ input: volumeWeek.getValue?.(), type: NumberType.FiatTokenStats })}</ThemedText.BodyPrimary>
+      //         </Cell>
+      //       ),
+      //     })
+      //   : null,
       // Filter out null values
     ].filter(Boolean) as ColumnDef<PoolTableValues, any>[]
   }, [formatNumber, formatPercent, hiddenColumns, orderDirection, showLoadingSkeleton, sortMethod])

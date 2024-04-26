@@ -75,7 +75,7 @@ export function TokenDescription() {
   const { address, currency, tokenQuery } = useTDPContext()
   const { neutral2 } = useTheme()
 
-  const { description, homepageUrl, twitterName } = tokenQuery.data?.token?.project ?? {}
+  // const { description, homepageUrl, twitterName } = tokenQuery.data?.token?.project ?? {}
   const explorerUrl = getExplorerLink(
     currency.chainId,
     address,
@@ -88,9 +88,9 @@ export function TokenDescription() {
   }, [address, setCopied])
 
   const [isDescriptionTruncated, toggleIsDescriptionTruncated] = useReducer((x) => !x, true)
-  const truncatedDescription = truncateDescription(description ?? '', TRUNCATE_CHARACTER_COUNT)
-  const shouldTruncate = !!description && description.length > TRUNCATE_CHARACTER_COUNT
-  const showTruncatedDescription = shouldTruncate && isDescriptionTruncated
+  // const truncatedDescription = truncateDescription(description ?? '', TRUNCATE_CHARACTER_COUNT)
+  // const shouldTruncate = !!description && description.length > TRUNCATE_CHARACTER_COUNT
+  // const showTruncatedDescription = shouldTruncate && isDescriptionTruncated
   const { inputTax: sellFee, outputTax: buyFee } = useSwapTaxes(address, address)
   const { formatPercent } = useFormatter()
   const { sellFeeString, buyFeeString } = {
@@ -120,7 +120,7 @@ export function TokenDescription() {
             {currency.chainId === ChainId.X1 ? <Trans>X Layer Explorer</Trans> : <Trans>Explorer</Trans>}
           </TokenInfoButton>
         </ExternalLink>
-        {homepageUrl && (
+        {/* {homepageUrl && (
           <ExternalLink href={homepageUrl}>
             <TokenInfoButton>
               <Globe width="18px" height="18px" fill={neutral2} />
@@ -135,10 +135,10 @@ export function TokenDescription() {
               <Trans>Twitter</Trans>
             </TokenInfoButton>
           </ExternalLink>
-        )}
+        )} */}
       </TokenButtonRow>
       <TokenDescriptionContainer>
-        {!description && (
+        {/* {!description && (
           <NoInfoAvailable>
             <Trans>No token information available</Trans>
           </NoInfoAvailable>
@@ -160,7 +160,7 @@ export function TokenDescription() {
           >
             {isDescriptionTruncated ? <Trans>Show more</Trans> : <Trans>Hide</Trans>}
           </TruncateDescriptionButton>
-        )}
+        )} */}
       </TokenDescriptionContainer>
       {hasFee && (
         <MouseoverTooltip

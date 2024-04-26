@@ -109,9 +109,9 @@ export function useV3Tokens(sortState: TokenSortState): {
     loading: ethLoading,
   } = useEthPriceUsdQuery({
     variables: {
-      block24: block24,
-      block48: block48,
-      blockWeek: blockWeek,
+      block24: { number: block24 },
+      block48: { number: block48 },
+      blockWeek: { number: blockWeek },
     },
   })
 
@@ -180,9 +180,18 @@ export function useV3Tokens(sortState: TokenSortState): {
       const week: TokenFields | undefined = parsedTokens.parsedWeek[address]
 
       const [volumeUSD, volumeUSDChange] =
-        current && oneDay && twoDay ? get2DayChange(current.volumeUSD, oneDay.volumeUSD, twoDay.volumeUSD) : current ? [Number.parseFloat(current.volumeUSD), 0] : [0, 0]
+        current && oneDay && twoDay
+          ? get2DayChange(current.volumeUSD, oneDay.volumeUSD, twoDay.volumeUSD)
+          : current
+            ? [Number.parseFloat(current.volumeUSD), 0]
+            : [0, 0]
 
-      const volumeUSDWeek = current && week ? Number.parseFloat(current.volumeUSD) - Number.parseFloat(week.volumeUSD) : current ? Number.parseFloat(current.volumeUSD) : 0
+      const volumeUSDWeek =
+        current && week
+          ? Number.parseFloat(current.volumeUSD) - Number.parseFloat(week.volumeUSD)
+          : current
+            ? Number.parseFloat(current.volumeUSD)
+            : 0
       const tvlUSD = current ? Number.parseFloat(current.totalValueLockedUSD) : 0
       const tvlUSDChange = getPercentChange(current?.totalValueLockedUSD, oneDay?.totalValueLockedUSD)
       const tvlToken = current ? Number.parseFloat(current.totalValueLocked) : 0
@@ -192,8 +201,10 @@ export function useV3Tokens(sortState: TokenSortState): {
       const priceUSDChange = priceUSD && priceUSDOneDay ? getPercentChange(priceUSD.toString(), priceUSDOneDay.toString()) : 0
 
       const priceUSDChangeWeek = priceUSD && priceUSDWeek ? getPercentChange(priceUSD.toString(), priceUSDWeek.toString()) : 0
-      const txCount = current && oneDay ? Number.parseFloat(current.txCount) - Number.parseFloat(oneDay.txCount) : current ? Number.parseFloat(current.txCount) : 0
-      const feesUSD = current && oneDay ? Number.parseFloat(current.feesUSD) - Number.parseFloat(oneDay.feesUSD) : current ? Number.parseFloat(current.feesUSD) : 0
+      const txCount =
+        current && oneDay ? Number.parseFloat(current.txCount) - Number.parseFloat(oneDay.txCount) : current ? Number.parseFloat(current.txCount) : 0
+      const feesUSD =
+        current && oneDay ? Number.parseFloat(current.feesUSD) - Number.parseFloat(oneDay.feesUSD) : current ? Number.parseFloat(current.feesUSD) : 0
 
       return {
         exists: !!current,

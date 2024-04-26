@@ -84,10 +84,7 @@ function TDPSwapComponent() {
     (tokens: CurrencyState) => {
       const inputCurrencyURLAddress = getCurrencyURLAddress(tokens.inputCurrency)
       const outputCurrencyURLAddress = getCurrencyURLAddress(tokens.outputCurrency)
-      if (
-        addressesAreEquivalent(inputCurrencyURLAddress, address) ||
-        addressesAreEquivalent(outputCurrencyURLAddress, address)
-      ) {
+      if (addressesAreEquivalent(inputCurrencyURLAddress, address) || addressesAreEquivalent(outputCurrencyURLAddress, address)) {
         return
       }
 
@@ -95,11 +92,7 @@ function TDPSwapComponent() {
 
       if (!newDefaultToken) return
 
-      const preloadedLogoSrc = getInitialUrl(
-        newDefaultToken.wrapped.address,
-        newDefaultToken.chainId,
-        newDefaultToken.isNative
-      )
+      const preloadedLogoSrc = getInitialUrl(newDefaultToken.wrapped.address, newDefaultToken.chainId, newDefaultToken.isNative)
       const url = getTokenDetailsURL({
         // The function falls back to "NATIVE" if the address is null
         address: newDefaultToken.isNative ? null : newDefaultToken.address,
@@ -131,10 +124,7 @@ function TDPSwapComponent() {
 
   return (
     <>
-      <div
-        style={{ pointerEvents: isBlockedToken ? 'none' : 'auto' }}
-        onClick={() => isBlockedToken && setOpenTokenSafetyModal(true)}
-      >
+      <div style={{ pointerEvents: isBlockedToken ? 'none' : 'auto' }} onClick={() => isBlockedToken && setOpenTokenSafetyModal(true)}>
         <Swap
           syncTabToUrl={false}
           chainId={currency.chainId}
@@ -180,7 +170,6 @@ function TDPAnalytics({ children }: PropsWithChildren) {
 
 export default function TokenDetails() {
   const { address, currency, tokenQuery } = useTDPContext()
-  const tokenQueryData = tokenQuery.data?.token
 
   const { lg: isLargeScreenSize } = useScreenSize()
 
@@ -192,9 +181,9 @@ export default function TokenDetails() {
           <TokenInfoContainer data-testid="token-info-container">
             <TokenDetailsHeader />
           </TokenInfoContainer>
-          {/* <ChartSection /> */}
-          {/* <StatsSection chainId={currency.chainId} address={address} tokenQueryData={tokenQueryData} /> */}
-          {/* <DividerLine /> */}
+          <ChartSection />
+          <StatsSection chainId={currency.chainId} address={address} tokenQueryData={tokenQuery?.data} />
+          <DividerLine />
           <ActivitySection />
         </LeftPanel>
         <RightPanel>

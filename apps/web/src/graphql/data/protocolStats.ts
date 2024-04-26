@@ -1,8 +1,13 @@
 import { StackedLineData } from 'components/Charts/StackedLineChart'
-import { StackedHistogramData } from 'components/Charts/VolumeChart/renderer'
+import { SingleHistogramData, StackedHistogramData } from 'components/Charts/VolumeChart/renderer'
 import { ChartType } from 'components/Charts/utils'
-import { ChartQueryResult, checkDataQuality } from 'components/Tokens/TokenDetails/ChartSection/util'
-import { UTCTimestamp } from 'lightweight-charts'
+import {
+  ChartQueryResult,
+  V3ChartQueryResult,
+  checkDataQuality,
+} from 'components/Tokens/TokenDetails/ChartSection/util'
+import { useUniswapDayDatasQuery } from 'graphql/thegraph/__generated__/types-and-hooks'
+import { UTCTimestamp, WhitespaceData, CustomData } from 'lightweight-charts'
 import { useMemo } from 'react'
 import {
   Chain,
@@ -21,12 +26,18 @@ function mapDataByTimestamp(
   const dataByTime: Record<number, Record<ProtocolVersion, number>> = {}
   v2Data?.forEach((v2Point) => {
     const timestamp = v2Point.timestamp
-    dataByTime[timestamp] = { [ProtocolVersion.V2]: v2Point.value, [ProtocolVersion.V3]: 0 }
+    dataByTime[timestamp] = {
+      [ProtocolVersion.V2]: v2Point.value,
+      [ProtocolVersion.V3]: 0,
+    }
   })
   v3Data?.forEach((v3Point) => {
     const timestamp = v3Point.timestamp
     if (!dataByTime[timestamp]) {
-      dataByTime[timestamp] = { [ProtocolVersion.V2]: 0, [ProtocolVersion.V3]: v3Point.value }
+      dataByTime[timestamp] = {
+        [ProtocolVersion.V2]: 0,
+        [ProtocolVersion.V3]: v3Point.value,
+      }
     } else {
       dataByTime[timestamp][ProtocolVersion.V3] = v3Point.value
     }
@@ -76,4 +87,38 @@ export function useDailyProtocolTVL(chain: Chain): ChartQueryResult<StackedLineD
     const dataQuality = checkDataQuality(entries, ChartType.TVL, HistoryDuration.Year)
     return { chartType: ChartType.TVL, entries, loading, dataQuality }
   }, [loading, queryData?.v2DailyProtocolTvl, queryData?.v3DailyProtocolTvl])
+}
+
+export function useDailyV3ProtocolChart(): {
+  tvl: ChartQueryResult<StackedLineData, ChartType.TVL>
+  volume: ChartQueryResult<SingleHistogramData, ChartType.VOLUME>
+} {
+  const { data: queryData, loading } = useUniswapDayDatasQuery()
+
+  return useMemo(() => {
+    const tvl = (queryData?.uniswapDayDatas.map((item) => ({
+      time: Number(item.date),
+      values: [Number(item.tvlUSD)],
+    })) ?? []) as StackedLineData[]
+
+    const volume = (queryData?.uniswapDayDatas.map((item) => ({
+      time: Number(item.date),
+      value: Number(item.volumeUSD),
+    })) ?? []) as SingleHistogramData[]
+
+    return {
+      tvl: {
+        chartType: ChartType.TVL,
+        entries: tvl,
+        loading,
+        dataQuality: checkDataQuality(tvl, ChartType.TVL, HistoryDuration.Year),
+      },
+      volume: {
+        chartType: ChartType.VOLUME,
+        entries: volume,
+        loading,
+        dataQuality: checkDataQuality(volume, ChartType.VOLUME, HistoryDuration.Year),
+      },
+    }
+  }, [queryData, loading, queryData])
 }

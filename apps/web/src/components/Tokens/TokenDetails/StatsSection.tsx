@@ -12,6 +12,7 @@ import { NumberType, useFormatter } from 'utils/formatNumbers'
 import { HEADER_DESCRIPTIONS } from 'components/Tokens/TokenTable'
 import { UNSUPPORTED_METADATA_CHAINS } from '../constants'
 import { TokenSortMethod } from '../state'
+import { TokensByIdQuery } from 'graphql/thegraph/__generated__/types-and-hooks'
 
 export const StatWrapper = styled.div`
   color: ${({ theme }) => theme.neutral2};
@@ -77,21 +78,17 @@ function Stat({ dataCy, value, title, description }: { dataCy: string; value: Nu
 type StatsSectionProps = {
   chainId: ChainId
   address: string
-  tokenQueryData: TokenQueryData
+  tokenQueryData: TokensByIdQuery | undefined
 }
 export default function StatsSection(props: StatsSectionProps) {
   const { chainId, address, tokenQueryData } = props
+  console.log('%c⧭', 'color: #f27999', tokenQueryData)
   const { label, infoLink } = getChainInfo(chainId)
 
-  const tokenMarketInfo = tokenQueryData?.market
-  const tokenProjectMarketInfo = tokenQueryData?.project?.markets?.[0] // aggregated market price from CoinGecko
+  const TVL = tokenQueryData?.token?.totalValueLockedUSD
+  const volume24H = tokenQueryData?.token?.tokenDayData[0]?.volumeUSD
 
-  const FDV = tokenProjectMarketInfo?.fullyDilutedValuation?.value
-  const marketCap = tokenProjectMarketInfo?.marketCap?.value
-  const TVL = tokenMarketInfo?.totalValueLocked?.value
-  const volume24H = tokenMarketInfo?.volume24H?.value
-
-  const hasStats = TVL || FDV || marketCap || volume24H
+  const hasStats = TVL || volume24H
 
   if (hasStats) {
     return (
@@ -104,26 +101,28 @@ export default function StatsSection(props: StatsSectionProps) {
             <Stat
               dataCy="tvl"
               value={TVL}
-              description={<Trans>Total value locked (TVL) is the aggregate amount of the asset available across all Uniswap v3 liquidity pools.</Trans>}
+              description={
+                <Trans>Total value locked (TVL) is the aggregate amount of the asset available across all Uniswap v3 liquidity pools.</Trans>
+              }
               title={<Trans>TVL</Trans>}
             />
-            <Stat
+            {/* <Stat
               dataCy="market-cap"
               value={marketCap}
               description={<Trans>Market capitalization is the total market value of an asset&apos;s circulating supply.</Trans>}
               title={<Trans>Market cap</Trans>}
-            />
+            /> */}
           </StatPair>
           <StatPair>
-            <Stat
+            {/* <Stat
               dataCy="fdv"
               value={FDV}
               // @ts-ignore
               description={HEADER_DESCRIPTIONS[TokenSortMethod.FULLY_DILUTED_VALUATION]}
               title={<Trans>FDV</Trans>}
-            />
+            /> */}
             <Stat
-              dataCy="volume-24h"
+              dataCy="volume"
               value={volume24H}
               description={<Trans>1 day volume is the amount of the asset that has been traded on Uniswap v3 during the past 24 hours.</Trans>}
               title={<Trans>1 day volume</Trans>}

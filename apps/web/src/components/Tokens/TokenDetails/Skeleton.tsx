@@ -24,7 +24,7 @@ import { TDP_CHART_HEIGHT_PX } from './ChartSection'
 import { StatPair, StatWrapper, StatsWrapper } from './StatsSection'
 import { Hr } from './shared'
 
-const SWAP_COMPONENT_WIDTH = 360
+const SWAP_COMPONENT_WIDTH = 420
 
 export const TokenDetailsLayout = styled.div`
   display: flex;

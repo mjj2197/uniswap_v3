@@ -426,7 +426,7 @@ export function DoubleTokenLogo({
   size?: number
 }) {
   const token0IsNative = tokens[0] === NATIVE_CHAIN_ID
-  const token1IsNative = tokens[0] === NATIVE_CHAIN_ID
+  const token1IsNative = tokens[1] === NATIVE_CHAIN_ID
 
   const [src, nextSrc] = useTokenLogoSource({
     address: tokens?.[0],

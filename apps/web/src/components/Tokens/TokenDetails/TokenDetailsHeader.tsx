@@ -25,6 +25,7 @@ import { ExplorerDataType, getExplorerLink } from 'utils/getExplorerLink'
 
 import { useTDPContext } from 'pages/TokenDetails/TDPContext'
 import { TokenNameCell } from './Skeleton'
+import useAssetLogoSource, { getInitialUrl } from 'hooks/useAssetLogoSource'
 
 const HeaderActionsContainer = styled.div`
   display: flex;
@@ -139,8 +140,9 @@ export const TokenDetailsHeader = () => {
     currency.isNative ? ExplorerDataType.NATIVE : ExplorerDataType.TOKEN
   )
 
-  const { homepageUrl, twitterName, logoUrl } = tokenQuery.data?.token?.project ?? {}
-  const twitterUrl = twitterName && `https://x.com/${twitterName}`
+  const logo = getInitialUrl(address)
+  // const { homepageUrl, twitterName, logoUrl } = tokenQuery.data?.token?.project ?? {}
+  // const twitterUrl = twitterName && `https://x.com/${twitterName}`
 
   const currentLocation = window.location.href
 
@@ -154,7 +156,7 @@ export const TokenDetailsHeader = () => {
   return (
     <>
       <TokenNameCell>
-        <PortfolioLogo currencies={[currency]} images={[logoUrl]} chainId={currency.chainId} size="32px" />
+        <PortfolioLogo currencies={[currency]} images={[logo]} chainId={currency.chainId} size="32px" />
         <TokenTitle>
           <TokenName>{currency.name ?? <Trans>Name not found</Trans>}</TokenName>
           <TokenSymbol>{tokenSymbolName}</TokenSymbol>
@@ -182,7 +184,7 @@ export const TokenDetailsHeader = () => {
                 </StyledExternalLink>
               </MouseoverTooltip>
             )}
-            {homepageUrl && (
+            {/* {homepageUrl && (
               <MouseoverTooltip text={t`Website`} placement="top" size={TooltipSize.Max} disabled={isMobileScreen}>
                 <StyledExternalLink href={homepageUrl}>
                   <ActionButton>
@@ -195,8 +197,8 @@ export const TokenDetailsHeader = () => {
                   </ActionButton>
                 </StyledExternalLink>
               </MouseoverTooltip>
-            )}
-            {twitterUrl && (
+            )} */}
+            {/* {twitterUrl && (
               <MouseoverTooltip text={t`Twitter`} placement="top" size={TooltipSize.Max} disabled={isMobileScreen}>
                 <StyledExternalLink href={twitterUrl}>
                   <ActionButton>
@@ -209,7 +211,7 @@ export const TokenDetailsHeader = () => {
                   </ActionButton>
                 </StyledExternalLink>
               </MouseoverTooltip>
-            )}
+            )} */}
             {isMobileScreen ? (
               <>
                 <ActionButton onClick={() => setCopied(currentLocation)}>

@@ -14,6 +14,7 @@ import {
   useTokenPriceQuery,
 } from 'uniswap/src/data/graphql/uniswap-data-api/__generated__/types-and-hooks'
 import { ChartQueryResult, DataQuality, checkDataQuality, withUTCTimestamp } from './util'
+import { useTokenDayDataQuery } from 'graphql/thegraph/__generated__/types-and-hooks'
 
 type TDPChartQueryVariables = { chain: Chain; address?: string; duration: HistoryDuration }
 
@@ -45,9 +46,7 @@ export function useTDPPriceChartData(
     let entries =
       (ohlc
         ? ohlc?.filter((v): v is CandlestickOhlcFragment => v !== undefined).map(toPriceChartData)
-        : priceHistory
-            ?.filter((v): v is PriceHistoryFallbackFragment => v !== undefined)
-            .map(fallbackToPriceChartData)) ?? []
+        : priceHistory?.filter((v): v is PriceHistoryFallbackFragment => v !== undefined).map(fallbackToPriceChartData)) ?? []
     const currentPrice = price?.value
 
     if (ohlc) {
@@ -138,16 +137,11 @@ export function useTDPPriceChartData(
   }, [data?.token?.market, fallback, loading, priceChartType, variables.duration])
 }
 
-export function useTDPVolumeChartData(
-  variables: TDPChartQueryVariables,
-  skip: boolean
-): ChartQueryResult<SingleHistogramData, ChartType.VOLUME> {
+export function useTDPVolumeChartData(variables: TDPChartQueryVariables, skip: boolean): ChartQueryResult<SingleHistogramData, ChartType.VOLUME> {
   const { data, loading } = useTokenHistoricalVolumesQuery({ variables, skip })
   return useMemo(() => {
     const entries =
-      data?.token?.market?.historicalVolume
-        ?.filter((v): v is PriceHistoryFallbackFragment => v !== undefined)
-        .map(withUTCTimestamp) ?? []
+      data?.token?.market?.historicalVolume?.filter((v): v is PriceHistoryFallbackFragment => v !== undefined).map(withUTCTimestamp) ?? []
     const dataQuality = checkDataQuality(entries, ChartType.VOLUME, variables.duration)
     return { chartType: ChartType.VOLUME, entries, loading, dataQuality }
   }, [data?.token?.market?.historicalVolume, loading, variables.duration])
@@ -157,15 +151,11 @@ function toStackedLineData(entry: { timestamp: number; value: number }): Stacked
   return { values: [entry.value], time: entry.timestamp as UTCTimestamp }
 }
 
-export function useTDPTVLChartData(
-  variables: TDPChartQueryVariables,
-  skip: boolean
-): ChartQueryResult<StackedLineData, ChartType.TVL> {
+export function useTDPTVLChartData(variables: TDPChartQueryVariables, skip: boolean): ChartQueryResult<StackedLineData, ChartType.TVL> {
   const { data, loading } = useTokenHistoricalTvlsQuery({ variables, skip })
   return useMemo(() => {
     const { historicalTvl, totalValueLocked } = data?.token?.market ?? {}
-    const entries =
-      historicalTvl?.filter((v): v is PriceHistoryFallbackFragment => v !== undefined).map(toStackedLineData) ?? []
+    const entries = historicalTvl?.filter((v): v is PriceHistoryFallbackFragment => v !== undefined).map(toStackedLineData) ?? []
     const currentTvl = totalValueLocked?.value
 
     // Append current tvl to end of array to ensure data freshness and that each time period ends with same tvl
@@ -188,4 +178,63 @@ export function useTDPTVLChartData(
     const dataQuality = checkDataQuality(entries, ChartType.TVL, variables.duration)
     return { chartType: ChartType.TVL, entries, loading, dataQuality }
   }, [data?.token?.market, loading, variables.duration])
+}
+export function useTDPV3ChartData(
+  tokenAddress: string | undefined,
+  timePeriod: HistoryDuration
+): {
+  price: ChartQueryResult<PriceChartData, ChartType.PRICE>
+  tvl: ChartQueryResult<StackedLineData, ChartType.TVL>
+  volume: ChartQueryResult<SingleHistogramData, ChartType.VOLUME>
+} {
+  const { data, loading } = useTokenDayDataQuery({ variables: { token: tokenAddress }, skip: !tokenAddress })
+
+  return useMemo(() => {
+    const price: PriceChartData[] = []
+    const tvl: StackedLineData[] = []
+    const volume: SingleHistogramData[] = []
+
+    const today = new Date() // 获取当前日期
+    const oneDay = 24 * 60 * 60 * 1000 // 一天的毫秒数
+
+    data?.tokenDayDatas.forEach((item) => {
+      price.push({
+        time: Number(item.date),
+        value: item.priceUSD,
+        open: item.close,
+        close: item.close,
+        high: item.high,
+        low: item.low,
+      } as PriceChartData)
+      tvl.push({
+        time: Number(item.date),
+        values: [Number(item.totalValueLockedUSD)],
+      } as StackedLineData)
+      volume.push({
+        time: Number(item.date),
+        value: Number(item.volumeUSD),
+      } as SingleHistogramData)
+    })
+
+    return {
+      price: {
+        chartType: ChartType.PRICE,
+        entries: price,
+        loading,
+        dataQuality: checkDataQuality(price, ChartType.PRICE, timePeriod),
+      },
+      tvl: {
+        chartType: ChartType.TVL,
+        entries: tvl,
+        loading,
+        dataQuality: checkDataQuality(tvl, ChartType.TVL, timePeriod),
+      },
+      volume: {
+        chartType: ChartType.VOLUME,
+        entries: volume,
+        loading,
+        dataQuality: checkDataQuality(volume, ChartType.VOLUME, timePeriod),
+      },
+    }
+  }, [data, loading, timePeriod])
 }

@@ -120,7 +120,7 @@ export function ChartHeader({
   valueFormatterType,
   time,
   timePlaceholder,
-  protocolData,
+  // protocolData,
   additionalFields,
 }: ChartHeaderProps) {
   return (
@@ -132,7 +132,8 @@ export function ChartHeader({
           <HeaderTimeDisplay time={time} timePlaceholder={timePlaceholder} />
         </Row>
       </ChartHeaderLeftDisplay>
-      <ProtocolLegend protocolData={protocolData} />
+      {/* NOTE: 因为只有一个 v3 的数据，所以不需要显示 Legend */}
+      {/* <ProtocolLegend protocolData={protocolData} /> */}
     </ChartHeaderWrapper>
   )
 }

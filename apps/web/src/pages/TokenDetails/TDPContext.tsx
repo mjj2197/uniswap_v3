@@ -2,6 +2,7 @@ import type { QueryResult } from '@apollo/client'
 import type { ChainId, Currency } from '@jaguarswap/sdk-core'
 import { TDPChartState } from 'components/Tokens/TokenDetails/ChartSection'
 import { Warning } from 'constants/tokenSafety'
+import { TokensByIdQuery } from 'graphql/thegraph/__generated__/types-and-hooks'
 import { PropsWithChildren, createContext, useContext } from 'react'
 import {
   Chain,
@@ -25,7 +26,7 @@ type BaseTDPContext = {
   /** True if this token did not exist in GQL backend and was instead fetched from on-chain */
   currencyWasFetchedOnChain: boolean
 
-  tokenQuery: QueryResult<TokenWebQuery, Exact<{ chain: Chain; address?: string }>>
+  tokenQuery: QueryResult<TokensByIdQuery, Exact<{ chain: Chain; address?: string }>>
   chartState: TDPChartState
 
   multiChainMap: MultiChainMap

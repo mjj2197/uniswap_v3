@@ -24,7 +24,7 @@ export default function useBlocksFromTimestamp(timestamp: number): {
     () => ({
       error,
       isLoading,
-      data: data?.blocks[0] ?? 0,
+      data: +data?.blocks[0]?.number ?? 0,
     }),
     [data, error, isLoading]
   )

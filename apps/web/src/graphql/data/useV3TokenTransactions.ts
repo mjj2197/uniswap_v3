@@ -25,7 +25,7 @@ export function useV3TokenTransactions(
 
   for (const t of data?.swapsAs0 ?? []) {
     unfilteredTransaction.push({
-      type: TokenTransactionType.SELL,
+      type: t.amount0 > 0 ? TokenTransactionType.SELL : TokenTransactionType.BUY,
       hash: t.transaction.id,
       timestamp: t.timestamp,
       sender: t.origin,
@@ -46,7 +46,7 @@ export function useV3TokenTransactions(
   }
   for (const t of data?.swapsAs1 ?? []) {
     unfilteredTransaction.push({
-      type: TokenTransactionType.BUY,
+      type: t.amount1 > 0 ? TokenTransactionType.SELL : TokenTransactionType.BUY,
       hash: t.transaction.id,
       timestamp: t.timestamp,
       sender: t.origin,

@@ -17,7 +17,7 @@ import { useTDPContext } from 'pages/TokenDetails/TDPContext'
 import { Chain } from 'graphql/data/util'
 import { AdvancedPriceChartToggle } from './AdvancedPriceChartToggle'
 import { ChartTypeDropdown } from './ChartTypeSelector'
-import { useTDPPriceChartData, useTDPTVLChartData, useTDPVolumeChartData } from './hooks'
+import { useTDPPriceChartData, useTDPTVLChartData, useTDPV3ChartData, useTDPVolumeChartData } from './hooks'
 import { ChartQueryResult, DataQuality } from './util'
 
 export const TDP_CHART_HEIGHT_PX = 356
@@ -58,7 +58,10 @@ const ChartTypeSelectorContainer = styled.div`
 `
 
 /** Represents a variety of query result shapes, discriminated via additional `chartType` field. */
-type ActiveQuery = ChartQueryResult<PriceChartData, ChartType.PRICE> | ChartQueryResult<SingleHistogramData, ChartType.VOLUME> | ChartQueryResult<StackedLineData, ChartType.TVL>
+type ActiveQuery =
+  | ChartQueryResult<PriceChartData, ChartType.PRICE>
+  | ChartQueryResult<SingleHistogramData, ChartType.VOLUME>
+  | ChartQueryResult<StackedLineData, ChartType.TVL>
 
 export type TDPChartState = {
   /** Time controls for TDP Charts */
@@ -76,31 +79,22 @@ export type TDPChartState = {
 const InvalidChartMessage = () => <Trans>Unable to display historical data for the current token.</Trans>
 
 /** Exported to `TDPContext` to fire queries on pageload. `TDPChartState` should be accessed through `useTDPContext` rather than this hook. */
-export function useCreateTDPChartState(tokenDBAddress: string | undefined, currencyChainName: Chain): TDPChartState {
+export function useCreateTDPChartState(tokenDBAddress: string | undefined): TDPChartState {
   const [timePeriod, setTimePeriod] = useState<TimePeriod>(TimePeriod.DAY)
 
   const [chartType, setChartType] = useState<TokenDetailsChartType>(ChartType.PRICE)
   const [priceChartType, setPriceChartType] = useState<PriceChartType>(PriceChartType.LINE)
 
-  const variables = { address: tokenDBAddress, chain: Chain.Arbitrum, duration: toHistoryDuration(timePeriod) }
-
-  // @ts-ignore
-  const priceQuery = useTDPPriceChartData(variables, chartType !== ChartType.PRICE, priceChartType)
-  // @ts-ignore
-  const volumeQuery = useTDPVolumeChartData(variables, chartType !== ChartType.VOLUME)
-  // @ts-ignore
-  const tvlQuery = useTDPTVLChartData(variables, chartType !== ChartType.TVL)
-
+  const { price, volume, tvl } = useTDPV3ChartData(tokenDBAddress, toHistoryDuration(timePeriod))
   return useMemo(() => {
-    const { disableCandlestickUI } = priceQuery
     const activeQuery = (() => {
       switch (chartType) {
         case ChartType.PRICE:
-          return priceQuery
+          return price
         case ChartType.VOLUME:
-          return volumeQuery
+          return volume
         case ChartType.TVL:
-          return tvlQuery
+          return tvl
       }
     })()
 
@@ -108,12 +102,12 @@ export function useCreateTDPChartState(tokenDBAddress: string | undefined, curre
       timePeriod,
       setTimePeriod,
       setChartType,
-      priceChartType: disableCandlestickUI ? PriceChartType.LINE : priceChartType,
+      priceChartType,
       setPriceChartType,
       activeQuery,
-      disableCandlestickUI,
+      disableCandlestickUI: false,
     }
-  }, [chartType, priceQuery, volumeQuery, tvlQuery, timePeriod, priceChartType])
+  }, [chartType, price, volume, tvl, timePeriod, priceChartType])
 }
 
 export default function ChartSection() {
@@ -123,7 +117,13 @@ export default function ChartSection() {
     <div data-cy={`tdp-${activeQuery.chartType}-chart-container`}>
       {(() => {
         if (activeQuery.dataQuality === DataQuality.INVALID) {
-          return <ChartSkeleton type={activeQuery.chartType} height={TDP_CHART_HEIGHT_PX} errorText={activeQuery.loading ? undefined : <InvalidChartMessage />} />
+          return (
+            <ChartSkeleton
+              type={activeQuery.chartType}
+              height={TDP_CHART_HEIGHT_PX}
+              errorText={activeQuery.loading ? undefined : <InvalidChartMessage />}
+            />
+          )
         }
 
         const stale = activeQuery.dataQuality === DataQuality.STALE
@@ -136,7 +136,7 @@ export default function ChartSection() {
             return <LineChart data={activeQuery.entries} height={TDP_CHART_HEIGHT_PX} stale={stale} />
         }
       })()}
-      <ChartControls />
+      {/* <ChartControls /> */}
     </div>
   )
 }
@@ -148,7 +148,13 @@ function ChartControls() {
   return (
     <ChartActionsContainer>
       <ChartTypeSelectorContainer>
-        {activeQuery.chartType === ChartType.PRICE && <AdvancedPriceChartToggle currentChartType={priceChartType} onChartTypeChange={setPriceChartType} disableCandlestickUI={disableCandlestickUI} />}
+        {activeQuery.chartType === ChartType.PRICE && (
+          <AdvancedPriceChartToggle
+            currentChartType={priceChartType}
+            onChartTypeChange={setPriceChartType}
+            disableCandlestickUI={disableCandlestickUI}
+          />
+        )}
         <ChartTypeDropdown
           options={TDP_CHART_SELECTOR_OPTIONS}
           currentChartType={activeQuery.chartType}

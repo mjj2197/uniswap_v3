@@ -57,17 +57,17 @@ query BlocksFromTimestamp($timestamp: BigInt, $timestampEnd: BigInt) {
 }
 
 # 获取 ETH 价格
-query EthPriceUSD($block24: Int = 1, $block48: Int = 1, $blockWeek: Int = 1) {
+query EthPriceUSD($block24: Block_height, $block48: Block_height, $blockWeek: Block_height) {
   current: bundles(first: 1, subgraphError: allow) {
     ethPriceUSD
   }
-  oneDay: bundles(first: 1, block: { number: $block24 }, subgraphError: allow) {
+  oneDay: bundles(first: 1, block: $block24, subgraphError: allow) {
     ethPriceUSD
   }
-  twoDay: bundles(first: 1, block: { number: $block48 }, subgraphError: allow) {
+  twoDay: bundles(first: 1, block: $block48, subgraphError: allow) {
     ethPriceUSD
   }
-  oneWeek: bundles(first: 1, block: { number: $blockWeek }, subgraphError: allow) {
+  oneWeek: bundles(first: 1, block: $blockWeek, subgraphError: allow) {
     ethPriceUSD
   }
 }
@@ -120,6 +120,11 @@ query TokensById($address: ID!) {
     totalValueLocked
     totalValueLockedUSD
     feesUSD
+    tokenDayData(first: 1, orderDirection: desc, orderBy: date) {
+      date
+      volume
+      volumeUSD
+    }
   }
 }
 
@@ -189,12 +194,12 @@ query TokenDayDatas($startTime: Int!, $skip: Int!, $address: String!) {
     totalValueLockedUSD
   }
 }
-query UniswapDayDatas($startTime: Int!, $skip: Int!) {
-  uniswapDayDatas(first: 1000, skip: $skip, subgraphError: allow, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
+query UniswapDayDatas {
+  uniswapDayDatas(first: 1000) {
     id
     date
-    volumeUSD
     tvlUSD
+    volumeUSD
   }
 }
 
@@ -501,5 +506,21 @@ query TokenTransactions($address: String!) {
     amount0
     amount1
     amountUSD
+  }
+}
+
+# 统计相关
+# 每日token 数据
+query TokenDayData($token: String) {
+  tokenDayDatas(where: { token: $token }) {
+    id
+    date
+    priceUSD
+    volumeUSD
+    totalValueLockedUSD
+    open
+    high
+    low
+    close
   }
 }

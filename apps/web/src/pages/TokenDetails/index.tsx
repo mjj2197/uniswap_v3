@@ -43,7 +43,7 @@ function useTDPCurrency(tokenQuery: ReturnType<typeof useTokenWebQuery>, tokenAd
 
   const queryCurrency = useMemo(() => {
     if (isNative) return nativeOnChain(currencyChainId)
-    if (tokenQuery.data?.token) return gqlToCurrency(tokenQuery.data.token)
+    if (tokenQuery.data?.token) return gqlToCurrency({ ...tokenQuery.data.token, address: tokenQuery.data.token.id }, chainId)
     return undefined
   }, [isNative, currencyChainId, tokenQuery.data?.token])
   // fetches on-chain token if query data is missing and page chain matches global chain (else fetch won't work)
@@ -76,7 +76,7 @@ function useMultiChainMap(tokenQuery: ReturnType<typeof useTokensByIdQuery>) {
     //   }
     //   return map
     // }, {})
-  // }, [balanceQuery?.portfolios, tokenQuery.data?.token?.project?.tokens])
+    // }, [balanceQuery?.portfolios, tokenQuery.data?.token?.project?.tokens])
   }, [])
 }
 
@@ -91,9 +91,9 @@ function useCreateTDPContext(): PendingTDPContext | LoadedTDPContext {
   const tokenDBAddress = isNative ? getNativeTokenDBAddress(currencyChain) : tokenAddress
 
   const tokenQuery = useTokensByIdQuery({
-    variables: { address: tokenDBAddress ?? "" },
+    variables: { address: tokenDBAddress ?? '' },
   })
-  const chartState = useCreateTDPChartState(tokenDBAddress, currencyChain)
+  const chartState = useCreateTDPChartState(tokenDBAddress)
 
   const multiChainMap = useMultiChainMap(tokenQuery)
 
@@ -124,7 +124,18 @@ function useCreateTDPContext(): PendingTDPContext | LoadedTDPContext {
       multiChainMap,
       extractedAccent1,
     }
-  }, [currency, currencyChain, currencyChainId, currencyWasFetchedOnChain, extractedAccent1, multiChainMap, warning, tokenAddress, tokenQuery, chartState])
+  }, [
+    currency,
+    currencyChain,
+    currencyChainId,
+    currencyWasFetchedOnChain,
+    extractedAccent1,
+    multiChainMap,
+    warning,
+    tokenAddress,
+    tokenQuery,
+    chartState,
+  ])
 }
 
 export default function TokenDetailsPage() {

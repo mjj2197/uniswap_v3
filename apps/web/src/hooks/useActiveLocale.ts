@@ -12,9 +12,7 @@ import useParsedQueryString, { parsedQueryString } from './useParsedQueryString'
 function parseLocale(maybeSupportedLocale: unknown): SupportedLocale | undefined {
   if (typeof maybeSupportedLocale !== 'string') return undefined
   const lowerMaybeSupportedLocale = maybeSupportedLocale.toLowerCase()
-  return SUPPORTED_LOCALES.find(
-    (locale) => locale.toLowerCase() === lowerMaybeSupportedLocale || locale.split('-')[0] === lowerMaybeSupportedLocale
-  )
+  return SUPPORTED_LOCALES.find((locale) => locale.toLowerCase() === lowerMaybeSupportedLocale || locale.split('-')[0] === lowerMaybeSupportedLocale)
 }
 
 /**
@@ -36,8 +34,7 @@ function storeLocale(): SupportedLocale | undefined {
   return store.getState().user.userLocale ?? undefined
 }
 
-export const initialLocale =
-  parseLocale(parsedQueryString().lng) ?? storeLocale() ?? navigatorLocale() ?? DEFAULT_LOCALE
+export const initialLocale = parseLocale(parsedQueryString().lng) ?? storeLocale() ?? navigatorLocale() ?? DEFAULT_LOCALE
 
 function useUrlLocale() {
   const parsed = useParsedQueryString()
@@ -51,5 +48,7 @@ function useUrlLocale() {
 export function useActiveLocale(): SupportedLocale {
   const urlLocale = useUrlLocale()
   const userLocale = useUserLocale()
-  return useMemo(() => urlLocale ?? userLocale ?? navigatorLocale() ?? DEFAULT_LOCALE, [urlLocale, userLocale])
+  // FIXME: navigatorLocale() 会读取浏览器的语言配置，所以会覆盖默认英语
+  // return useMemo(() => urlLocale ?? userLocale ?? navigatorLocale() ?? DEFAULT_LOCALE, [urlLocale, userLocale])
+  return useMemo(() => urlLocale ?? userLocale ?? DEFAULT_LOCALE, [urlLocale, userLocale])
 }
